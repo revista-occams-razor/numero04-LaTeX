@@ -1,0 +1,1554 @@
+% Este fichero es parte del Número 4 de la Revista Occam's Razor
+% Revista Occam's Razor Número 4
+%
+% (c)  2009, The Occam's Razor Team
+%
+% Esta obra está bajo una licencia Reconocimiento 3.0 España de
+% Creative Commons. Para ver una copia de esta licencia, visite
+% http://creativecommons.org/licenses/by/3.0/es/ o envie una carta a
+% Creative Commons, 171 Second Street, Suite 300, San Francisco,
+% California 94105, USA. 
+
+% Seccion Mú Rápido
+%
+
+\rput(4.5,-4.0){\resizebox{18cm}{!}{{\epsfbox{images/murapido/header.eps}}}}
+
+% -------------------------------------------------
+% Cabecera
+\begin{flushright}
+\msection{introcolor}{black}{0.25}{MÚ RÁPIDO}
+
+\mtitle{8cm}{Sistema de Videovigilancia Casero}
+
+\msubtitle{11cm}{Controla tu casa en dos patadas... y mucho más}
+
+{\sf por Er Boyer}
+
+{\psset{linecolor=black,linestyle=dotted}\psline(-12,0)}
+\end{flushright}
+
+\vspace{2mm}
+% -------------------------------------------------
+
+\begin{multicols}{2}
+
+% Introducción
+\intro{introcolor}{V}{ale, para montar un sistema de videovigilancia casero mú rápido,
+podemos usar motion... eso sería lo más rápido, pero no sería tan
+divertido. En este número os vamos a contar como programar vuestros
+dispositivos de adquisición de vídeo, como codificar imágenes, y como
+mostrarlas en plan Aero en una ventana. Mola no?
+}
+
+\vspace{2mm}
+
+
+Al final de este artículo habremos desarrollado un sistema de
+vídeo vigilancia muy rudimentario, es decir, no va a ser especialmente
+útil, pero os proporcionará el punto de partida para desarrollos más
+complejos, y sobre todo, para poder sacarle partido a vuestros
+dispositivos de adquisición de imagen, más allá de ver
+guarrerías decodificadas o chatear con el "mesenyer".
+
+Nuestro sistema, nos permitirá capturar imágenes de varios
+dispositivos, almacenarlas comprimidas en el disco y visualizarlas de
+una forma güay... y como siempre, todo ello, mú rápido!
+
+\sectiontext{white}{black}{ARQUITECTURA}
+
+Un sistema de vídeo vigilancia básico debe ser capaz de realizar las
+siguientes tareas. A saber:
+
+\begin{itemize}
+\item Capturar imágenes de al menos una fuente de vídeo.
+\item Almacenar esas imágenes de forma eficiente (vamos, que no
+reventemos  el disco duro).
+\item Visualizar las imágenes almacenadas y, por supuesto, el vídeo en tiempo real.
+\end{itemize}
+
+Con esto en mente, nuestro sistema estará compuesto de tres
+módulos. Un módulo con el que capturar imágenes, otro con el que
+codificar y decodificarlas y finalmente otro que nos permita
+visualizarlas. Obvio no?
+
+Para conseguir esto, vamos a utilizar distintos sistemas de
+soporte. 
+
+Para la captura de vídeo utilizaremos el API V4L (Video 4 Linux)
+que proporciona nuestro querido kernel Linux. Este API, como
+veremos muy pronto, es un poco engorroso, por esa razón vamos a
+escribir un pequeño interfaz para hacer nuestra vida más fácil. En
+este artículo utilizaremos la versión 1 del API, que, aunque obsoleta,
+es la única soportada por todos los drivers.
+
+
+Para la codificación y decodificación de las imágenes utilizaremos la
+librería libjpeg. También os contaremos como utilizar un formato mucho
+más sencillo y que podéis incluir en vuestras aplicaciones "mú rápido".
+
+Finalmente, para la visualización de las imágenes vamos a utilizar
+OpenGL. Esto si que es fácil, y además nos va a permitir visualizar
+nuestros vídeos en un entorno 3D bastante impactante. Os daremos las
+bases para poder utilizarlo... que quede bonito dependerá de vosotros :).
+
+\sectiontext{white}{black}{EL HARDWARE}
+
+Lo que vamos a necesitar seguro es algún tipo de
+hardware de captura de imágenes. Aquí tenemos varias opciones y las
+buenas noticias son que, prácticamente, todas ellas funcionan con el
+API V4L (Video for Linux).
+
+Nosotros vamos a utilizar dos webcams Logitech Messenger que están
+bien soportadas en Linux y nos proporcionan, en un solo bloque, la
+cámara y el hardware de adquisición. Además solo cuestan unos 25 euros
+(julio 2008).
+
+\end{multicols}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=13.0cm,angle=0]{images/murapido/arquitectura.eps}
+
+{\footnotesize\bf Arquitectura de nuestro sistema. Hardware, Software y APIs}
+\end{figure}
+
+\clearpage
+\pagebreak
+
+\bOpage{introcolor}{0.25}{MÚ RÁPIDO}
+
+Si disponéis de una tarjeta capturadora de TV BT848, necesitaréis una
+fuente de vídeo adicional, una cámara externa o, en su defecto, un DVD
+o magnetoscopio. Si utilizáis la salida de vídeo 
+compuesto, el código que vamos a comentar en el artículo debería funcionar
+casi sin modificaciones. Si, lo que queréis es utilizar la entrada de
+RF (la de la antena), serán necesarias algunas modificaciones. Os
+daremos algunas indicaciones de como hacerlas pero, por cuestiones de
+espacio, no las vamos a incluir aquí.
+
+\begin{entradilla}
+{\em Un par de {\color{introcolor} webcams} nos servirán para nuestro prototipo.}
+\end{entradilla}
+
+En nuestro caso concreto, el de las webcams Logitech Messenger,
+tenemos que hacer un par de comentarios. El primero es que parece que
+las cámaras (o más bien el driver) no funciona correctamente si se
+conectan a través de un HUB USB externo. Para poder utilizarlas deben
+estar conectadas directamente a los puertos USB del ordenador.
+
+El segundo problema que nos encontramos con estas cámaras, fue que el
+driver no soporta más de un dispositivos del mismo tipo. Mardita sea!.
+
+\sectiontext{white}{black}{ARREGLANDO EL DRIVER}
+
+Aunque para lo que os vamos a contar en este artículo, podríamos
+utilizar una única cámara, a nosotros nos interesaba poder utilizar
+dos o más para poder hacer cosas más güays.... os suenan esas gafas rojas y
+azules?.
+
+Así que nos bajamos el driver y le echamos un ojo, con la esperanza de
+poder modificarlo fácilmente para que nuestras dos cámaras
+funcionaran. Bendito software libre!. 
+
+Con la información de depuración del driver y mucha suerte, encontramos que el ``problema''
+estaba en la función ``gspca\_init\_transfert''. 
+
+Por cada dispositivo, esta función "reparte" lo que en los logs
+aparece como un "AlternateSet". Cuando la primera cámara es
+inicializada, la función le asigna todos los ``recursos'' (por llamarlos
+de alguna forma) y al intentar inicializar la segunda, se produce un
+error, ya que, aparentemente no hay ``recursos'' que asignarle (los
+tiene todos la primera cámara). 
+
+Los recursos no son otra cosa que el
+ancho de banda USB que se asigna a ese dispositivo. En la FAQ de
+motion, podréis encontrar algunos detalles más sobre como utilizar
+varias cámaras USB, básicamente necesitaríais una segunda tarjeta
+USB. Como nosotros no la tenemos, hemos optado por este parche, como
+solución de compromiso.
+
+Para ello, añadimos un nuevo parámetro al driver que
+llamamos \verb!ndevices!. Las modificaciones en el fichero \verb!gspca_core.c!
+fueron las siguientes:
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+static int ndevices = 1;
+
+module_param(ndevices, int, 0644);
+MODULE_PARM_DESC(ndevices, "Number of devices to"
+                           " use simultaneously.");
+\end{lstlisting}
+
+Esta nueva variable la utilizamos en la función \verb!gspca\_init\_transfert! para
+modificar el valor de la variable \verb!nbalt!, de la siguiente forma:
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+intf = usb_ifnum_to_if(dev, spca50x->iface);
+nbalt = intf->num_altsetting - 1;
+
+/* Nuestra nueva línea */
+nbalt = nbalt / ndevices;
+\end{lstlisting}
+
+Por supuesto esto es un hack ``mú rápido'' y probablemente haya mejores
+formas de hacerlo, pero para las pruebas que nosotros vamos a hacer es
+más que suficiente.
+
+Ahora podemos cargar nuestra nueva versión del driver, de la siguiente
+forma:
+
+{\small
+\begin{verbatim}
+# rmmod gspca
+# insmod ./gspca.ko ndevices=2
+\end{verbatim}
+}
+
+Et voilà!.... tenemos nuestras dos webcams disponibles.
+
+Para comprobar que todo funciona correctamente, podéis utilizar la
+aplicación spcaview descargable desde la página del driver gspca. Este
+programa es especialmente interesante ya que se trata de un ejemplo
+completo de como manejar un dispositivo soportado por este driver. 
+
+Como esta es la sección "mú rápido", nuestro interfaz V4L va a ser muy
+simplón, y estudiar esta aplicación os permitirá extenderlo si queréis
+hacer que vuestros programas funcionen en el caso general.
+
+\begin{entradilla}
+{\em Para la captura de imágenes utilizaremos el {\color{introcolor} API V4L}}
+\end{entradilla}
+
+Si vuestro hardware utiliza otro driver, probad con alguna aplicación
+estándar como camorama o cheese.
+
+\sectiontext{white}{black}{CAPTURANDO VIDEO}
+
+Después de todos estos preparativos vamos al ajo :). Lo primero que
+vamos a hacer es nuestro módulo de captura de vídeo. En esta versión
+supersimplificada, nuestro módulo tendrá 3 funciones. Aquí tenéis los prototipos.
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+int open_v4l (DISP d, char *d, int *w, int *h);
+void start_v4l (DISP d);
+char *capture_v4l_full (DISP d);
+\end{lstlisting}
+
+La primera de las funciones abre e inicializa el dispositivo de
+captura. La segunda le dice al dispositivo que comience a capturar
+video. Por último, la tercera, nos permite obtener la última imagen
+capturada por el dispositivo.
+
+Para poder utilizar el API V4L, necesitamos los siguientes includes en
+nuestro código:
+
+\ebOpage{introcolor}{0.25}{MÚ RÁPIDO}
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+#include <sys/ioctl.h>
+#include <fcntl.h>
+
+#include <sys/mman.h>
+#include <linux/videodev.h>
+\end{lstlisting}
+
+El primero es necesario para utilizar la llamada al sistema \verb!ioctl!, con
+la que poder enviar mensajes al driver. El segundo solo es
+necesario para la llamada al sistema \verb!open!, con la que acceder al
+dispositivo de captura. En seguida veremos como utilizarla.
+
+El tercero lo necesitamos para el proceso de captura. Nosotros vamos a
+utilizar un mapeado de memoria en lugar del método \verb!read!. 
+
+Finalmente, el último de los includes es el que define todas las
+estructuras de datos específicas de los dispositivos de video. La
+mayoría de las estructuras de datos que utiliza la función \verb!open_v4l!
+están definidas aquí.
+
+Para poder utilizar más de un dispositivo de captura de video, hemos
+definido una estructura muy sencilla en la que almacenar los datos
+específicos de cada uno de ellos. Esta es:
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+typedef struct disp_t {
+  int                fd;
+  struct video_mbuf  mbuf_info;
+  struct video_mmap  mmap_info;
+  /* Mapa de memorua de datos de video */
+  char               *mm;
+  char               *buffer;
+  /* Información sobre la imagen */
+  int                w, h, canal, bpp;
+  double             brillo, contraste, color;
+} *DISP;
+\end{lstlisting}
+
+El uso de cada uno de estos campos quedará claro en cuanto describamos
+las funciones de nuestro interfaz... esto es, ya mismo :)
+
+
+\sectiontext{white}{black}{ABRIENDO EL DISPOSITIVO}
+
+La función \verb!open_v4l! es la que se encarga de la inicialización del
+dispositivo de captura de vídeo, y es la más larga de todas, por esa
+razón la iremos comentando por partes para que sea más fácil seguirla.
+
+Lo primero que nos encontramos es esto:
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+  struct video_capability dev_info;
+  struct video_channel    channel_info;
+  struct video_picture    picture_info;
+
+  /* Abrimos el dispositivo de video */
+  if ((d->fd = open (device, O_RDWR)) < 0)
+    {    
+      fprintf (stderr, "No puedo abrir "
+                       "dispositivo %s\n", 
+                       device);
+      return (-1);
+    }
+\end{lstlisting}
+
+La función comienza declarando tres variables locales que utilizaremos
+durante la inicialización del dispositivo, para, a continuación, abrir
+el dispositivo. 
+
+Dos comentarios aquí. El primero es que hemos eliminado todas las
+comprobaciones de error con la excepción de esta primera. Si el
+dispositivo se abre, muy probablemente todo vaya como la seda, pero si
+esto falla, nada funcionará.
+
+El segundo es que los dispositivos de vídeo, tienen nombres como \verb!/dev/video1! o
+\verb!/dev/video2!. Tendremos tantos como dispositivos de captura hayamos instalado
+en el sistema. Si vuestro hardware de captura está correctamente
+instalado los dispositivos deberían estar ahí.
+
+\sectiontext{white}{black}{CONFIGURANDO CANALES}
+
+El siguiente paso consiste en configurar el canal del dispositivo que
+vamos a utilizar. Si estáis utilizando una webcam como nosotros,
+probablemente solo tengáis un canal. Pero si estáis utilizando
+una tarjeta de captura de televisión, normalmente tendréis al menos 2
+canales. Uno para la entrada de video compuesto (o banda base) y otro para el
+sintonizador de televisión. 
+
+\begin{entradilla}
+{\em Video 4 Linux nos permite {\color{introcolor} configurar los parámetros} de captura de
+nuestra webcam}
+\end{entradilla}
+
+Si os
+veis obligados a utilizar la entrada del sintonizador de televisión,
+tendréis que configurar el canal correcto, y programar el sintonizador
+para seleccionar el canal (de la TV) que queráis capturar.
+
+No vamos a explicar como hacer todo esto, pero si alguien está
+utilizando una tarjeta de captura TV, le recomendamos que utilice la
+librería libbgrab.
+
+Volviendo al código...
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+  /* Conseguimos las caracteristicas */
+  ioctl (d->fd, VIDIOCGCAP, &dev_info);
+ 
+  /* Nos quedamos con el ancho y alto máximos */
+  d->w = dev_info.maxwidth;
+  d->h = dev_info.maxheight;
+
+  *w = d->w;
+  *h = d->h;
+  
+  /*Usamos canal 0. Entrada de video compuesto*/
+  channel_info.channel = d->canal;
+
+  /*Obtenemos información del canal seleccionado*/
+  ioctl (d->fd, VIDIOCGCHAN, &channel_info);
+
+  /*Activamos modo PAL*/
+  channel_info.norm = 0;
+
+  /*Actualizamos la información del canal*/
+  ioctl (d->fd, VIDIOCSCHAN, &channel_info);
+\end{lstlisting}
+
+Como adelantamos más arriba, la forma de ``hablar'' con el driver es a través de
+la llamada al sistema ioctl. Para la configuración del canal,
+utilizamos tres mensajes. \verb!VIDIOCGCAP!, algo así como "VIDeo Input Output
+Chanel Get Capabilities"... vamos digo yo :), con lo que obtenemos las
+características del dispositivo, la información sobre sus canaleso. En
+nuestro ejemplo, estamos utilizando este 
+mensaje para obtener el ancho y alto máximo de las imágenes que pueden
+ser capturadas utilizando este canal y almacenándolas en nuestra
+estructura para su uso posterior.
+
+\ebOpage{introcolor}{0.25}{MÚ RÁPIDO}
+
+Estos valores los retornamos a la aplicación principal, ya que los
+necesitaremos para la visualización de las imágenes.
+
+El siguiente mensaje es \verb!VIDIOCGCHAN!, con el que obtenemos información
+sobre el canal de interés. El canal de interés se indica utilizando el
+campo channel de la estructura de datos \verb!video_channel! (variable
+\verb!channel_info!). La información sobre el canal se retorna sobre esa
+misma estructura de datos.
+
+\begin{entradilla}
+{\em Los dispositivos de {\color{introcolor} captura de imágenes}
+pueden proporcionar varios {\color{introcolor}canales}}
+\end{entradilla}
+
+Finalmente, utilizamos el mensaje \verb!VIDIOCSCHAN! (la s es de SET), para
+configurar el canal. Lo que estamos haciendo es coger la configuración
+del canal (\verb!VIDIOCGCHAN!), modificando solamente la norma de video a PAL y
+reconfigurando el canal de nuevo (\verb!VIDICSCHAN!).
+
+Puede que dependiendo de vuestro hardware tengáis que modificar algún
+campo más para configurar apropiadamente el canal, o que no necesitéis
+modificar la norma de vídeo para vuestro dispositivo. Ahí tendréis que
+investigar un poco por vuestra cuenta.
+
+Hemos intentado reducir al mínimo el código de
+inicialización saltándonos varias comprobaciones que serían necesarias
+en una aplicación ``profesional''. Si algo falla, coged el código de
+alguno de los programas incluido en vuestra distribución que funcione
+correctamente, y empezad a añadir las partes que faltan... eso es lo que nosotros hemos hecho :).
+
+\sectiontext{white}{black}{PARÁMETROS DE IMAGEN}
+
+Ahora que hemos seleccionado y configurado nuestro canal, tenemos que
+proporcionar al driver una serie de parámetros, para decirle como
+queremos las imágenes.
+
+Aquí podéis ver como hacerlo.
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+/* Ahora los parámetros de imagen */
+picture_info.brightness = (int)(65535*d->brillo);
+picture_info.hue        = 0;
+picture_info.colour     = (int)(65535*d->color);
+picture_info.contrast   = (int)(65535*d->contraste);
+picture_info.whiteness  = 0;
+picture_info.depth      = 24;
+picture_info.palette    = VIDEO_PALETTE_RGB24;
+
+ioctl (d->fd, VIDIOCSPICT, &picture_info);
+\end{lstlisting}
+
+La estructura \verb!video_picture! (variable \verb!picture_info!), nos permite
+configurar el brillo, contraste y color de la imagen, entre otros
+parámetros. Dependiendo si la captura es en color o escala de grises
+ciertos parámetros no tienen efecto. 
+
+Todos estos valores se codifican como un entero entre 0 y 65535, y
+nosotros los proporcionamos como valores reales entre 0 y 1
+representando un porcentaje. 
+
+Pero los datos importantes son los dos últimos (\verb!depth! y
+\verb!palette!). Estos campos nos permiten configurar la profundidad de color
+y el formato de la imagen que vamos a obtener. Nosotros estamos
+utilizando 24 bits por pixel (True Color) y un formato RGB de 24 bits,
+ya que esto va ha hacer nuestro código de visualización mucho más
+sencillo.
+
+Estos parámetros dependen del hardware de captura e idealmente, el
+programa, debe utilizar las \verb!ioctl! apropiadas para preguntar al driver
+que formatos soporta y configurarlo apropiadamente. La
+configuración que estamos utilizando es bastante estándar y debería
+funcionar en la mayoría de los casos, pero quizás tengáis que
+modificar estos valores para que funcionen en vuestro hardware.
+
+Obviamente el mensaje \verb!VIDIOCSPICT! es el que nos permite pasar estos
+datos al driver (ya sabéis Set PICTure).
+
+\sectiontext{white}{black}{CONFIGURANDO LA TRANSFERENCIA DE DATOS}
+
+El último paso que nos falta para completar el proceso de
+inicialización es la configuración de transferencia de datos. Como
+adelantábamos un poco más arriba, hay dos formas de transferir las
+imágenes a nuestro programa. Una es utilizando la llamada al sistema
+read y otra es utilizando mapeado de memoria con la llamada al sistema
+mmap.
+
+Nosotros utilizamos el mapeado de memoria, porque mola más y además
+podemos utilizar doble buffer para la captura. El código es el
+siguiente:
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+  /* Obtenemos mapa  de meoria */
+  ioctl (d->fd, VIDIOCGMBUF, &d->mbuf_info);
+
+  /* Vamos a trabajar con doble buffer */
+  if (d->mbuf_info.frames < 2)
+    exit (1);
+\end{lstlisting}
+
+Lo primero que hacemos es preguntarle al driver los detalles para el
+mapeado de memoria, utilizando , una vez más, la llamada al sistema
+ioctl. En la estructura \verb!video_mbuf! (uno de los campos de nuestra
+estructura \verb!DISP!), obtendremos el resultado.
+
+\begin{entradilla}
+{\em Nuestra aplicación captura las imágenes utilizando
+{\color{introcolor} mapeado de memoria}}
+\end{entradilla}
+
+Y cuales son los detalles para el mapeado de memoria? Os
+preguntaréis. Básicamente son los siguiente: El número de cuadros que
+el dispositivo es capaz de capturar, el tamaño de la zona de memoria
+en la que el driver va a poder los datos de la imagen y los
+desplazamientos, dentro de ese bloque de memoria, donde se almacenarán
+los distintos cuadros. 
+
+Todo esto tomará sentido muy pronto, en cuanto os mostremos una
+sencilla figura :).
+
+\end{multicols}
+
+\clearpage
+\pagebreak
+
+\msection{introcolor}{black}{0.25}{MÚ RÁPIDO}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[height=8.0cm,angle=0]{images/murapido/v4l_doble_buffer.eps}
+\end{figure}
+
+\bigskip
+
+\begin{multicols}{2}
+
+En nuestro ejemplo, utilizamos doble buffer. Esta
+técnica consiste en utilizar dos bloques de memoria para adquirir los
+datos, de tal forma que cuando el driver está capturando un cuadro, lo
+está almacenando en uno de esos buffers y así, nosotros podemos acceder
+al otro (el cuadro anterior) sin que nadie nos moleste.
+
+\begin{entradilla}
+{\em Utilizando {\color{introcolor} doble buffer} podemos capturar una imagen, mientras
+procesamos otra}
+\end{entradilla}
+
+Cuando el cuadro actual haya sido capturado, los buffers se
+intercambian y nuestra aplicación puede acceder al nuevo cuadro a la
+vez que el driver captura los datos del siguiente cuadro y los
+almacena en el otro buffer. 
+
+Por esa razón terminamos nuestra aplicación si el driver no es capaz
+de proporcionarnos al menos dos buffers. Si por alguna razón vuestro
+hardware/driver no soporta más que un buffer, podéis eliminar esa
+comprobación, pero tendréis que hacer unos pequeños cambios al resto
+de las funciones de este módulo. 
+
+Una vez obtenida esta información, utilizamos la llamada al sistema
+\verb!mmap! para mapear la memoria, es decir, para permitir a nuestra
+aplicación acceder a los buffers que el driver está utilizando y, por
+tanto, acceder a los datos de las imágenes capturadas.
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+  /* Mapeamos memoria para acceder a las imagenes */
+  d->mm = (char *)mmap (0, d->mbuf_info.size, 
+			PROT_READ | PROT_WRITE, 
+                        MAP_SHARED, 
+			d->fd, 0);
+\end{lstlisting}
+
+Finalmente, reservamos un buffer adicional en el que almacenaremos una
+copia de la imagen capturada, e inicializamos el campo \verb!mmap_info! con
+los datos que necesitaremos durante la captura real de las imágenes.
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+  d->buffer = malloc (d->mbuf_info.size);
+  
+  /* Estructura para el mapeo de memoria */
+  d->mmap_info.frame  = 0;
+  d->mmap_info.width  = d->w;
+  d->mmap_info.height = d->h;
+  d->mmap_info.format = picture_info.palette;
+\end{lstlisting}
+
+En este punto, nuestro hardware de captura está listo para empezar a
+``escupir'' imágenes... pero como las obtenemos?... enseguida lo
+veremos.
+
+\sectiontext{white}{black}{INICIANDO LA CAPTURA}
+
+El proceso de captura lo hemos dividido en dos funciones, una que
+inicia el proceso y otra que obtiene los datos de la imagen.
+
+La primera pinta tal que así:
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+void start_v4l (DISP d)
+{
+  d->mmap_info.frame = 0;
+  ioctl (d->fd, VIDIOCMCAPTURE, &d->mmap_info);
+  d->mmap_info.frame = 1;
+  ioctl (d->fd, VIDIOCMCAPTURE, &d->mmap_info);
+  d->mmap_info.frame = 0;
+}
+\end{lstlisting}
+
+Esta función utiliza el mensaje \verb!VIDIOCMCAPTURE! y espera como parámetro
+una estructura del tipo \verb!video_mmap!. El campo \verb!frame!, le dice al driver
+que cuadro capturar, o dicho de otra forma, que parte del buffer
+utilizar.
+
+Con lo que acabamos de comentar, debería estar claro lo que hace la
+función. Inicia la captura de los dos frames y nos devuelve el
+control mientras el hardware hace su trabajo.
+
+A partir de ese momento, nuestra aplicación principal entrará en un
+bucle infinito, en que llamará continuamente a la función \verb!capture_v4l!
+que os mostramos a continuación: 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ebOpage{introcolor}{0.25}{MÚ RÁPIDO}
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+char *capture_v4l (DISP d)
+{
+  ioctl (d->fd, VIDIOCSYNC, &d->mmap_info.frame);
+
+  memcpy (d->buffer, d->mm + 
+          d->mbuf_info.offsets[d->mmap_info.frame], 
+	  d->mbuf_info.size / 2);
+
+  ioctl (d->fd, VIDIOCMCAPTURE, &d->mmap_info);
+  d->mmap_info.frame = 1 - d->mmap_info.frame;
+
+  return d->buffer;
+}
+\end{lstlisting}
+
+Lo primero que hace la función es enviar el mensaje \verb!VIDIOCSYNC!. Este
+mensaje hace que nuestro programa espere hasta que el cuadro
+que se pasa como parámetro esté listo. Que significa que esté
+listo?. Pues que la parte del buffer asociada a ese cuadro, contenga
+una imagen completa.
+
+\begin{entradilla}
+{\em Nuestro {\color{introcolor} sencillo interfaz con V4L}, nos permite capturar imágenes
+de forma sencilla}
+\end{entradilla}
+
+Una vez que tenemos una imagen disponible (cuando \verb!ioctl! retorna),
+copiamos inmediatamente la imagen a nuestro buffer temporal. En
+principio, esto no sería necesario, pero en las distintas pruebas que
+hemos hecho, cuando utilizamos más de un dispositivo los buffers se
+corrompen, si bien, esto puede ser debido a que el programa es muy
+tonto, o simplemente que nuestro USB no da para más :(. Aquí tenéis
+algo interesante para investigar ;).
+
+Si solo estáis utilizando un dispositivo, podéis utilizar directamente
+el puntero de la zona de memoria mapeada. Esto sería:
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+d->mm + d->mbuf_info.offsets [d->mmap_info.frame]
+\end{lstlisting}
+
+Con lo que os ahorráis la copia de los datos, pero es necesaria una
+pequeña modificación del resto del código.
+
+Finalmente, se inicia de nuevo la captura del frame que acabamos de
+copiar con el mensaje \verb!VIDIOCMCAPTURE! y se actualiza el campo, para que
+en la próxima llamada a la función trabajemos sobre el otro buffer,
+que debería contener ya la siguiente imagen.
+
+\sectiontext{white}{black}{EL PROGRAMA PRINCIPAL}
+
+Ahora que ya tenemos nuestro interfaz de captura de imágenes, estamos
+en condiciones de escribir nuestra aplicación de captura de imágenes.
+
+El programa principal, además de utilizar nuestro flamante interface
+para V4L, mostrará en una ventana las imágenes capturadas. Para ello
+vamos a utilizar OpenGL, pero para el interfaz entre OpenGL y el
+sistema de ventanas vamos a utilizar GLUT (GL Utility Toolkit), que va
+a hacer nuestra vida mucho más fácil.... GLX y Xlib son un poco más
+engorrosos. 
+
+Aquí tenéis el programa principal.
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+DISP d[2];
+
+int main (int argc, char *argv[])
+{
+  /* Creamos dispositivos */
+  d[0] = create_dev();
+  d[1] = create_dev();
+
+  /* Inicializa GLUT */
+  glutInit (&argc, argv);
+  glutInitDisplayMode (GLUT_RGBA | GLUT_DOUBLE 
+                                 | GLUT_DEPTH);
+  glutInitWindowSize (WIN_WIDTH, WIN_HEIGHT);
+  glutCreateWindow ("Sistema Video Vigilancia "
+                    "- Occam's Razor");
+ 
+  /* Inicializa OpenGL */
+  gfx_init ();
+  
+  /* Inicializa dispositivos de captura. 
+     Terminamos ante cualquier error */
+  open_v4l (d[0], "/dev/video1", &img_w, &img_h);
+  start_v4l (d[0]);
+
+  open_v4l (d[1], "/dev/video2", &img_w, &img_h);
+  start_v4l (d[1]);
+  
+  /* Creamos las Texturas */
+  init_texture (img_w, img_h);
+  img_size = img_w * img_h * img_bpp;
+
+  /* Configure GLUT callback handlers for events */
+  glutDisplayFunc (gfx_pinta);
+  glutKeyboardFunc (handle_keyboard);
+  glutIdleFunc (handle_idle);
+  
+  /*Now we enter the main loop and process GLUT events*/
+  glutMainLoop ();
+  exit (0);
+}
+\end{lstlisting}
+
+Si obviamos por un momento las llamadas a GLUT, el programa es muy
+sencillo. Hemos utilizado una función adicional (\verb!create_dev!) que
+simplemente crea dinámicamente un objeto del tipo \verb!DISP! (vamos, hace un
+\verb!malloc!), y a continuación llamamos a las funciones para inicializar
+los dispositivos y comenzar la captura.
+
+
+Lo que no vemos por ningún lado es la llamada a \verb!capture_v4l!. Vale,
+para encontrar esa llamada tenemos que explicaros un poco como
+funciona GLUT.
+
+\sectiontext{white}{black}{LA APLICACIÓN GLUT}
+
+Como ya habréis intuido, todas las funciones de GLUT, empiezan
+precisamente por glut :). Las primeras cuatro llamadas que nos
+encontramos son las encargadas de crear la ventana en la que
+mostraremos nuestro video.
+
+\begin{entradilla}
+{\em GLUT nos va a permitir utilizar OpenGL {\color{introcolor}mú rápido}}
+\end{entradilla}
+
+
+Una explicación detallada de GLUT se sale un poco de nuestro objetivo,
+así que no vamos a dar muchos detalles. Simplemente, las dos primeras
+llamadas inicializan la librería, y normalmente van a ser siempre
+así. Las dos siguientes, como os podéis imaginar, permiten definir el
+tamaño de la ventana, y crearla especificando un título.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ebOpage{introcolor}{0.25}{MÚ RÁPIDO}
+
+El siguiente bloque de llamadas a GLUT lo encontramos hacia el final,
+y lo reproducimos de nuevo aquí por comodidad:
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+  glutDisplayFunc (gfx_pinta);
+  glutKeyboardFunc (handle_keyboard);
+  glutIdleFunc (handle_idle);
+\end{lstlisting}
+
+Estas tres funciones nos permiten definir ``call-backs''. Concretamente,
+nos permiten decirle a GLUT que función tiene que ejecutar cuando
+tenga que actualizar la ventana, cuando se pulse una tecla y cuando no
+tenga nada que hacer... sí, en esta última es en la que vamos a capturar
+nuestras imágenes.
+
+Finalmente, la función \verb!glutMainLoop! ejecuta un bucle infinito en el
+que va llamando, según convenga a cada una de los ``call-backs'' que
+hemos definido.
+
+\sectiontext{white}{black}{MANEJANDO EL TECLADO}
+
+Vamos a empezar por esta función, ya que es la más sencilla. El código
+es este:
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+void 
+handle_keyboard (unsigned char key, int x, int y)
+{
+  /* Process the input */
+  switch (key)
+    {
+    case 'Q':
+    case 27:
+      exit (0);
+      break;
+      /* Control de la rotación */
+    case 'W':
+      xangle += 5;
+      break;
+    case 'S':
+      xangle -= 5;
+      break;
+    case 'A':
+      zangle += 5;
+      break;
+    case 'D':
+      zangle -= 5;
+      break;      
+    default:
+      break;
+    }
+  
+  /* Now refresh the display */
+  gfx_pinta ();
+}
+\end{lstlisting}
+
+Cada vez que el usuario pulsa una tecla, esta función se ejecuta,
+recibiendo como parámetro la tecla pulsada. Nuestro manejador, utiliza
+la tecla Q o ESC (ASCII 27) para terminar la aplicación. Las teclas A,
+S, D y W se utilizan para actualizar las variables globales xangle e
+yangle, que utilizaremos para rotar nuestros vídeos en 3D.
+
+\sectiontext{white}{black}{CAPTURANDO}
+
+La captura se realiza en la función \verb!handle_idle!. Esta función se
+ejecuta en cada ciclo del bucle principal cuando no hay otra cosa que
+hacer, es decir, no hay que actualizar el contenido de la ventana, no
+se ha pulsado ninguna tecla ni se a movido el ratón.
+
+Esta función sería algo tal que así:
+
+\columnbreak
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+void handle_idle (void)
+{
+  char fname[1024];
+  char *im, *im1;
+  int  w, h, size, i, temp;
+
+  im = capture_v4l_full (d[0]);
+  im1 = capture_v4l_full (d[1]);
+
+  /* Reordena componentes de color */
+  for (i = 0; i < img_size; i+= img_bpp)
+    {
+      temp = *(im + i + 2);
+      *(im + i + 2) = *(im + i + 0);
+      *(im + i + 0) = temp;
+    }
+
+  for (i = 0; i < img_size; i+= img_bpp)
+    {
+      temp = *(im1 + i + 2);
+      *(im1 + i + 2) = *(im1 + i + 0);
+      *(im1 + i + 0) = temp;
+    }
+
+  /* Actualizamos nuestras texturas */
+  change_texture (0, im);
+  change_texture (1, im1);
+
+  snprintf (fname, 1024, "video0-%05d.jpg", cnt);
+  write_jpeg_file (fname, img);
+
+  /* Redibujamos las nuevas imagenes */
+  gfx_pinta ();
+}
+\end{lstlisting}
+
+Lo primero que hacemos es obtener las últimas imágenes capturadas por
+nuestro dispositivo. A continuación tenemos que hacer un pequeño
+procesado. En nuestro caso, las componentes azul y roja (2 y 0) de
+cada pixel de la imagen están intercambiadas. Por alguna razón nuestra
+cámara nos devuelve la imagen en formato BGR en lugar de RGB.
+
+Aunque podríamos dejar que OpenGL se encargara de esto, hemos
+preferido hacerlo a mano a modo de un sencillo procesado de
+imagen. Pensad que en un sistema de vídeo vigilancia real, una de las
+funcionalidades que se suelen requerir es la detección de movimiento,
+de forma que el sistema solo graba la secuencia de video cuando está
+pasando algo. Un montón de gigas de vídeo de una imagen estática no
+valen para nada :).
+
+\begin{entradilla}
+{\em La captura de imágenes se realiza en el {\color{introcolor} callback IDLE} de GLUT}
+\end{entradilla}
+
+Ese tipo de procesado, o cualquier otra cosa que queramos hacer con
+las imágenes, implica manipular los pixels de ésta... y eso es lo que
+hacen esos dos bucles tras la captura. 
+
+Una vez que tenemos nuestras imágenes en el formato que queremos,
+utilizamos la función \verb!change_texture!, con la que modificaremos las
+texturas OpenGL que utilizamos para visualizar el video. Muy pronto
+veremos que hace esta función exactamente.
+
+Finalmente, llamamos a una función \verb!write_jpeg_file! que grabará las imágenes
+en el disco en formato JPEG.
+
+La función termina ejecutando \verb!gfx_pinta! que es la encargada
+de mostrar las imágenes en la ventana. Esta es nuestra siguiente víctima!
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ebOpage{introcolor}{0.25}{MÚ RÁPIDO}
+
+\sectiontext{white}{black}{VISUALIZANDO LA ESCENA}
+
+La función gfx\_pinta utiliza OpenGL para mostrar el vídeo en tiempo
+real en un espacio 3D (echadle un ojo a la figura). Si sabéis algo de
+OpenGL, veréis que la función es muy sencilla, sino, os comentaremos
+solamente un par de cosas para que podáis hacer algunos cambios.
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+void gfx_pinta (void)
+{
+  glClear (GL_COLOR_BUFFER_BIT | 
+           GL_DEPTH_BUFFER_BIT);
+  
+  /* Ponemos la prespectiva */
+  glMatrixMode (GL_PROJECTION);
+  glLoadIdentity ();
+  gluPerspective (45.0, 
+                 (double)WIN_WIDTH /
+                 (double)WIN_HEIGHT, 
+                 0.2, 20); 
+  
+  /* Pasamos a la matriz View Model */
+  glMatrixMode (GL_MODELVIEW);  
+  glLoadIdentity();
+  
+  /* Posicionamos la cámara */
+  gluLookAt (0, 4, 0,  /* Posición del Ojo */
+	     0, 1, 0,  /* Punto al que miramos*/
+	     0, 0, 1); /* Arriba */
+  
+  /* Rotamos la camara para efecto guay */
+  glRotatef (zangle, 0, 0, 1);
+  glRotatef (xangle, 1, 0, 0);
+
+  glPushMatrix ();
+  glTranslatef (-2.1, 0.0, 0.0);
+  glScalef (scale, scale * ASPECT, scale);
+  square_texture (0);
+
+  glPopMatrix ();
+  glTranslatef (0.1, 0.0, 0.0);
+  glScalef (scale, scale * ASPECT, scale);
+  square_texture (1);
+   
+  glutSwapBuffers ();
+}
+\end{lstlisting}
+
+Lo primero que hace la función es limpiar la pantalla (bueno, y el
+z-buffer, pero eso ahora no nos interesa). A continuación define la
+matriz de proyección o, en lenguaje llano, la perspectiva de la escena, esto es, el
+campo de visión (que son 45 grados en nuestro ejemplo), el aspecto de
+la ventana, el resto de parámetros no nos interesan en este ejemplo.
+
+A continuación se cambia a la matriz de modelo, que es la que tenemos
+que utilizar para pintar cosas en 3D, y la inicializamos
+(\verb!glLoadIdentity!), para luego posicionar la cámara con \verb!gluLookAt!. Los
+comentarios en el código son suficientemente claros no?.
+
+En este punto está todo listo para que nuestros vídeos aparezcan en
+pantalla. Como queremos ese interfaz 3D súper güay de la muerte, lo
+primero que hacemos es rotar la escena tanto en el eje Z como en el
+X. Estos valores los podemos controlar con el teclado como ya hemos
+visto. 
+
+Esta transformación (la rotación definida con el teclado) la
+vamos a aplicar a los dos vídeos que mostraremos en pantalla, así que,
+una vez calculada, nos la guardamos para usarla con la segunda
+imagen. Esto es lo que hace la función \verb!glPushMatrix!, almacena en una
+pila la transformación actual.
+
+Movemos el primer vídeo un poco hacia la izquierda y los escalamos
+según el valor de la variable \verb!scale!. Podéis ampliar la función de
+control de teclado para modificar este valor y hacer vuestros vídeos
+más grandes o pequeños en pantalla. Como podéis ver, la componente Y
+se escala de forma diferente para mantener el aspecto de la imagen,
+esto es, la relación entre el ancho y el alto, en función de las
+dimensiones de nuestra ventana. Esto es necesario debido a la forma en
+la que dibujamos los cuadros de nuestro vídeo. Lo veremos un poco
+más adelante.
+
+Finalmente dibujamos la imagen utilizando la función
+\verb!square_texture!. Observad que antes de dibujar la segunda imagen, hemos
+recuperado nuestra transformación inicial (\verb!glPopMatrix!), para, a
+continuación, posicionar la segunda imagen un poco a la izquierda.
+
+Nosotros hemos colocado una imagen junto a la otra. Aunque visualmente
+no parece tan güay, es más práctico. Si queréis el estilo ``Aero'',
+tendréis que modificar la componente Z de las traslaciones y hacer que
+las imágenes se solapen modificando la componente X. 
+
+La función termina con una llamada a \verb!glutSwapBuffers! que envía los
+datos a la tarjeta. Sí, OpenGL también utiliza doble buffer para la
+visualización. Realmente podéis activarlo o desactivarlo al
+inicializar la librería (habéis averiguado cual es el flag que hay que
+eliminar?).
+
+\end{multicols}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[height=5.5cm,angle=0]{images/murapido/shot00.eps}
+\includegraphics[height=5.5cm,angle=0]{images/murapido/shot01.eps}
+
+{\footnotesize\bf Nuestra aplicación. Izquierda: GUI normal. Derecha
+GUI 3D}
+\end{figure}
+
+
+\clearpage
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\msection{introcolor}{black}{0.25}{MÚ RÁPIDO}
+
+\begin{figure}[ht]
+\centering
+
+\includegraphics[height=5.5cm,angle=0]{images/murapido/shot05.eps}
+\includegraphics[height=5.5cm,angle=0]{images/murapido/shot06.eps}
+
+{\footnotesize\bf Jugando un poco podemos conseguir efectos más interesantes}
+
+\end{figure}
+
+\bigskip
+
+\begin{multicols}{2}
+
+\sectiontext{white}{black}{GENERANDO LAS IMÁGENES}
+
+En la sección anterior hemos visto como componer la escena OpenGL,
+pero todavía no os hemos contado como visualizar realmente las
+imágenes.
+
+Esto se puede hacer manipulando el frame buffer directamente, pero
+nosotros hemos elegido hacerlo utilizando texturas. El uso de texturas
+proporciona dos ventajas frente a escribir los datos directamente en
+el frame buffer: La primera es que la técnica es más rápida, y la
+segunda es que si queremos cambiar el tamaño de la imagen, OpenGL
+realizará la interpolación por nosotros.
+
+\begin{entradilla}
+{\em {\color{introcolor} Utilizaremos texturas} para la visualización
+del video en directo}
+\end{entradilla}
+
+Así, la técnica consiste en lo siguiente. Primero generamos e
+inicializamos una textura por cada imagen que queremos
+mostrar. Utilizamos las imágenes capturadas para inicializar los datos
+de la textura y finalmente, dibujamos un cuadro sobre el que mapeamos
+esta textura. 
+
+Si habéis seguido los comentarios del programa principal, recordaréis
+que se nos han quedado tres funciones en el tintero. La primera se
+utiliza en la función main y se llama init\_texture. La segunda se
+utiliza cuando capturamos nuestras imágenes y se llama,
+change\_texture. Y finalmente, la última la acabamos de ver en la
+sección anterior y se llama square\_texture.
+
+Veamos cada una de ellas por separado.
+
+\sectiontext{white}{black}{INICIALIZANDO LAS TEXTURAS}
+
+La función init\_texture se encarga de la inicialización de las
+texturas. La inicialización consiste en decirle a OpenGL que le de
+``nombre'' a las texturas que vamos a utilizar y que inicialice sus
+atributos. Recordad que aunque nosotros vamos a utilizar la textura
+para visualizar una imagen, las texturas se utilizan sobre modelos 3D
+para darles mayor realismo. Cuando hacemos esto último todos estos
+parámetros toman mucho más sentido.
+
+La función init\_texture es la encargada de hacer esto. La hemos
+intentado reducir a la mínima expresión, y el resultado es este:
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+#define MAX_TEXTURE 4
+
+static GLuint texid[MAX_TEXTURE];
+
+void init_texture (int w, int h)
+{
+  int     i;
+
+  /* Almacenamos las dimensiones para más tarde*/    
+  tex_w = w;
+  tex_h = h;
+
+  /* Genera "Nombres" OpenGL para las texturas */
+  glGenTextures (MAX_TEXTURE, &texid);
+
+  for (i = 0; i < MAX_TEXTURE; i++)
+    {
+      glBindTexture (GL_TEXTURE_2D, texid[i]);
+  
+      /* Define el tipo de interpolación */
+      /* Para ampliar la textura*/
+      glTexParameteri (GL_TEXTURE_2D, 
+                       GL_TEXTURE_MAG_FILTER, 
+                       GL_NEAREST);
+
+      /* Para disminuir la textura*/
+      glTexParameteri (GL_TEXTURE_2D, 
+                       GL_TEXTURE_MIN_FILTER, 
+                       GL_NEAREST);
+      
+      /* Inicializa los datos de la textura */
+      glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA8, 
+                    w, h, 0, GL_RGB, 
+                    GL_UNSIGNED_BYTE, NULL);
+    }    
+    
+}
+\end{lstlisting}
+
+Nuestro más-que-básico gestor de texturas es capaz de manejar un
+máximo de 4 de ellas y almacena sus identificadores en una variable
+global del módulo llamada texid. 
+
+Lo primero que hacemos es decirle a OpenGL que necesitamos nuestras
+cuatro texturas y que nos almacene los identificadores en la matriz
+texid. A continuación, tenemos que inicializar cada una de ellas. 
+
+Aquí podemos configurar un montón de parámetros de la textura, pero
+nosotros solo hemos dejado uno de ellos. Obviamente la forma de
+configurar los parámetros de las texturas es utilizando la función
+glTexParameteri... está claro no? :).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ebOpage{introcolor}{0.25}{MÚ RÁPIDO}
+
+Los dos parámetros que hemos dejado le dicen a OpenGL que filtro
+utilizar cuando tiene que ampliar la textura o hacerla más
+pequeña. Nosotros hemos utilizado el filtro "del vecino más cercano",
+que en principio es el más rápido, pero podéis utilizar interpolación
+lineal, mejorando la calidad del zoom de vuestras aplicaciones,
+simplemente cambiando este parámetro de GL\_NEAREST a GL\_LINEAR.
+
+Finalmente, la función glTexImage2D es la que nos permite definir el
+formato de los datos de imagen que vamos a pasar a OpenGL. Como podéis
+ver los datos se corresponden con los que hemos utilizado todo el
+tiempo, ancho, alto y formato (RGB 24bits). El último parámetro es un
+puntero a los datos de imagen 
+a almacenar en la textura. Nosotros haremos esto en otra función y por
+eso lo hemos dejado a NULL.
+
+\begin{entradilla}
+{\em OpenGL nos permite {\color{introcolor} suavizar las imágenes por
+Hardware} con un simple parámetro}
+\end{entradilla}
+
+Algunos comentarios dependientes de la implementación concreta de
+OpenGL que estéis usando: El primero es que muchas implementaciones
+viejas necesitan que los dimensiones de las texturas (ancho y alto)
+sean potencias de dos. Si este es vuestro caso (obtendríais una imagen
+blanca en lugar de la imagen de la cámara), en la función de
+inicialización tendréis que aproximar las dimensiones de vuestras
+imágenes a los valores correctos.
+
+El otro comentario, es que algunas implementaciones de OpenGL,
+soportan el formato de texturas GL\_BGR. Si recordáis, nuestro
+dispositivo V4L, nos devolvía los valores en este formato, y tuvimos
+que añadir un pequeño bucle para ordenarlos antes de enviárselos a
+OpenGL.... Pues quizás os lo podáis ahorrar.
+
+\sectiontext{white}{black}{CAMBIANDO LOS DATOS DE LA TEXTURA}
+
+Cada vez que capturamos una imagen, tenemos que actualizar nuestra
+textura. Esto lo hacemos con la función change\_texture que podéis ver
+a continuación
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+void change_texture (int id, char *in_data)
+{
+  glBindTexture (GL_TEXTURE_2D, texid[id]);
+  
+  glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0, 
+  tex_w, tex_h, GL_RGB, GL_UNSIGNED_BYTE, in_data);
+  
+}
+\end{lstlisting}
+
+Esta es sencilla no?. La función glBindTexture le dice a OpenGL que
+textura queremos utilizar. Sí, es la misma que utilizamos para
+configurar la textura tras su creación. El índice que pasamos como primer parámetro
+nos permite obtener el identificador OpenGL de la textura que nos
+interesa.
+
+Una vez seleccionada la textura, utilizamos la función
+glTexSubImage2D, que es exactamente igual a la función glTexImage2D
+que utilizamos en la inicialización, pero ésta nos permite actualizar solo
+una parte de la textura. 
+
+Esta función es en principio más rápida, y además funcionará si
+nuestra implementación OpenGL tiene la limitación de las potencias de
+2, ya que nos permitirá actualizar la parte de la textura que realmente
+utilizamos.
+
+\sectiontext{white}{black}{PINTANDO LAS IMÁGENES}
+
+Ya estamos en condiciones de pintar la imagen. Como comentamos, lo que
+vamos a hacer es pintar un cuadro sobre el que mapearemos una
+textura. Esta es la forma de hacerlo.
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+void square_texture (int id)
+{
+ 
+  glBindTexture (GL_TEXTURE_2D, texid[id]);
+  
+  glBegin (GL_QUADS);
+  glTexCoord2f (0.0, 0.0); glVertex2f (0.0, 1.0);
+  glTexCoord2f (0.0, 1.0); glVertex2f (0.0, 0.0);
+  glTexCoord2f (1.0, 1.0); glVertex2f (1.0, 0.0);
+  glTexCoord2f (1.0, 0.0); glVertex2f (1.0, 1.0);
+  glEnd ();
+
+}
+\end{lstlisting}
+
+Lo primero que hace la función, es seleccionar la textura que vamos a
+utilizar, con la habitual llamada a glBindTexture. A continuación,
+dibujaremos el cuadrado, para lo que tendremos que decirle a OpenGL
+cuales serán las coordenadas de sus vértices, y que "punto" de la
+textura queremos asociar a cada uno de ellos.
+
+
+\end{multicols}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[height=4.0cm,angle=0]{images/murapido/mapeado_textura.eps}
+
+{\footnotesize\bf Transformaciones de coordenadas para mapeado de texturas}
+\end{figure}
+
+
+\clearpage
+\pagebreak
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bOpage{introcolor}{0.25}{MÚ RÁPIDO}
+
+La función glTexCoord2f, nos permite seleccionar un punto dentro de la
+textura. El 0,0 será el punto inicial de nuestra imagen, y el 1,1 se
+corresponderá con la esquina inferior derecha. Si os fijáis, las
+coordenadas de la textura y del vértice del cuadro no se
+corresponden. Esto sucede porque el sistema de coordenadas OpenGL
+asigna el origen a la esquina inferior izquierda y la imagen que nos
+devuelve nuestro dispositivo de captura, está definida respecto a la
+esquina superior izquierda. 
+
+\begin{entradilla}
+{\em Para utilizar {\color{introcolor} nuestra imagen como textura} es necesario realizar
+algunas transformaciones}
+\end{entradilla}
+
+Observad que si habéis modificado el programa para utilizar texturas
+con dimensiones múltiplos de potencias de 2, la parte de la textura
+que contiene la imagen no se corresponde con el tamaño de la textura
+(hay una parte negra a la derecha). En ese caso, tendréis que
+sustituir el valor 1.0 en glTexCoord2f, por el valor apropiado, que
+dependerá del tamaño de vuestra imagen.
+
+Finalmente, recordáis el escalado especial de la coordenada Y en la
+función que dibuja la escena?. Como podéis ver aquí, lo que estamos
+dibujando es un cuadrado. Si en lugar de un cuadrado, dibujáramos el
+rectángulo con el aspecto correcto, no sería necesario escalar la
+coordenada Y de forma especial... La mejor opción dependerá de cada
+aplicación. 
+
+\sectiontext{white}{black}{INICIALIZACIÓN DE OPENGL}
+
+Para terminar con todo lo relacionado con la visualización, tenemos
+que comentar una última función, gfx\_init. Esta función se encarga de
+inicializar OpenGL, y en general contiene comandos OpenGL que
+solamente es necesario ejecutar una vez.
+
+En nuestro caso la función es muy sencilla.
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+void gfx_init (void)
+{
+  glClearColor (0, 0, 0, 0);
+  glEnable (GL_DEPTH_TEST);
+  glEnable (GL_TEXTURE_2D);
+}
+\end{lstlisting}
+
+El primer comando define el color de fondo a utilizar cuando borremos
+los buffers de color (la imagen en la ventana), utilizando la función
+glClear (la primera llamada en gfx\_pinta).
+
+Las otras dos funciones permiten activar, respectivamente, el uso del
+z-buffer y el de las texturas 2D. Tened en cuenta que antes de
+ejecutar ninguna de las funciones relacionadas con la manipulación de
+las texturas que acabamos de ver, necesitamos ejecutar esta función
+para activar el uso de texturas 2D. Si no lo hacemos obtendremos una
+imagen vacía.
+
+El uso de z-buffer es necesario si las imágenes se van a solapar de
+alguna manera en la escena. Si no activamos el z-buffer, las imágenes
+se visualizarán en el orden en el que las pintemos en nuestro
+programa, independientemente de su posición real en el espacio 3D. 
+
+Si no queréis hacer filigranas con las texturas y vuestras imágenes
+van a aparecer en una posición fija en la pantalla (lo usual en un
+sistema de vídeo vigilancia), podéis desactivar el z-buffer, ahorrando
+memoria y trabajo a vuestra tarjeta gráfica. En este mismo caso,
+probablemente os interese más utilizar una proyección ortográfica que
+la perspectiva que estamos utilizando... solo estamos dando pistas...
+
+\sectiontext{white}{black}{VOLCANDO IMÁGENES}
+
+El último elemento que nos queda es la función para volcar las
+imágenes capturadas al disco. Desde el punto de vista del almacenaje
+nos interesa utilizar un formato comprimido, pero antes os vamos a
+comentar como utilizar el formato Netpbm, que es tremendamente
+sencillo y si lo utilizamos junto con zlib, nos puede solucionar el
+problema mú rápido.
+
+Aquí tenéis la función para grabar vuestras imágenes:
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+int write_image (char *fname, char*data)
+{
+  FILE *f;
+
+  f = fopen (fname, "wb");
+  fprintf (f, "P6\n#Occam's Razor "
+              "Video Vigilancia\n"
+              "%d %d\n%d\n",
+	   img_w, img_h, 255);
+  fwrite (data, img_size, 1, f);
+  fclose (f);
+}
+\end{lstlisting}
+
+Más rápido no se puede XD. El formato ppm, utiliza una sencilla
+cabecera ASCII, en la que se indican las dimensiones de la imagen y su
+profundidad de color (el valor 255 indica 8 bits por componente). A
+continuación escribimos los datos y listo.
+
+\begin{entradilla}
+{\em El {\color{introcolor} formato PPM} es muy conveniente para volcar imágenes de forma sencilla}
+\end{entradilla}
+
+El problema de PPM es que los datos no se comprimen en absoluto. Cada
+imagen captura por nuestra aplicación ocupa unos 900Kb. La misma
+imagen en formato jpg ocupa unos 19Kb, y por eso os vamos a contar
+como usar este formato.
+
+En la sección Ratas de Biblioteca de el número 1 de Occam's Razor, os
+contábamos como utilizar zlib para almacenar ficheros. Alguien quiere
+modificar la función de arriba y ver cuanto puede comprimir nuestras
+imágenes zlib?. Esperamos vuestros resultados ;)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ebOpage{introcolor}{0.25}{MÚ RÁPIDO}
+
+\sectiontext{white}{black}{USANDO JPEG}
+
+Al principio del artículo os decíamos que íbamos a utilizar libjpeg
+para almacenar las imagenes, y como lo prometido es deuda, aquí tenéis
+la función para almacenar una imagen en formato JPEG en el disco:
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+#include <jpeglib.h>
+
+int color_space = JCS_RGB; 
+/* JCS_GRAYSCALE para nivels de gris */
+
+int 
+write_jpeg_file(char *filename, char *buffer, 
+                int w, int h, int bpp )
+{
+  struct jpeg_compress_struct cinfo;
+  struct jpeg_error_mgr jerr;
+  
+  JSAMPROW row_pointer[1];
+  FILE *outfile = fopen( filename, "wb" );
+  
+  if ( !outfile )
+    {
+      printf("Error opening output jpeg " 
+             "file %s\n!", filename );
+      return -1;
+    }
+
+  cinfo.err = jpeg_std_error( &jerr );
+  jpeg_create_compress(&cinfo);
+  jpeg_stdio_dest(&cinfo, outfile);
+  
+  cinfo.image_width = w;
+  cinfo.image_height = h;
+  cinfo.input_components = bpp;
+  cinfo.in_color_space = color_space;
+
+  jpeg_set_defaults( &cinfo );
+
+  jpeg_start_compress( &cinfo, TRUE );
+
+  while(cinfo.next_scanline<cinfo.image_height)
+    {
+      row_pointer[0]=&buffer[cinfo.next_scanline* 
+                           cinfo.image_width*  
+                           cinfo.input_components];
+      jpeg_write_scanlines( &cinfo, row_pointer, 1);
+    }
+  /* similar to read file, clean up after 
+     we're done compressing */
+  jpeg_finish_compress( &cinfo );
+  jpeg_destroy_compress( &cinfo );
+  fclose( outfile );
+  return 1;
+}
+\end{lstlisting}
+
+Bueno, esta función la podéis encontrar en los ejemplos que se
+distribuyen con el código fuente de libjpeg. En el mismo fichero
+podéis encontrar la función para leer un fichero jpeg del disco.
+
+
+
+El código es autoexplicativo, y además, así es como funciona la
+librería, no hay mucho que rascar. 
+
+\begin{entradilla}
+{\em {\color{introcolor}libjpeg} nos permite grabar {\color{introcolor}imágenes en formato JPEG} de forma sencilla}
+\end{entradilla}
+
+Con esta función podremos almacenar
+las imágenes capturadas en formato jpeg. Esto es más o menos
+equivalente a almacenar la secuencia de video en formato MJPEG, lo que
+no está nada mal.
+
+\sectiontext{white}{black}{A JUGAR!}
+
+Bueno, este artículo ha sido un poco largo, pero hemos tratado un
+montón de cosas distintas que nos dan mucho juego. Aquí van algunas
+propuestas:
+
+\begin{itemize}
+\item Añadir soporte de red a la aplicación. Con lo que os hemos contado
+  en los números anteriores de Occam's Razor, en esta misma sección,
+  eso debería estar chupado!
+\item Captura de vídeos panorámicos. Utilizando varias cámaras, podemos
+  modificar nuestro programa para poder generar vídeos panorámicos,
+  utilizando un par de webcams :).
+\item Vigilando en estéreo?. Tenéis unas gafas de esas rojas y
+  azules?. Sabéis lo que es un anaglifo? (buscad Anaglifo en la
+  wikipedia :)). Sabéis que con el código de este artículo, podéis
+  generar un anaglifo modificando una sola línea del código!!!!
+  (bueno, y colocando las cámaras correctamente).
+\item Grabar la secuencia de vídeo en formato AVI, MPEG o lo que os
+  apetezca (pista... ffmpeg).
+\end{itemize}
+
+Y cualquier otra cosa que se os ocurra. No os olvidéis de enviarnos
+vuestros experimentos!!. Esta vez hay cosas de sobra para
+jugar!. Hasta el próximo número.
+
+
+%% Tabla de recursos en internet 
+
+\end{multicols}
+
+{\colorbox{introcolor}{
+\begin{minipage}{0.98\linewidth}
+{\textsf
+{\color{white}{\Large RECURSOS}}
+
+\footnotesize
+
+\medskip
+
+{\textsf{Driver GSPCA y Spcaview}}
+
+{\footnotesize\url{http://mxhaard.free.fr/download.html}}
+
+\medskip
+
+{\textsf{FAQ de motion con mucha información interesante}}
+
+{\footnotesize\url{http://www.lavrsen.dk/twiki/bin/view/Motion/FrequentlyAskedQuestions}}
+\medskip
+
+{\textsf{Tutoriales y ejemplos OpenGL}}
+
+{\footnotesize\url{http://www.opengl.org/code/}}
+\medskip
+
+{\textsf{Formato PPM}}
+
+{\footnotesize\url{http://netpbm.sourceforge.net/doc/ppm.html}}
+
+\medskip
+
+{\textsf{Libjpeg a través de la wikipedia}}
+
+{\footnotesize\url{http://en.wikipedia.org/wiki/Libjpeg}}
+
+\medskip
+
+
+{\textbf{\textsf{Para los que quieran jugar}}}
+
+{\textsf{Anaglifos}}
+
+{\footnotesize\url{http://es.wikipedia.org/wiki/Anaglifo}}
+
+
+{\textsf{Página web de FFMPEG}}
+
+{\footnotesize\url{http://en.wikipedia.org/wiki/Libjpeg}}
+
+\medskip
+
+
+\normalsize
+}
+\end{minipage}
+}}
+
+
+\clearpage
+\pagebreak
+
+ 

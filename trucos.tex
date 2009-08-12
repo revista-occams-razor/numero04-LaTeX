@@ -1,0 +1,154 @@
+% Este fichero es parte del Número 4 de la Revista Occam's Razor
+% Revista Occam's Razor Número 4
+%
+% (c)  2009, The Occam's Razor Team
+%
+% Esta obra está bajo una licencia Reconocimiento 3.0 España de
+% Creative Commons. Para ver una copia de esta licencia, visite
+% http://creativecommons.org/licenses/by/3.0/es/ o envie una carta a
+% Creative Commons, 171 Second Street, Suite 300, San Francisco,
+% California 94105, USA. 
+
+% Sección Trucos
+
+
+\rput(3,-2.5){\resizebox{!}{6cm}{{\epsfbox{images/general/varita3.eps}}}}
+\begin{flushright}
+\msection{red}{black}{0.1}{TRUCOS}
+
+\mtitle{6cm}{Con un par... de líneas}
+
+\msubtitle{8cm}{Chuletillas para hacer cosas mú rápido}
+
+{\sf por Tamariz el de la Perdíz}
+
+{\psset{linecolor=black,linestyle=dotted}\psline(-10,0)}
+
+\end{flushright}
+
+\vspace{4mm}
+
+\begin{multicols}{2}
+\raggedcolumns
+
+
+\sectiontext{white}{black}{GDB CON INTERFAZ MAS AMIGABLE}
+\hrule
+\vspace{2mm}
+
+El depurador de GNU gdb, proporciona un interfaz {\em más amigable},
+si es que eso es posible. Para echarle un ojo, solo tenéis que utilizar la
+opción {\tt -tui} (algo así como {\em Text User Interface}). Lo que obtendréis es algo como esto:
+
+\myfig{0}{images/trucos/gdb_tui.eps}{0.9}
+\vspace{2mm}
+
+Os adelantamos que, este interfaz se suele ir a paseo en cuanto
+nuestro programa empieza a escribir cosas en la consola. Si necesitáis algo todavía más amigable podéis probar {\tt cgdb}.
+
+\myfig{0}{images/trucos/cgdb.eps}{0.9}
+
+\sectiontext{white}{black}{DEPURANDO CON GDB Y LIBTOOL}
+\hrule
+\vspace{2mm}
+
+Si utilizáis la autotools de GNU para compilar una aplicación que
+incluye librerías dinámicas, habréis observado que el supuesto
+ejecutable que generan las herramientas, es realmente un {\em
+script}. Si intentáis utilizar {\tt gdb} con ese {\em script},
+obviamente, solo conseguiréis un bonito mensaje de error.
+
+Para poder depurar nuestro programa, tenemos que utilizar {\tt
+libtool} de la siguiente manera.
+
+
+{\small
+\begin{verbatim}
+$ libtool --mode=execute gdb ./mi_ejecutable
+\end{verbatim}
+}
+
+\sectiontext{white}{black}{HELPDESK CON SCREEN}
+\hrule
+\vspace{2mm}
+
+Seguro que alguna vez habéis estado al teléfono un montón de tiempo
+dictando comandos a alguien en el otro lado. Al mismo tiempo, vuestro
+interlocutor os va diciendo que es esa cosa que hace que no le
+funciona (porque falta un espacio, porque no ha pulsado ENTER, ...). 
+
+La utilidad {\tt screen} puede hacernos la vida más fácil en estas
+situaciones. El modo multiusuario nos permite conectar dos instancias
+de {\tt screen}, de forma que podremos ver lo que el otro usuario
+escribe y nuestro cliente podrá ver que es lo que nosotros escribimos.
+
+Para conectarnos a una sesión {\tt screen} en modo usuario, sólo
+tenemos que utilizar el flag {\tt -x}, al invocarlo.
+
+
+\sectiontext{white}{black}{VARIAS IPs}
+\hrule
+\vspace{2mm}
+
+La forma más sencilla de configurar varias IPs es disponiendo de
+varios interfaces de red. Si no tenemos varias tarjetas podemos
+utilizar {\em alias}. Esta es la forma de definirlos.
+
+{\small
+\begin{verbatim}
+# ifconfig eth0:1 192.168.100.1 netmask 255.255.255.0
+\end{verbatim}
+}
+
+
+El comando anterior crea un alias de nuestro interfaz eth0, llamado
+eth0:1 con la nueva configuración de red. Notad que esto es solo un
+alias y no podéis utilizarlo, por ejemplo, en las reglas de vuestro
+firewall. 
+
+Para configuraciones más complejas disponéis de otras alternativas
+como las VLAN (ya hablaremos de ellas en otra ocasión).
+
+
+
+\sectiontext{white}{black}{PRODUCE VIDEOS DESDE TU WEBCAM}
+\hrule
+\vspace{2mm}
+
+Solo tenemos que escribir esta línea:
+
+
+{\small
+\begin{verbatim}
+$  mencoder -tv driver=v4l -ovc lavc -o movie.avi tv://
+\end{verbatim}
+}
+
+Y tener instaladas los paquetes apropiados (mplayer, mencoder, ffmpeg,
+libavcodec). 
+
+
+\colorbox{introcolor}{
+\begin{minipage}{.9\linewidth}{
+\textbf{\textsf{Envía tus trucos}}
+
+\vspace{1mm}
+
+\textsf{Puedes enviarnos esos trucos que usas a diario para compartirlos con el resto de lectores a la dirección: }
+
+\vspace{2mm}
+
+\texttt{occams-razor@uvigo.es}
+}
+\end{minipage}
+}
+
+\raggedcolumns
+\pagebreak
+
+\vspace{6cm}
+\end{multicols}
+
+\clearpage
+\pagebreak
+

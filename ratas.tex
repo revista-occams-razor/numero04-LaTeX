@@ -1,0 +1,291 @@
+% Este fichero es parte del Número 4 de la Revista Occam's Razor
+% Revista Occam's Razor Número 4
+%
+% (c)  2009, The Occam's Razor Team
+%
+% Esta obra está bajo una licencia Reconocimiento 3.0 España de
+% Creative Commons. Para ver una copia de esta licencia, visite
+% http://creativecommons.org/licenses/by/3.0/es/ o envie una carta a
+% Creative Commons, 171 Second Street, Suite 300, San Francisco,
+% California 94105, USA. 
+
+% Seccion Ratas de Biblioteca
+%
+
+\rput(5.0,-3.0){\resizebox{16cm}{!}{{\epsfbox{images/ratas/header.eps}}}}
+
+% -------------------------------------------------
+% Cabecera
+\begin{flushright}
+\msection{introcolor}{black}{0.25}{RATAS DE BIBLIOTECA}
+
+\mtitle{10cm}{libpcap. Tu propio sniffer en 5 líneas}
+
+\msubtitle{8cm}{... bueno, 5 líneas y un call-back}
+
+{\sf por Snortel }
+
+{\psset{linecolor=black,linestyle=dotted}\psline(-12,0)}
+\end{flushright}
+
+\vspace{2mm}
+% -------------------------------------------------
+
+\begin{multicols}{2}
+
+
+% Introducción
+\intro{introcolor}{C}{apturar paquetes es una de esas cosas ``Sinatra'', vamos, que cada sistema hace ``a su manera''. Afortunadamente para nosotros algunas
+personas se han preocupado de escribir una librería para poder llevar
+a cabo esta tarea de una forma portable. Estamos hablando de la
+librería libpcap.
+}
+
+\vspace{2mm}
+
+% Cuerpo del artículo
+
+Una de las herramientas básicas relacionadas con la seguridad
+informática es el sniffer o capturador de paquetes o analizador de
+protocolos, o... Bueno, tienen muchos nombres, dependiendo del uso que
+se le quiera dar.
+
+Estos programas normalmente utilizan lo que se conoce como ``sockets
+RAW'', los cuales, desafortunadamente, tienen un interfaz diferente en
+cada sistema operativo. La librería libpcap nos permite utilizar esta
+funcionalidad independientemente del sistema operativo.
+
+\sectiontext{white}{black}{EL CÓDIGO}
+
+Sin más preámbulos vamos a ver el código de nuestro sniffer de cinco
+líneas y un callback utilizando libpcap. 
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\footnotesize}   
+\begin{lstlisting}
+#include <pcap.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+static int count = 1;
+
+void ip_cb(u_char *args,
+           const struct pcap_pkthdr* ph,
+           const u_char* p) {
+  printf ("Hemos recibido %d paquetes!!!. "
+          "Ha, ha, ha!!!!"
+	  "%d paquetes!!!\n", count++, count);
+}
+int main(int argc,char **argv) { 
+  char                err[PCAP_ERRBUF_SIZE];
+  pcap_t*             h;
+  struct bpf_program  fp;    
+  bpf_u_int32         maskp;          
+  bpf_u_int32         netp;           
+  u_char*             args = NULL;
+  
+  pcap_lookupnet ("eth0", &netp, &maskp, err);
+  h = pcap_open_live("eth0",BUFSIZ,1,-1,err);
+  if(argc > 1) {
+    pcap_compile (h, &fp, argv[1], 0, netp);
+    pcap_setfilter (h, &fp);
+  } 
+  /* Cuenta!!!, Cuenta!!! Maldito!!! 
+     Ha, ha,ha !!!! */ 
+  pcap_loop (h, -1, ip_cb, args);
+  return 0;
+}
+\end{lstlisting}
+
+Vale, no son exactamente cinco líneas, pero sí cinco llamadas a
+funciones de libpcap. Aunque aparentemente este programa es muy tonto
+(cuenta paquetes en el interfaz eth0), enseguida veréis que es mucho
+más potente de lo que parece.
+
+Lo primero que aparece es nuestro callback. Esta es la función
+que libpcap ejecuta cada vez que captura un paquete. En nuestro caso,
+esta función utiliza una variable estática para llevar la cuenta de
+los paquetes capturados.
+
+En el programa principal es donde está lo interesante.
+
+\sectiontext{white}{black}{CONFIGURANDO LA CAPTURA}
+
+Lo primero que hacemos es obtener información sobre la configuración
+del interfaz eth0. Esta llamada os la podéis ahorrar si no vais a
+trabajar con paquetes de ``broadcast'' ya que su única finalidad es
+obtener la máscara de red asociada con el interfaz.
+
+A continuación le decimos a libpcap que queremos capturar paquetes ``en
+directo'' en el interfaz ``eth0''. De especial interés es el tercer
+parámetro. Este parámetro le dice a libpcap que intente configurar el
+interfaz de red en modo promiscuo, es decir, la tarjeta de red informará al
+sistema operativo de todos los paquetes que ve, no solo de los
+paquetes dirigidos a ella.
+
+
+En estos momentos ya estamos en condiciones de capturar paquetes, y
+la sentencia if (y la siguiente sección) que sigue a continuación os la podéis ahorrar si no
+queréis utilizar el filtrado de paquetes que ofrece la librería. 
+
+\sectiontext{white}{black}{FILTRANDO PAQUETES}
+
+Como os decíamos, la parte central del programa utiliza el sistema de
+filtrado de paquetes proporcionado por libpcap. En nuestro ejemplo,
+solamente activamos el filtro si hemos recibido algún parámetro a
+través de la línea de comandos (argc mayor que 1).
+
+\begin{entradilla}
+{\em El sistema de {\color{introcolor} filtrado de paquetes de} libpcap es muy potente}
+\end{entradilla}
+
+Como podéis ver,simplemente pasamos el primer parámetro del programa a la función
+pcap\_compile. 
+
+\ebOpage{introcolor}{0.25}{RATAS DE BIBLIOTECA}
+
+Y a continuación asignamos el nuevo filtro a nuestro
+manejador pcap.
+
+
+Supongo que ahora os estaréis preguntando \ldots ¿Y cómo son esos filtros? Bueno, pues para tener una descripción detallada de como definirlos
+solo tenéis que consultar la página del manual del programa
+tcpdump. Sí, tcpdump, el capturador de paquetes por excelencia utiliza
+libpcap :).
+
+\sectiontext{white}{black}{EL BUCLE PRINCIPAL}
+
+Finalmente, utilizamos la función pcap\_loop para iniciar la
+captura. El programa entrará en un bucle infinito en el que, cada vez
+que capture un paquete, ejecutará nuestra función ip\_cb pasándole como
+primer parámetro el paquete capturado (bueno, pasa algo más, pero en esencia
+eso es lo que hace). El segundo parámetro de pcap\_loop, nos permite especificar el
+número de paquetes que queremos capturar. En este caso, el valor -1
+indica que no hay límite.
+
+%
+
+
+\sectiontext{white}{black}{PROBANDO NUESTRO SNIFFER}
+
+Pues ya solo nos queda probar que todo funciona. Lo primero que
+haremos es compilar nuestro programa de la forma habitual.
+
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\small}   
+\begin{lstlisting}
+$ gcc -o count_packet count_packet.c -lpcap
+
+\end{lstlisting}
+
+Como en nuestro programa, hemos decidido poner el interfaz de red en
+modo promiscuo, tendremos que ejecutar nuestro sniffer como usuario
+root. Para probar el programa, vamos además a utilizar un sencillo
+filtro y la utilidad ping (el parámetro -c2 le dice a ping que envíe
+solo dos paquetes). 
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\small}   
+\begin{lstlisting}
+$ ping -c2 una_ip
+
+\end{lstlisting}
+
+
+Esto es lo que obtendremos, al ejecutar nuestro programa en la misma máquina.
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+# ./count_packet icmp
+Hemos recibido 1 paquetes!.Ha, ha, ha! 1 paquetes!
+Hemos recibido 2 paquetes!.Ha, ha, ha! 2 paquetes!
+Hemos recibido 1 paquetes!.Ha, ha, ha! 3 paquetes!
+Hemos recibido 2 paquetes!.Ha, ha, ha! 4 paquetes!
+\end{lstlisting}
+
+Como podéis ver, estamos capturando el paquete ICMP ECHO que ping
+envía y el paquete ICMP ECHO-REPLY que recibimos de la máquina
+remota. Observad que si la ip que habéis utilizado no está accesible,
+solamente recibiréis dos paquetes ICMP HOST\_UNREACH y, obviamente,
+ninguna respuesta del sistema remoto (que no existe).
+
+Probemos ahora algo más elaborado.
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+# ./count_packet 'icmp[icmptype] != icmp-echo'
+Hemos recibido 1 paquetes!.Ha, ha, ha! 1 paquetes!
+Hemos recibido 2 paquetes!.Ha, ha, ha! 2 paquetes!
+\end{lstlisting}
+
+Si volvemos ha ejecutar nuestro ping... veremos que ahora nuestro
+programa solo muestra dos paquetes... claro, en nuestro filtro estamos diciendo
+que solo nos interesan los paquetes ECHO y no los ECHO-REPLY.
+
+¿Qué obtendríais ahora haciendo ping a una máquina que no existe?
+
+\sectiontext{white}{black}{UN CALLBACK MÁS INTERESANTE}
+
+Nuestro conde contador es güay, pero no resulta demasiado útil. Como
+decíamos más arriba, el callback que pasemos como parámetro a
+pcap\_loop recibirá toda la información asociada al paquete que se ha
+capturado. 
+
+Aquí tenéis uno un poco más interesante.
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+#include <netinet/ether.h>
+#include <netinet/ip.h> 
+
+void ip_cb(u_char *args,const struct pcap_pkthdr* ph,
+           const u_char* p) {
+  struct ip   *ip_pqt;
+
+  ip_pqt = (struct ip*) (packet + 
+                        sizeof(struct ether_header));
+
+  printf ("[%16s]->", inet_ntoa(ip_pqt->ip_src));
+  printf ("[%16s]: (TTL:%03d proto: %02d) ", 
+	  inet_ntoa(ip_pqt->ip_dst), 
+          ip_pqt->ip_ttl, ip_pqt->ip_p);
+}
+\end{lstlisting}
+
+
+Lo primero que podéis ver es un par de ficheros de cabecera
+adicionales. Esto ficheros contienen la definición de las estructuras
+de datos asociadas a los paquetes de red que vamos a
+capturar. 
+
+La función simplemente muestra alguna información general asociada al
+nivel IP: las direcciones IP de origen y destino del paquete, el TTL
+(Time To Live) y el protocolo asociado. Como podéis ver, lo primero
+que hacemos es saltarnos la cabecera ethernet para poder acceder a los
+datos IP.
+
+\begin{entradilla}
+{\em Para escribir un {\color{introcolor} sniffer personalizado,} solo necesitáis hacer 5 llamadas a la librería}
+\end{entradilla} 
+
+Una explicación detallada de como funciona una pila de protocolos se
+sale de los objetivos de este pequeño artículo, pero jugando con libpcap, un par
+de buenos libros y un puñado de RFC, los protocolos de red no tendrán
+secretos para vosotros.
+
+Como siempre, recordad que en estos ejemplos, por cuestiones de
+espacio, hemos eliminado todas las comprobaciones de error. Vosotros
+no debéis hacerlo. 
+
+En el caso concreto de este último ejemplo, es
+posible que obtengáis algunos datos ``raros'' durante vuestras
+pruebas... No estamos comprobando si el paquete es realmente un
+paquete IP, no estamos comprobando la versión del protocolo (v4 o v6),
+ni si se trata de un paquete completo o un fragmento.
+
+Si tenéis mucha curiosidad, una buena idea es echarle un ojo al código
+fuente de tcpdump o wireshark. Ambos utilizan libpcap.
+
+Hasta el próximo número.
+
+\end{multicols}
+\clearpage
+\pagebreak

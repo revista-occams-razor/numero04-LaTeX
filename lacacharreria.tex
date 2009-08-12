@@ -1,0 +1,609 @@
+% Este fichero es parte del Número 4 de la Revista Occam's Razor
+% Revista Occam's Razor Número 4
+%
+% (c)  2009, The Occam's Razor Team
+%
+% Esta obra está bajo una licencia Reconocimiento 3.0 España de
+% Creative Commons. Para ver una copia de esta licencia, visite
+% http://creativecommons.org/licenses/by/3.0/es/ o envie una carta a
+% Creative Commons, 171 Second Street, Suite 300, San Francisco,
+% California 94105, USA. 
+
+% Seccion La cacharreria
+%
+
+\rput(2.5,-3.0){\resizebox{12cm}{!}{{\epsfbox{images/cacharreria/camara_3-1.eps}}}}
+
+% -------------------------------------------------
+% Cabecera
+\begin{flushright}
+\msection{introcolor}{black}{0.25}{LA CACHARRERÍA}
+
+\mtitle{8cm}{Tu propia webcam IR}
+
+\msubtitle{10cm}{Explorando el Infrarrojo cercano}
+
+{\sf por Chinao}
+
+{\psset{linecolor=black,linestyle=dotted}\psline(-12,0)}
+\end{flushright}
+
+\vspace{2mm}
+% -------------------------------------------------
+
+\begin{multicols}{2}
+
+
+% Introducción
+\intro{introcolor}{B}{uscando cosas güays por internet, nos encontramos una interesante
+página en la que cuentan como ``tunear'' tu webcam para convertirla en
+una cámara de infrarrojos (los recursos al final del artículo). Nos
+pareció interesante, así que ni cortos ni perezosos nos pusimos a ello.
+
+}
+
+\vspace{2mm}
+
+% Cuerpo del artículo
+
+Antes de que comencéis a, quizás, destruir vuestra webcam, tenemos que
+decir dos cosas. La primera es que no nos hacemos responsables de
+cualquier daño ocasionado por seguir los pasos que se describen en
+este artículo. Es decir, si os cargáis la cámara (la verdad que es
+difícil, pero podría llegar a pasar) es vuestro problema.
+
+La segunda es que antes de destrozarla, comprobéis que realmente va a
+servir de algo. Para ello no tenéis más que conectar la cámara al
+ordenador, lanzar vuestro programa preferido para utilizarla, y coger
+cualquier mando a distancia que tengáis por casa y que funcione con
+infrarrojos. 
+
+Estos mandos suelen tener lo que parece un LED (y que
+efectivamente lo es :), en el extremo con el que intentáis intimidar a
+vuestro equipo electrónico doméstico. Normalmente, cuando pulsáis
+cualquier botón, el LED parece no hacer nada, pero si apuntáis a
+vuestra webcam y al pulsar el botón veis un punto brillante donde
+debería estar el LED... entonces sí, es hora de ``cacharrear''.
+
+\sectiontext{white}{black}{RADIACIÓN ELECTROMAGNÉTICA}
+
+La mayoría de los sensores utilizados por las cámaras digitales (CCD o
+CMOS), por sus propias características son sensibles a lo que se
+conoce como infrarrojo cercano.
+
+Y que es eso del infrarrojo?... mejor aún, qué es eso del infrarrojo
+cercano?. Vale, pues, si hablamos con propiedad, de lo que tenemos que
+hablar es de radiación infrarroja. La radiación infrarroja, es una
+radiación electromagnética, cuya longitud de onda se encuentra entre
+750nm y 1mm.
+
+
+
+Sí, ya, o no os he contado nada nuevo, o os habéis quedado como estábais.
+Bien, vamos a explicarlo un poco más. La radiación electromagnética
+que todos conocemos es la luz visible, lo bueno de esta es que la
+podemos percibir. Esta radiación se propaga, es decir, se mueve y llega
+hasta nuestros ojos como una onda (una onda electromagnética
+concretamente). Dependiendo de la frecuencia de esa onda (lo rápido o
+lento) que varie, veremos un color u otro.
+
+Así, las ondas que tienen menor longitud de onda, es decir, que
+necesitan menos ``espacio'' para pasar de una cresta a la siguiente, son
+las que tienen mayor frecuencia (cambian más rápido, o en menos
+``espacio'' si lo preferís). 
+
+Cuanto menor sea lo longitud de onda, más
+``azulado'' será el color que percibimos, hasta que llega un punto, en
+el que nuestro ojo ya no es capaz de percibirlo. Los fotones de esa
+frecuencia que llegan a nuestra retina no pueden excitar las células
+que en ella se encuentra y por lo tanto ninguna señal llega al
+cerebro... estamos ciegos para esa longitud de onda!.
+
+\begin{entradilla}
+{\em La  {\color{introcolor} radiación infrarroja} tiene una longitud de onda se encuentra entre 750nm y 1mm.}
+\end{entradilla}
+
+Como os decíamos según disminuimos la longitud de onda, los colores se
+hacen más azulados, y en el punto en el que dejamos de percibirlo, lo
+que estaremos recibiendo es radiación ultravioleta.
+
+Si por el contrario, aumentamos la longitud de onda (y por tanto
+disminuimos la frecuencia), los colores se hacen más rojizos, hasta
+que llega un punto en el que ya no los podemos percibir. Estamos
+recibiendo radiación infrarroja.
+
+Porqué lo del infra y el ultra... muchos ya lo habréis imaginado,
+estos nombres hacen referencia a la frecuencia y no a la longitud de
+onda. Así que lo que está por debajo del rojo visible (menor
+frecuencia) se denomina infrarrojo, mientras que lo que está por encima
+del violeta visible se denomina ultravioleta :)
+
+\sectiontext{white}{black}{EL INFRARROJO CERCANO}
+
+Sí, las radiaciones infrarrojas tienen frecuencias inferiores a las
+del rojo visible, pero no todas las frecuencias inferiores a esta son
+radiación infrarroja. 
+
+
+\end{multicols}
+
+\clearpage
+\pagebreak
+
+
+\msection{introcolor}{black}{0.25}{LA CACHARRERÍA}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=13cm,angle=0]{images/cacharreria/espectro.eps}
+
+{\small\bf Espectro Electromagnético (fuente Wikipedia)}
+\end{figure}
+
+
+\begin{multicols}{2}
+
+
+Si seguimos bajando la frecuencia nos
+encontramos las microondas y más abajo las frecuencias utilizadas por
+la radio y la televisión. Sí amigos, tenéis dispositivos de alta
+frecuencia en vuestras cabezas XD.
+
+Bien, la cuestión es que la región del espectro (esto es, todas las
+frecuencias posibles) que se considera radiación infrarroja, está
+dividida en tres grandes grupos, que se llaman, respectivamente, IR-A,
+IR-B e IR-C.
+
+Con lo que nosotros vamos a jugar es con el IR-A, también conocido
+como infrarrojo cercano... os imagináis porqué no?. Efectivamente, por
+que es el que está más cerca del espectro visible. Sí, los más
+interesantes son los otros, los que se usan para guiar misiles y para
+obtener esas imágenes térmicas tan chulas que salen en las
+películas... pero efectivamente, hace falta algo más caro que una
+webcam de 25 euros para jugar con esas cosas.
+
+Así que ahora que tenemos una idea general de que es lo que estamos
+haciendo... pues vamos a ponernos manos a la obra.
+
+
+\sectiontext{white}{black}{DESMONTANDO LA CÁMARA}
+
+Nuestra webcam es una Logitech Messenger. Si, aprovechamos todo aquí
+en Occam's... qué, todavía no os habéis leído el artículo sobre video
+vigilancia?... a qué estáis esperando?
+
+Primer consejo, perded un poco de tiempo intentando descubrir que
+tenéis que desmontar. Los tornillos suelen estar ocultos, porque son
+antiestéticos y, por la ley de Murphy, nosotros empezamos quitando
+justo los que no necesitábamos quitar XD.
+
+
+
+Para poder desmontar esta webcam, tenemos que retirar una pequeña tapa
+de goma que se encuentra en uno de los laterales de la esfera que
+contiene la lente. En el agujero que cubre encontraremos un pequeño tornillo
+que debemos retirar para poder acceder al interior de la cámara.
+
+\begin{center}
+\myfig{0}{images/cacharreria/paso01.eps}{0.9}
+
+{\footnotesize\bf Accediendo al tornillo.}
+\end{center}
+
+
+Por otra parte, con mucho cuidado, retiramos la carcasa gris azulada,
+de la parte frontal, ayudándonos de un destornillador o cualquier cosa
+que nos permita hacer palanca.
+
+\begin{center}
+\myfig{0}{images/cacharreria/paso02.eps}{0.9}
+
+{\footnotesize\bf Quitando parte frontal.}
+\end{center}
+
+
+Ahora ya podemos acceder a la cámara propiamente dicha, presionando el
+clip que une las dos mitades de la esfera. 
+
+\ebOpage{introcolor}{0.25}{LA CACHARRERÍA}
+
+Retiramos una de las
+mitades, la guía de luz para poder ver el LED de actividad desde fuera
+(un pedazo de plástico transparente), y ya tenemos nuestra cámara 
+``al desnudo'' :).
+
+\begin{center}
+\myfig{0}{images/cacharreria/paso03.eps}{0.9}
+
+{\footnotesize\bf Ya casi estamos.}
+\end{center}
+
+
+El siguiente paso es desmontar la lente. En esta cámara (y al parecer
+en la mayoría de las webcams), la lente se enrosca directamente sobre
+el sensor que captura la imagen. Así que la giramos hasta que se
+separe del circuito.
+
+Ahora tenemos, por una parte, la placa de circuito impreso, con el
+sensor de imagen y la rosca para la lente, y la lente por la otra.
+
+\begin{center}
+\myfig{0}{images/cacharreria/paso04.eps}{0.9}
+
+{\footnotesize\bf Sensor de la webcam.}
+\end{center}
+
+\begin{center}
+\myfig{0}{images/cacharreria/paso05.eps}{0.9}
+
+{\footnotesize\bf La lente que acabamos de desenrroscar.}
+\end{center}
+
+
+\sectiontext{white}{black}{FILTRANDO LA LUZ}
+
+Ooops!, no habíamos dicho nada sobre esto. Bueno, lo decimos
+ahora. Puesto que los sensores son sensibles al IR cercano, las
+cámaras digitales traen incorporado un filtro IR, ya que de lo
+contrario... bueno, eso lo podréis controlar vosotros mismos ;).
+
+El objetivo de todo esto es sustituir ese filtro IR, por un filtro de
+luz visible, de tal forma que la cámara solo capte el IR cercano y no
+la luz normal.
+
+Como podéis ver en la imagen, el filtro IR se encuentra (siempre para
+nuestro modelo), en la parte de la lente, sujeto a ella con una
+especie de pasta negra. Con un cutter eliminamos parte de esta pasta y
+quitamos el filtro.
+
+\begin{center}
+\myfig{0}{images/cacharreria/paso06.eps}{0.9}
+
+{\footnotesize\bf Filtro IR separado de la lente.}
+\end{center}
+
+
+Efectivamente, ese cristalito rosado es el filtro IR. Que os
+esperabais, los filtros de luz son así. Tiene que ser transparente,
+para que pase la luz visible, y, pues eso, se llama infraRROJO por
+algo :).
+
+
+\begin{entradilla}
+{\em El  {\color{introcolor}filtro IR} es un cristal rosado entre la
+lente y el sensor.}
+\end{entradilla}
+
+La gran cuestión ahora es como hacer un filtro de luz visible. La
+respuesta la sacamos de Internet, yo no tenía ni idea la verdad,
+lo único que tenía claro, era que tenía que ser algo oscuro.
+
+
+Pues nuestro filtro lo haremos con un negativo fotográfico
+velado... sí, quien diría que algún día eso no sería tan fácil de
+conseguir eh?. Ojo, el negativo tiene que estar revelado y tendréis
+que escoger una de esas partes oscuras que normalmente quedan al
+principio o final del rollo.
+
+Para nuestra cámara concreta, utilizamos un perforador de hojas que
+tiene aproximadamente el mismo diámetro que el orificio de la
+lente. Acoplamos la lente de nuevo y a ver que pasa.
+
+\ebOpage{introcolor}{0.25}{LA CACHARRERÍA}
+
+\begin{center}
+\myfig{0}{images/cacharreria/paso07.eps}{0.9}
+
+{\footnotesize\bf Nuestro filtro de luz visible.}
+\end{center}
+
+
+Nosotros probamos la cámara antes de volver a montarla, pero vosotros
+haced lo que queráis :).
+
+\sectiontext{white}{black}{A JUGAR}
+
+Bien, pues después de todo este lío, vamos a ver que nos permite ver
+nuestra nueva cámara IR. En las páginas web de los recursos podéis ver
+varios ejemplos. Nosotros pondremos algunos más aquí.
+
+Lo primero que vamos a comprobar es que nuestro filtro de color
+funciona. Para ello, simplemente vamos a capturar una imagen
+multicolor y lo que esperaríamos obtener sería la misma imagen pero
+sin colores... que no en blanco y negro. Como podéis apreciar en la
+imagen, hay una sutil diferencia.
+
+\begin{center}
+\myfig{0}{images/cacharreria/colores.eps}{0.9}
+\end{center}
+
+
+Parece funcionar bastante bien pero, normalmente, donde los filtros
+suelen tener problemas es en las denominadas frecuencias de
+corte. Para nuestro caso específico, esa frecuencia de corte se
+encuentra entre el rojo visible y el infrarrojo cercano. 
+
+En la siguiente imagen utilizamos un puntero láser de esos de color
+rojo para comprobar que lo que acabamos de decir tiene un cierto
+sentido :P.
+
+\begin{center}
+\myfig{0}{images/cacharreria/puntero-laser.eps}{0.9}
+\end{center}
+
+Como podéis ver en la imagen de la derecha, aún cuando el color ha
+sido eliminado de la escena, la luz roja proveniente del puntero láser
+no es eliminada por nuestro filtro hecho con negativos fotográficos
+usados... bueno, nadie esperaría que fuera perfecto.
+
+
+Las pantallas TFT no se ven... pero la televisión es otra
+historia. Este último caso os lo dejamos como ejercicio :)
+
+\begin{center}
+\myfig{0}{images/cacharreria/monitor.eps}{0.95}
+\end{center}
+
+
+\sectiontext{white}{black}{VISIÓN DE RAYOS X?}
+
+Si buscáis más información sobre todo esto de las cámaras IR, os
+encontraréis entradas sobre ``milagrosos ingenios para mirar a través de
+las cosas''. Sí, es que suenan así de raros.
+
+Lo que si es cierto es que al poder ``captuar'' la radiación
+infrarroja, y eliminar las componentes del espectro visible, ciertos
+detalles de las imágenes se hacen más evidentes.
+
+Por ejemplo, si miramos a este lápiz USB que utiliza una carcasa azul
+transparente, apenas podemos ver su interior, pero si filtramos el
+color (el azul en este caso), la superficie se vuelva prácticamente
+transparente, y podemos ver los chips en su interior.
+
+\begin{center}
+\myfig{0}{images/cacharreria/usb.eps}{0.95}
+\end{center}
+
+Lo mismo sucede con estas gafas de sol. Para ser sincero, las gafas
+que aparecen en la imagen son un poco cutres de estas de plástico, así
+que no podemos confirmar como funcionaría con unas gafas de las buenas
+:). Observad el ojo de Don... no nos la volverá a jugar en las
+partidas de póker.
+
+\begin{center}
+\myfig{0}{images/cacharreria/gafas.eps}{0.95}
+\end{center}
+
+La razón de la popularidad de estas páginas es que supuestamente
+permiten ver la ropa interior. Lamentablemente nadie se ha ofrecido
+voluntario para enseñar sus vergüenzas en aras de la ciencia, pero
+enseguida os damos algunas indicaciones sobre este tema.
+
+
+\ebOpage{introcolor}{0.25}{LA CACHARRERÍA}
+
+
+\sectiontext{white}{black}{COSAS RARAS}
+
+Como os adelantábamos hace un momento, cuando eliminamos la radiación
+visible de nuestras imágenes, los distintos materiales de nuestras
+ropas de muestran de diferentes formas.
+
+
+
+En general, el color desaparece, ya que normalmente se consigue
+utilizando un tinte que la única propiedad del material que modifica
+es precisamente el color.
+
+Aquí podéis ver como convertimos una moderno e informal chaqueta de
+rayas, en un elegante traje blanco :).
+
+\begin{center}
+\myfig{0}{images/cacharreria/ropa.eps}{0.9}
+
+\end{center}
+
+Lo mismo sucede con las plantas que en general se verán de color
+blanco, como podéis observar en la siguiente imagen. Nuestro filtro de
+color elimina el típico color verde.
+
+\begin{center}
+\myfig{0}{images/cacharreria/plantas.eps}{0.9}
+\end{center}
+
+Lo curioso de esto es que podemos hacer bonitas estampas invernales en
+pleno agosto :).
+
+
+Otra de las características de nuestra nueva cámara es que nos permite
+observar algunas de las medidas de seguridad incluidas en los
+billetes. En la siguiente imagen podéis observar un billete de 5 euros
+y otros de 10.
+
+
+\begin{center}
+\myfig{0}{images/cacharreria/ejemplo01.eps}{0.9}
+\end{center}
+
+Como en la mayoría de los ejemplos anteriores, gran parte del color
+desaparece, pero la zona entorno al holograma, está impresa con una
+tinta especial (algo más que simplemente color). En el caso particular de los billetes, resulta más
+efectivo e interesante utilizar luz ultravioleta o luz ``negra'' como
+suele ser más conocida.
+
+En la siguiente imagen podemos ver un billete de 50 y otro de 100 por
+ambos lados. Nótese como el número de serie y la cantidad se imprimen
+con una tinta especial.
+
+\begin{center}
+\myfig{0}{images/cacharreria/billetes.eps}{0.9}
+\end{center}
+
+
+Finalmente, aquí podéis ver mi cartera que esta un poco para ser
+retirada. Parece que las zonas mas desgastadas se resaltan en nuestra
+camara IR. 
+
+\begin{center}
+\myfig{0}{images/cacharreria/cartera.eps}{0.9}
+
+\end{center}
+
+
+
+
+\sectiontext{white}{black}{LUZ INVISIBLE EN LA OSCURIDAD}
+
+Y por supuesto, nuestro mando a distancia de la tele se convierte en
+una linterna que no da luz XDDDDD. Y es precisamente esta
+característica la que resulta más interesante desde el punto de vista
+de las aplicaciones de nuestra webcam IR.
+
+\begin{center}
+\myfig{0}{images/cacharreria/linterna-ir.eps}{0.9}
+\end{center}
+\begin{center}
+\myfig{0}{images/cacharreria/linterna-ir2.eps}{0.9}
+\end{center}
+
+Unas imágenes curiosas eh?... Pero muchos os preguntaréis, y para que
+sirve esto. Bueno, además de para quedarte con los colegas. La
+pregunta exacta que probablemente se os esté viniendo a la cabeza es: ¿ Qué hace
+una gente tan discreta como los tíos de Occam's, haciendo algo para
+chulear?
+
+Buena pregunta. Efectivamente, disponer de una cámara IR nos permite
+abordar algunos proyectos muy interesantes, sobre todo desde el punto
+de vista de los denominado MMI (Man Machine Interface o Interface
+Hombre Máquina).
+
+La primera y la más obvia de estas aplicaciones es lo que los ingleses
+denominan tracking y que nosotros podemos llamar seguimiento.
+
+\ebOpage{introcolor}{0.25}{LA CACHARRERÍA}
+
+\sectiontext{white}{black}{TRACKING}
+
+Como os decíamos, las aplicaciones más interesantes y directas de este
+tipo de cámaras es el de los interfaces MMI. La ventaja más
+importante... pues que la radiación infrarroja es invisible para el
+ojo humano.
+
+Esto se traduce en que nuestra cámara va a capturar unas imágenes
+totalmente oscuras con un pedazo de punto blanco allá donde haya una
+fuente de luz infrarroja. Como podéis imaginar, esto hace
+prácticamente trivial el determinar la posición de esas fuentes de luz IR
+en la imagen.
+
+Para utilizar estas técnicas, tenemos dos opciones
+fundamentales. Hacer que la ``cosa'' que queremos seguir emita luz IR,
+o que la refleje.
+
+En general si tenemos que seguir muchos puntos es mejor utilizar
+elementos que reflejen la luz IR, de lo contrario habría que llenar el
+objeto a seguir (pensad por ejemplo en un sistema de captura de
+movimiento de personas para un juego) de cables y baterías.
+
+
+
+Si por el contrario, solo necesitamos un par de puntos de referencia,
+por ejemplo para un dispositivo apuntador a utilizar en un sistema de
+realidad virtual, un par de LEDs y unas pilas harán el trabajo.
+
+\begin{entradilla}
+{\em El {\color{introcolor} wiimote} utiliza una barra sensora con
+{\color{introcolor} luz IR} para calcular la
+posición del jugador}
+\end{entradilla}
+
+Este tipo de soluciones son utilizados, por ejemplo, por el mando de la consola Wii (el
+denominado wiimote), como parte de su sistema de
+posicionamiento. El mando incluye un acelerómetro y una cámara
+infrarroja los cuales, junto con una barra sensora permiten calcular
+la posición y orientación del jugador.
+
+\begin{center}
+\myfig{0}{images/cacharreria/wiimote.eps}{0.7}
+\end{center}
+
+
+La barra sensora está compuesta de dos grupos de LEDs infrarrojos,
+separados una distancia conocida. La cámara en el mando detecta estos
+dos grupos y el procesador interno hace las matemáticas :).
+
+Con un puñado de LEDs infrarrojos, algunas resistencias y nuestra
+webcam IR podemos explorar este tipo de sistemas.
+
+La cámara detecta una serie de puntos de referencia
+
+\sectiontext{white}{black}{PANTALLAS TÁCTILES}
+
+Otra aplicación en la que podemos utilizar nuestra flamante webcam IR
+es la construcción de una pantalla táctil multi-toque :)... si, como
+la Microsoft Surface y similares.
+
+
+Este tipo de pantallas se pueden construir de distintas formas, pero
+una de ellas, bastante asequible para el aficionado al cacharreo es la
+denominada FTIR que son las siglas de Frustrated Total Internal
+Reflection. Podríamos traducirlo por Reflexión Interna Total
+Frustrada, y enseguida veremos que el nombre tiene cierto sentido.
+
+Estas pantallas utilizan una superficie acrílica (un
+plástico), en cuyo interior se inserta luz infrarroja, de forma que no
+es visible por el ojo humano. La luz insertada rebota en el interior
+del material pasando de un extremo al otro.
+
+\begin{center}
+\myfig{0}{images/cacharreria/multitouch.eps}{0.8}
+\end{center}
+
+
+Si presionamos la superficie con, por ejemplo, nuestros dedos, la
+deformación que producimos en la superficie, interrumpe el rebote de
+la luz IR en su interior y produce un efecto de dispersión... es
+decir, que se produce un ``puntazo IR''... Ahora lo de reflexión
+interna frustrada tiene más sentido ¿no?
+
+Todo este proceso es completamente transparente al ojo humano ya que
+la luz utilizada es IR, pero utilizando una cámara IR, esos
+``puntazos'' que se forman al presionar la superficie se pueden
+capturar y procesar muy fácilmente.
+
+El hecho de que sea multi-toque o no, va a depender del software que
+procese las imágenes y lo que ese software haga con los datos que obtenga.
+
+Esto es todo. Esperamos que os haya gustado esta nueva sección.
+
+\end{multicols}
+
+
+{\colorbox{introcolor}{
+\begin{minipage}{0.98\linewidth}
+{\textsf
+{\color{white}{\Large RECURSOS}}
+
+\medskip
+
+\footnotesize
+How to make a webcam work in infra red
+
+{\footnotesize\url{http://www.hoagieshouse.com/IR/}}
+
+\medskip
+
+Pantallas Multitouch FTIR
+
+{\footnotesize\url{http://en.wikipedia.org/wiki/Total_internal_reflection\#Frustrated_total_internal_reflection}}
+
+{\footnotesize\url{http://en.wikipedia.org/wiki/Multi-touch}}
+
+%\medskip
+\normalsize
+}
+\end{minipage}
+}}
+
+
+\clearpage
+\pagebreak

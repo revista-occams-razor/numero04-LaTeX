@@ -1,0 +1,127 @@
+% Este fichero es parte del Número 4 de la Revista Occam's Razor
+% Revista Occam's Razor Número 4
+%
+% (c)  2009, The Occam's Razor Team
+%
+% Esta obra está bajo una licencia Reconocimiento 3.0 España de
+% Creative Commons. Para ver una copia de esta licencia, visite
+% http://creativecommons.org/licenses/by/3.0/es/ o envie una carta a
+% Creative Commons, 171 Second Street, Suite 300, San Francisco,
+% California 94105, USA. 
+
+% Desafío 
+%
+
+\rput(5.0,-3.0){\resizebox{16cm}{!}{{\epsfbox{images/general/header.eps}}}}
+
+% -------------------------------------------------
+% Cabecera
+\begin{flushright}
+\msection{introcolor}{black}{0.25}{DESAFÍO}
+
+\vspace{4.5mm}
+
+\mtitle{10cm}{Un Desafío Criptográfico}
+
+{\sf por Fernando Martín Rodríguez (fmartin@tsc.uvigo.es) }
+
+{\psset{linecolor=black,linestyle=dotted}\psline(-12,0)}
+\end{flushright}
+
+\vspace{2mm}
+
+% -------------------------------------------------
+
+
+Después de escribir el artículo sobre criptografía me  entraron  unas  ganas
+irresistibles de ponerme a inventar métodos. Hablando con el director de  la
+revista se nos ocurrió esta idea: publicar  un  desafío.  Esto  es,  lo  que
+sigue es un algoritmo de criptografía de nuestra invención. Tan  público  va
+a ser que os vamos a dar el código fuente. Después va un  criptograma  y  se
+trata de descifrarlo... sin saber la clave claro.
+
+
+\vspace{2mm}
+
+
+En el próximo número se  publicará  la  solución  y  los  nombres  de  todos
+aquéllos que hayan enviado soluciones válidas.  Para  enviar  una  solución,
+enviad un correo a occams-razor@uvigo.es con:
+
+\begin{itemize}
+\item Nombre completo.
+\item Criptograma descifrado.
+\item Valor de la clave.
+\item Una explicación breve de lo que hace el método y  de  cómo  lo
+habéis atacado.
+\end{itemize}
+
+Ánimo, con las pistas dadas, no es difícil.
+
+El cifrador son dos funciones de matlab... ahí van (sin comentarios):
+ 
+
+%\sectiontext{white}{black}{EL CÓDIGO}
+
+Función principal:
+
+\lstset{language=Matlab,frame=tb,framesep=5pt,basicstyle=\footnotesize}   
+\begin{lstlisting}
+
+function criptograma = CifrarTexto(llano,clave)
+raiz = floor(sqrt(clave));
+resto = clave-raiz^2;
+N = length(llano);
+for i=1:N,
+    [raiz, resto, digito] = DigitoDecimalRaizCuadrada(raiz,resto);
+    cfr = llano(i)+digito;
+    if cfr>90
+        cfr = (cfr-91)+65;
+    end
+    criptograma(i) = char(cfr);
+end
+\end{lstlisting}
+
+Función auxiliar:
+
+\lstset{language=Matlab,frame=tb,framesep=5pt,basicstyle=\footnotesize}   
+\begin{lstlisting}
+
+function [raiz, resto, digito] = DigitoDecimalRaizCuadrada(raiz0,resto0)
+% Obtener el siguiente decimal de una raiz cuadrada
+resto1 = resto0*10;
+resto2 = resto1*10;
+aux1 = 2*raiz0;
+digito0 = floor(resto1/aux1);
+for cont = digito0:-1:0,
+    aux2 = aux1*10+cont;
+    aux3 = aux2*cont;
+    resto = resto2-aux3;
+    if (resto>=0)
+        digito = cont;
+        break;
+    end
+end
+raiz = raiz0*10+digito;
+\end{lstlisting}
+
+¡¡¡Aviso!!! No he ``encriptado'' los  nombres  de  las  funciones  ni  de  las
+variables. No os doy el programa que hace el descifrado. ¿Podríais crearlo?
+
+Y ahora el criptograma:
+
+\begin{verbatim}
+DWSGNGGJBVVPIWYXXKJSGHVLLPXVHQYWYAJBTLEDNLAROLXTBGINPFZYJRPXUMUFCVCJTMXRDKXIFUXRW
+\end{verbatim}
+
+Por último, para comprender totalmente el método estaría bien leer
+esto:
+
+\url{http://platea.pntic.mec.es/anunezca/ayudas/algoritmo_raiz/algoritmo_raiz.htm}
+
+
+%\sectiontext{white}{black}{FILTRANDO PAQUETES}
+
+
+\clearpage
+\pagebreak

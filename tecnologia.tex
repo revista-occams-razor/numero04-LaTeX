@@ -1,0 +1,584 @@
+% Este fichero es parte del Número 4 de la Revista Occam's Razor
+% Revista Occam's Razor Número 4
+%
+% (c)  2009, The Occam's Razor Team
+%
+% Esta obra está bajo una licencia Reconocimiento 3.0 España de
+% Creative Commons. Para ver una copia de esta licencia, visite
+% http://creativecommons.org/licenses/by/3.0/es/ o envie una carta a
+% Creative Commons, 171 Second Street, Suite 300, San Francisco,
+% California 94105, USA. 
+
+% Seccion Tecnología
+%
+
+\rput(8.5,-4.4){\resizebox{18.0cm}{!}{{\epsfbox{images/tecnologia/tecnologia.eps}}}}
+%\rput(-2.5,-4.5){\resizebox{19cm}{!}{{\epsfbox{images/tecnologia/tecnologia.eps}}}}
+
+% -------------------------------------------------
+% Cabecera
+\begin{flushright}
+\msection{introcolor}{black}{0.25}{TECNOLOGÍA}
+
+\vspace{3.5cm}
+
+
+%\mtitle{11cm}{{Reconocimiento Biométrico a Través de la Cara}}
+\mtitle{8cm}{{Reconocimiento Biométrico}}
+
+\mtitle{6cm}{{a Través de la Cara}}
+
+{\sf por Fernando Martín Rodríguez (fmartin@tsc.uvigo.es) }
+
+{\psset{linecolor=black,linestyle=dotted}\psline(-12,0)}
+\end{flushright}
+
+\vspace{2mm}
+
+% -------------------------------------------------
+
+\begin{multicols}{2}
+
+% Introducción
+\intro{introcolor}{S}{iendo éste un número dedicado a las tecnologías
+de seguridad no podía faltar un artículo de la serie
+biométrica. Advertido queda que seguramente será el último... Ante lo
+que seguramente estará pensando la dirección de la revista digo que
+no, no me siento capaz de escribir sobre el reconocimiento a través de
+voz. Hoy toca el reconocimiento a través de imágenes de la
+cara. 
+}
+
+\vspace{2mm}
+
+% Cuerpo del artículo
+Fijaos que ese el método que más empleamos los humanos para
+reconocer personas. En el 99\% de los casos reconocemos a alguien al
+ver su cara, también reconocemos personas por la voz pero casi siempre
+vemos las caras antes de oír nada. Ya puestos, comentar que el
+reconocimiento humano es muy fiable porque utiliza múltiples datos,
+esto es: vemos la cara pero también la silueta (la estatura,
+complexión...), oímos la voz y también nos fijamos en cosas muy
+difíciles de medir para una máquina: los gestos, la forma de
+andar.... La suma de todos esos factores (una suma ponderada que hace
+el cerebro sin que lo notemos) da un reconocimiento muy
+fiable. Realmente ese método (la redundancia) es el que usa el cerebro
+humano para casi todas sus tareas de reconocimiento. 
+
+
+\sectiontext{white}{black}{INTRODUCCIÓN}
+
+Para mantener la tradición, empezaremos recordando las características
+que un rasgo debe cumplir para dar lugar a un buen sistema biométrico
+y, ya de paso, veremos cómo se cumplen para las imágenes faciales. A
+saber: 
+
+\begin{itemize}
+\item Universalidad: todas las personas deben poseer el rasgo. Bueno,
+eso es cierto... por lo menos para personas vivas. 
+
+\item Unicidad: no debe haber dos personas con el rasgo seleccionado
+igual. Aquí ya empezamos a no cumplir... aparte de gemelos idénticos
+también hay pares de personas parecidas (más probables en gente con
+parentesco pero no necesariamente).
+
+\item Permanencia: debe ser invariantes con el tiempo. ¡¡La cagamos!!
+No hay rasgo biométrico más variable que la cara: barba, gafas, pelo
+largo o corto... Aparte de las diferencias (notables) que puede llegar
+a haber en la captura de imagen debidas a la postura frente a la
+cámara (pose), el gesto (sonrisa, enfado, bostezo ...). Pensad que en
+caso de usuarios malintencionados podremos tener casos de
+disfraz. Todo lo anterior, unido a que el número de imágenes que
+podemos tener almacenadas de la cara de alguien es limitado hace que
+éste sea uno de los rasgos biométricos menos fiables que se conocen. 
+
+\item Cuantificación: admiten medidas cuantitativas. Sí que las
+admiten... si no, no sería posible ni intentarlo y no estaríamos
+escribiendo esto. 
+
+\end{itemize}
+
+
+
+\begin{entradilla}
+{\em El {\color{introcolor} reconocimiento de caras es el método} más utilizado por los
+humanos para reconocer personas}
+\end{entradilla}
+
+Aun a riesgo de repetirme, voy a copiar otra vez el cuadro comparativo
+de los diferentes sistemas biométricos. Recordad que TFA significa
+``Tasa de Falsa Aceptación'' y es el porcentaje de veces que el
+sistema declara como iguales a dos individuos que no lo son, mientras
+que TFR es ``Tasa de Falso Rechazo'' y es el porcentaje de veces que
+dos individuos iguales son erróneamente considerados
+diferentes. Fijaos que aunque dichas tasas pueden llegar a ser bajas
+(en experimentos muy controlados), la memoria y el tiempo requeridos
+son altos y la facilidad de engañar al sistema también. 
+
+
+
+
+
+\eOpage
+
+\msection{introcolor}{black}{0.25}{TECNOLOGÍA}
+
+
+\begin{table}[ht]
+{\footnotesize
+\begin{tabular}{|p{1.6cm}|p{0.8cm}|p{0.8cm}|p{1.5cm}|p{1.7cm}|p{1.7cm}|p{1.7cm}|p{1.7cm}|p{1.7cm}|}
+\hline
+{Indicador biométrico} & {TFR} & {TFA}
+& {Memoria (bytes)} & {Tiempo respuesta} 
+& {Variabilidad intra-clase} & {Variabilidad
+inter-clase} & {Implantación en mercado} & {Facilidad  de engaño}\\
+\hline
+%\rowcolor{gray}
+Huellas & 3\% & $1 : 1 ^6$ & 100-1000 & Depende del sistema & Media & Alta &52\% & Media \\
+\hline
+Retina & Bajas & aprox. 0\% & Poca & Bastante bajo & Muy baja & Muy alta & <1\% & Baja \\
+\hline
+%\rowcolor{gray}
+Iris & Bajas & aprox. 0\%  & 1024 bits & Medio-bajo & Muy baja & Muy alta & 7,3\% & Baja \\
+\hline
+Cara & Bajas & Bajas & >10,000  & Alto(1:N)  Bajo (1:1) & Muy alta & Alta & 11,4\% & Muy alta\\
+\hline
+%\rowcolor{gray}
+Voz & Bajas & Bajas & >1000 & Alto (1:N)  Bajo (1:1) & Alta & Media-alta & 4,1\% & Muy alta \\
+\hline
+
+
+\end{tabular}
+}
+\end{table}
+\begin{center}
+{\textbf {Tabla 1: Principales características de algunos indicadores biométricos.}}
+\end{center}
+
+\begin{multicols}{2}
+
+
+
+
+El conocido gurú de la seguridad Bruce Schneier (inventor del
+algoritmo de cifrado Blowfish) escribió que era inviable el uso de un
+sistema de reconocimiento de caras en una aplicación masiva como, por
+ejemplo, detectar sospechosos en un aeropuerto. Con una TFA típica del
+1\% significaría ``parar'' a una de cada 100 personas que pasen por
+delante de una cámara (y obligarles a identificarse utilizando un
+método más fiable, por ejemplo: colocando el índice en un lector
+automático de huellas). Si en Barajas hay casi 150000 pasajeros al día
+(ese es el dato que encontré en Internet) tendríamos que identificar a
+1500 personas/día. ¡¡¡Ojo!!! que no estamos contando a los que van a
+esperar a alguien... Además, ser identificado por la policía para que
+resulte ser un error es algo bastante desagradable y que puede dar
+lugar a denuncias, quejas... ¿Qué ocurriría en el aeropuerto de
+Chicago (más de 250.000 pasajeros/día)? 
+
+El reconocimiento de caras sí es viable en grupos cerrados de pocos
+usuarios (control de acceso a un recinto o a un sistema
+informático...) y es en esos casos cuando se obtienen buenos
+resultados en TFR y TFA. 
+
+
+\sectiontext{white}{black}{PREPROCESADO}
+
+Como en todo problema de reconocimiento de imágenes, primero debemos
+extraer la zona de interés. En el reconocimiento de caras se suele
+buscar una cara frente a la cámara, con los ojos en posición conocida
+y de un tamaño fijo. Además, deberíamos normalizar el brillo de la
+imagen de forma que no haya variaciones grandes de iluminación. Llegar
+a tener esa imagen a partir de lo que ha capturado la cámara es lo que
+llamamos preprocesado y es muy importante hacerlo bien para que el
+reconocimiento funcione. En imágenes capturadas ``de cualquier manera'',
+esto es: las imágenes de una cámara de seguridad que apunta a un
+pasillo o a una cola de personas puede no ser posible hacer un
+preprocesado correcto. 
+
+\begin{entradilla}
+{\em Comenzaremos {\color{introcolor} preprocesando} las las imágenes}
+\end{entradilla}
+
+A continuación describiremos dos técnicas muy populares para localizar
+caras. Además, no son excluyentes, pudiendo haber sistemas que
+combinen ambas. 
+
+\sectiontext{white}{black}{LOCALIZACIÓN POR COLOR}
+
+Una de las técnicas más empleadas para localizar caras es la detección
+de aquellos puntos de la imagen que tienen un color similar al de la
+piel humana. Este método nos dará una serie de regiones con alta
+probabilidad de contener caras. Cada una de esas regiones (blobs)
+deberá ser procesada posteriormente para determinar si realmente es
+una cara o no. Una aplicación es, por ejemplo, buscar caras en una
+imagen compleja e impredecible (como las imágenes de una cámara de
+vigilancia). 
+
+Para entender bien la localización por color debemos saber que la
+representación habitual de los colores (R, G, B) no es la única
+posible y se puede transformar a otras representaciones (espacios de
+color), todas ellas basadas en tres componentes. Una representación
+muy interesante es la HSV que divide el color en tres números: 
+
+\begin{itemize}
+\item El tinte (Hue, H): es un ángulo y define la posición del color en un
+círculo que empieza en el rojo (ángulo 0) y que recorre todo el arco
+iris. El tinte es lo que coloquialmente llamamos ``color'': rojo,
+naranja, verde \ldots Otra cosa es que rojo sea intenso, brillante \ldots
+
+\item La saturación (Saturation, S): se mide entre 0 y 1 y es la
+``pureza'' del color. Si compramos pintura roja debería ser rojo puro
+(saturación 1 o rojo al 100\%). Si deseamos ``rebajar'' ese rojo,
+podemos mezclar la pintura roja con blanca e iremos logrando
+diferentes ``niveles'' de rojo, si tenemos 50\% de rojo y 50\% de
+blanco la saturación será 0.5.
+
+\item El brillo (llamado Value, V; a veces se le llama intensidad y se
+habla de sistema HIS): el brillo es la ``potencia'' del color o la
+iluminación que proporciona. El color blanco es el más brillante y el
+negro tiene brillo cero. Hace años se usaban monitores verdes porque
+es un color que da gran sensación de brillo para poco gasto en
+energía, las luces azules para estudiar usan la idea contraria (es un
+color que ilumina poco pero cansa menos la vista).  
+
+\end{itemize}
+
+\ebOpage{introcolor}{0.25}{TECNOLOGÍA}
+
+
+\begin{center}
+\myfig{0}{images/tecnologia/circulo_color.eps}{0.9}
+
+{\footnotesize\bf Círculo de Color. El ángulo polar determina el
+tinte, la distancia al centro la saturación.}
+\end{center}
+
+Para la piel humana\ldots.
+\begin{itemize}
+
+\item El tinte es ¡¡¡naranja!!! ¿Qué ocurre si subimos mucho el color del
+televisor? No nos vemos naranjas porque la saturación es baja. 
+
+\item El color varía mucho para los diferentes tipos de piel. La raza
+amarilla es la más ``saturada''. La raza negra tiene brillo muy bajo
+(y eso puede introducir errores de redondeo en el cálculo del tinte).
+
+\item Para hacer un reconocedor serio debemos utilizar reconocimiento
+de patrones. Esto es: tomar muchas fotos de individuos con diferentes
+tipos de piel y, de alguna manera, comparar la imagen que tengamos a
+la entrada con las previas (conjunto de entrenamiento).
+
+\item El sistema de color HSV es el más intuitivo para este problema pero se utilizan otros. 
+
+\end{itemize}
+
+Para ampliar un poco estos conocimientos podéis leer el sencillo artículo: ``Detección de Caras en Imágenes Capturadas por Cámaras Web'' (autores: Patricia Conde Pardo y yo mismo). Sí, sí, lo he vuelto a hacer: ``me acabo de hacer autobombo''. Lo podéis descargar de {\footnotesize{\url{http://webs.uvigo.es/gpi-rv/research-papers.html}}}.
+
+
+\sectiontext{white}{black}{EL ALGORITMO DE VIOLA}
+
+Actualmente existe un método capaz de detectar caras de cualquier
+tamaño en una imagen blanco y negro. Fue diseñado por Paul Viola y
+publicado en ``Rapid Object Detection using a Boosted Cascade of
+Simple Features,'' (autores P. Viola y M. J. Jones, publicado en 2001
+en el congreso del IEEE sobre visión artificial y reconocimiento de
+patrones: CVPR). Para este algoritmo disponemos de una implementación
+de código abierto (ver cuadro de recursos).
+
+Este código es parte de la excelente biblioteca ``OpenCV'' (conjunto
+de algoritmos de visión artificial donados por Intel al mundo):
+{\footnotesize\url{http://www.intel.com/technology/computing/opencv}}. Ufff,
+las multinacionales, a veces, también tienen su corazoncito :).
+
+\begin{entradilla}
+{\em El {\color{introcolor}algoritmo de Viola} se basa en la extracción de
+características de tipo Haar}
+\end{entradilla}
+
+El algoritmo se basa en las llamadas ``Haar-like features''
+(características tipo Haar, que se llaman así porque se calculan de
+una forma parecida a una transformada llamada ``transformada Haar'' o
+wavelet de Haar). Cada característica es como un operador gradiente
+pensado para resaltar un patrón. Los patrones son características
+como: contornos, líneas, cruces\ldots La imagen se recorre con una
+ventana a la que se le aplican varios clasificadores en serie, cada
+uno más complejo que el anterior, que usan las características para
+confirmar o descartar la hipótesis de que estamos ante el objeto
+buscado (en este caso una cara pero podría entrenarse para encontrar
+otros objetos). Si la hipótesis se rechaza en cualquier nivel, el
+proceso no continúa pero si se confirma tras todos los filtros
+tendremos un objeto detectado. 
+
+
+\end{multicols}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[height=4.0cm,angle=0]{images/tecnologia/imagenA.eps}
+\includegraphics[height=4.0cm,angle=0]{images/tecnologia/imagenB.eps}
+\includegraphics[height=4.0cm,angle=0]{images/tecnologia/imagenC.eps}
+
+{\footnotesize\bf A: Imagen original. B: se ha aumentado la saturación logrando resaltar la piel visualmente (y hacer evidente el tinte anaranjado). C: detección del óvalo facial utilizando colorimetría (se ha obtenido un blob del que se ha calculado un contorno poligonal: en verde, y una elipse de ajuste: en rojo).
+}
+\end{figure}
+
+\clearpage
+\pagebreak
+
+\msection{introcolor}{black}{0.25}{TECNOLOGÍA}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[height=9.0cm,angle=0]{images/tecnologia/resultado.eps}
+
+{\footnotesize\bf Resultado de aplicar la función OpenCV. Nótese que
+hay un falso positivo.}
+\end{figure}
+
+\bigskip
+
+\begin{multicols}{2}
+
+
+
+Los patrones se consideran girados en varios posibles ángulos. Además,
+el algoritmo puede ejecutarse a varias escalas para obtener objetos de
+diferentes tamaños o de tamaño desconocido. 
+
+Una vez que hemos localizado las caras en nuestra imagen, ha llegado
+el momento de reconocerlas. Se han probado muchas técnicas para el reconocimiento facial. Aquí sólo vamos a describir las dos más extendidas.
+
+
+\sectiontext{white}{black}{ANÁLISIS DE COMPONENTES PRINCIPALES}
+
+El análisis de componentes principales (o PCA: Principal Component
+Analysis) se basa en representar las caras como combinación lineal de
+ciertas caras básicas (autocaras).Además, conocemos cuáles son las
+autocaras más importantes por lo que podemos quedarnos sólo con ellas
+y descartar las demás. Los coeficientes que permiten representar la
+cara de entrada serán utilizados como características para el
+reconocimiento. A esta técnica también se le llama proyección en
+subespacios o también ``transformada de Karhunen-Loève''.
+
+\begin{entradilla}
+{\em El proceso de reconocimiento hace uso de {\color{introcolor}álgebra matricial}}
+\end{entradilla}
+
+El nombre de proyección en subespacios viene de la teoría matemática
+que se utiliza: se trata de convertir el conjunto de imágenes de caras
+en un subespacio vectorial (un subconjunto de un espacio mayor: el de
+imágenes). Para realizar el análisis debemos encontrar una base del
+subespacio, esto es: un conjunto de caras tal que podamos representar
+cualquier cara como combinación lineal de las caras de la base. Es
+más: no nos vale cualquier base... queremos una base ``ordenada en
+importancia''. 
+
+\begin{entradilla}
+{\em El PCA nos permite {\color{introcolor} generar una base de vectores} ordenada por importancia}
+\end{entradilla}
+
+Quiero decir: el primer vector será el más importante, el segundo ya será menos importante pero más que los siguientes... Una base con esas características ``concentra la información en los coeficientes de los primeros vectores''. Podremos llegar a decidir que, por ejemplo, los 50 primeros componentes son suficientes con lo que los otros (N-50, con N muy grande) los ignoramos. Si al representar una imagen con los 50 primeros coeficientes obtenemos una distancia euclídea baja respecto de la imagen original: ``Esa imagen será una cara''. Si la distancia obtenida es grande, no será una cara; será otra cosa.
+
+
+¿Cómo se consigue lo anterior? Bueno\ldots en cuatro palabras: ``utilizando álgebra de matrices'' (no me atrevo a decir que es álgebra avanzada pero puede desafiar un poco los conocimientos olvidados del ingeniero medio). Suponiendo que nuestras caras son imágenes $MxM$, tendremos un espacio total de dimensión $N=M^2$. Tomando muchas caras podemos calcular una matriz de autocorrelación para esos vectores (que resumirá la ``estadística'' de las caras). Ahora empieza lo ``fuerte'':
+
+
+\ebOpage{introcolor}{0.25}{TECNOLOGÍA}
+
+\begin{itemize}
+\item La matriz de autocorrelación será definida positiva (esto es:
+todos sus autovalores son reales y positivos) álgebra) por lo que
+podremos construir una base ortonormal de autovectores (creéroslo, es
+un teorema). ¿Qué es una base ortonormal? Aquélla formada por vectores
+unitarios y perpendiculares entre sí. 
+
+\item Esa será nuestra base. Los autovectores se les llama
+``autocaras'' porque son eso: caras (que pueden combinarse para formar
+cualquier cara). La autocara más importante es la asociada al mayor
+autovalor y así sucesivamente (ordenando los autovalores de mayor a
+menor tenemos ordenada la base).
+
+\item Una vez hecho esto habría que decidir cuántos vectores retenemos
+y cuántos descartamos... un indicativo puede ser el peso de los
+autovalores. Una medida simple como:  $\rho =
+{(\displaystyle\sum_{i=1}^p \lambda_i)} /
+{(\displaystyle\sum_{i=1}^N \lambda_i)}$estima el peso de los p
+primeros autovalores respecto del total: si  $\rho$ es cercano a 1 el peso es grande. De todas formas, el número suficiente de componentes debe ser verificado experimentalmente. Esto es: si implementáis esto y no funciona tal vez haya que subir p. Otro método es empezar con p muy grande e irlo bajando hasta que falle (funcionar/fallar significa que el conjunto de p autocaras representa bien las caras (pequeño error euclídeo).
+
+
+\end{itemize}
+
+Pensad que con todo esto hemos reducido la dimensión del espacio de caras de $N=M^2$ a p. Si $M=512$ y $p=50$
+
+Cuando queremos reconocer una imagen lo primero es calcular sus coeficientes para las autocaras seleccionadas. A eso se le llama ``proyectar sobre el subespacio de autocaras'' (de hecho, el coeficiente para cada autocara es muy fácil de calcular, basta un producto escalar entre la autocara y la cara de entrada).
+
+Después podríamos comprobar si la entrada es realmente una cara
+(calculando el error entre la cara representada por las autocaras y la
+cara misma). Si esa comprobación es positiva (error bajo), ahora toca
+saber de quién es la cara... para eso, hay que comparar el vector de
+características de la cara de entrada (coeficientes de la cara
+respecto a las autocaras) con los vectores almacenados (procedentes de
+caras que queremos reconocer). 
+
+
+\end{multicols}
+
+
+{\colorbox{excolor}{
+\begin{minipage}{0.98\linewidth}
+
+{\Large PCA fácil}
+
+Para intentar hacer más comprensible esto de los subespacios, permitidme un ejemplo muy simplificado. Supongamos que nuestras imágenes son de tamaño 2x1 (eso sí que es simplificar). Entonces las imágenes serán puntos del plano (figura de la izquierda).
+
+
+\begin{centering}
+\includegraphics[height=8.5cm,angle=0]{images/tecnologia/vectores.eps}
+\includegraphics[height=8.5cm,angle=0]{images/tecnologia/vectores_transformados.eps}
+\end{centering}
+
+El ``quiz'' de la cuestión es que no nos interesan todas las imágenes,
+sólo queremos procesar caras. Siguiendo con nuestra simplificación, si
+las imágenes de interés son puntos que ``aproximadamente'' están
+situados sobre la misma recta (figura de la derecha); podremos hacer
+una simplificación (creación de una base de autovectores) que viene a
+ser un giro de ejes de forma que la primera componente quede en la
+dirección principal. 
+
+¿Podemos despreciar la componente $Y'$? Yo diría que sí. Además,
+podemos saber fácilmente si un vector es del conjunto: si la
+representación eliminando $Y'$ comete un error pequeño ¿NO? 
+
+\bigskip
+
+\end{minipage}
+}}
+
+
+\clearpage
+\pagebreak
+
+\msection{introcolor}{black}{0.25}{TECNOLOGÍA}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[height=4.5cm,angle=0]{images/tecnologia/autocaras.eps}
+\includegraphics[height=2.0cm,angle=0]{images/tecnologia/cara-media.eps}
+
+{\footnotesize\bf Ejemplo de un conjunto de autocaras. La
+autocorrelación se hace restando la media a cada muestra por lo que
+debemos tenerla también.}
+\end{figure}
+
+\bigskip
+
+\begin{multicols}{2}
+
+
+Aquí se pueden usar muchas técnicas pero la más simple (y una de las
+más efectivas) es la del vecino más próximo. Esta técnica consiste en
+calcular distancias entre los vectores de características (euclídea o
+norma 2, norma 1...) y considerar como resultado reconocido, el patrón
+almacenado más próximo al de entrada. ¡¡¡Ojo!!! puede haber varias
+muestras por individuo a reconocer. 
+
+\begin{center}
+\myfig{0}{images/tecnologia/proyeccion.eps}{0.9}
+
+{\footnotesize\bf Proyección en subespacio de caras.}
+\end{center}
+
+
+\sectiontext{white}{black}{TÉCNICAS DE REPRESENTACIÓN CON MALLAS
+DEFORMABLES}
+
+La idea de este método es ``colocar una máscara deformable sobre la cara (con forma de red o malla) y ajustarla para que los nodos de la malla coincidan con puntos importantes como los ojos, nariz\ldots (puntos fiduciales)''. Este método es la versión informática del método que hemos visto muchos en televisión: encontrar características como la distancia entre los ojos, la posición de la punta de la nariz\ldots
+
+
+
+La base matemática del método es aplicar filtros de Gabor en cada nodo y utilizar las respuestas obtenidas para ir ajustando la malla hasta que esté colocada sobre los puntos deseados. Como vimos en el capítulo de las huellas el filtro de Gabor extrae características del entorno del punto, además los filtros Gabor tienen una orientación que hace que sean sensibles a las variaciones con determinado ángulo. Aplicando los filtros en múltiples direcciones podemos calcular una especie de vector gradiente que nos permita mover el nodo en la dirección deseada.
+
+
+\begin{entradilla}
+{\em la localización de los {\color{introcolor}puntos fiduciales de la cara} es más
+compleja de lo que parece en la TV}
+\end{entradilla}
+
+Una vez ajustadas las mallas, los sujetos se comparan mediante una medida de similitud que tiene dos términos: la similitud entre los vectores de textura de cada nodo y la similitud por deformación de cada malla.
+
+\begin{center}
+\myfig{0}{images/tecnologia/malla.eps}{0.4}
+
+{\footnotesize\bf Representación con mallas deformables (método EBGM:
+Elastic Bunch Graph Matching.}
+\end{center}
+
+\sectiontext{white}{black}{TRABAJOS DE LA ETSET VIGO}
+
+En nuestro centro, el profesor José Luis Alba (jalba@gts.tsc.uvigo.es)
+y varios colaboradores llevan algún tiempo trabajando en el
+reconocimiento a través de caras. Dichos trabajos forman parte de una
+línea más amplia dedicada al reconocimiento biométrico en
+general. 
+
+
+\ebOpage{introcolor}{0.25}{TECNOLOGÍA}
+
+Originalmente sólo se trabajó con reconocimiento por voz
+(reconocimiento de locutores) y posteriormente se añadieron los
+reconocimientos de caras, iris y huellas. Actualmente, se está
+desarrollando un sistema de verificación multimodal (voz y cara) para
+acceso a servicios a través de Internet. Esta línea de investigación
+se sigue en cooperación con otros grupos de trabajo europeos en el
+seno de la acción COST275: ``Biometrics-Based Recognition of people
+over the Internet'' (\url{http://www.fub.it/cost275}). Como parte de las
+actividades del COST se organizó un workshop (pequeño congreso) en el
+que se presentaron los últimos avances en el campo
+(\url{http://cost275.gts.tsc.uvigo.es/}). Además, estos estudios del reciben
+financiación a través de proyectos del Ministerio de Educación y de la
+Xunta de Galicia y parten de un sistema ya desarrollado previamente
+con fondos públicos en el que se utilizaba reconocimiento de voz para
+acceder a un buzón de correo por línea telefónica
+(\url{http://www.gts.tsc.uvigo.es/telcorreo/}). 
+
+
+\end{multicols}
+
+
+{\colorbox{introcolor}{
+\begin{minipage}{0.98\linewidth}
+{\textsf
+{\color{white}{\LARGE RECURSOS}}
+
+\bigskip
+
+\textsf{Implementación de Código Abierto del algoritmo de Viola}
+
+{\footnotesize\url{http://www.intel.com/technology/itj/2005/volume09issue02/art03_learning_vision/p04_face_detection.htm}}
+
+\medskip
+
+\textsf{Librería OpenCV}
+
+{\footnotesize\url{http://www.intel.com/technology/computing/opencv}}
+
+\medskip
+
+\textsf{Recursos en ETSET Vigo}
+
+{\footnotesize\url{http://www.fub.it/cost275}}
+
+{\footnotesize\url{http://cost275.gts.tsc.uvigo.es/}}
+
+{\footnotesize\url{http://www.gts.tsc.uvigo.es/telcorreo/}}
+
+}
+\end{minipage}
+}}
+
+
+
+
+
+\clearpage
+\pagebreak

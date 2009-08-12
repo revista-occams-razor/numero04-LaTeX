@@ -1,0 +1,502 @@
+% Este fichero es parte del Número 4 de la Revista Occam's Razor
+% Revista Occam's Razor Número 4
+%
+% (c)  2009, The Occam's Razor Team
+%
+% Esta obra está bajo una licencia Reconocimiento 3.0 España de
+% Creative Commons. Para ver una copia de esta licencia, visite
+% http://creativecommons.org/licenses/by/3.0/es/ o envie una carta a
+% Creative Commons, 171 Second Street, Suite 300, San Francisco,
+% California 94105, USA. 
+
+% Seccion Historia
+%
+
+\rput(8.5,-4.3){\resizebox{19cm}{!}{{\epsfbox{images/historia/historia.eps}}}}
+
+% -------------------------------------------------
+% Cabecera special... solo imagen
+
+\vspace{7.5cm}
+
+% -------------------------------------------------
+
+\begin{multicols}{2}
+
+% Introducción
+\intro{introcolor}{C}{uando la dirección de la revista me propuso
+escribir este artículo, me di cuenta de que sin pretenderlo me he
+convertido en una especie de historiador tecnológico
+aficionado. Aprovecho para recomendaros (si no los habéis leído ya)
+mis anteriores artículos ``Mi Historia de las Telecomunicaciones'' y
+``El telégrafo de Gauss'', ya sabéis que nunca puedo resistirme a
+hacer un poco de autobombo. En fin, ya que este número va dedicado a
+las tecnologías de seguridad resulta muy propio un artículo sobre la
+historia de la criptografía. La criptografía es la ciencia (o la
+técnica) de ``poner en clave'' mensajes de forma que un espía que
+logre interceptarlos no pueda entenderlos pero aquellos que conozcan
+la clave (o claves) adecuada(s) logren fácilmente recuperar la
+información inicial. Como veremos, la criptografía existe desde
+tiempos muy antiguos, aunque ha sido la llegada de los ordenadores la
+que ha logrado crear sistemas realmente potentes y seguros. 
+}
+
+\vspace{2mm}
+
+% Cuerpo del artículo
+
+Si me permitís repetirme un poco volveremos a la definición. El
+término {\em criptografía} procede de la unión de dos palabras griegas:
+krypto (ocultar) y graphos (escribir). Se trata por tanto de
+``escritura oculta''... es decir: la criptografía es un conjunto de
+técnicas que permiten poner un mensaje cualquiera en un formato
+ininteligible para todos, excepto para aquellos que poseen una
+información adicional (clave). Por supuesto, la clave es una
+información necesaria para realizar el proceso de cifrado (encriptado
+o puesta en clave) y también para el proceso de descifrado. Según el
+algoritmo empleado, la clave puede ser un número, una letra, un
+conjunto de bits o, incluso, cosas más raras como una tabla de
+símbolos. 
+
+
+
+
+Una suposición fundamental en todos los estudios criptográficos es que la seguridad se debe basar en el secreto de la clave, nunca en el secreto del algoritmo. Los algoritmos de cifrado deben ser públicos. Un sistema que se base en el secreto del algoritmo quedará comprometido si se descubre éste. Sin embargo, si se descubre una clave, podremos seguir operando el sistema cambiándola.
+
+Para terminar la introducción veremos un poco de terminología sobre el cifrado, a saber:
+
+\begin{itemize}
+\item {\bf Mensaje llano}: es el mensaje inicial, antes de ser cifrado, por tanto todavía legible.
+\item {\bf Criptograma}: mensaje una vez cifrado.
+\item {\bf Criptoanálisis}: son las operaciones que realiza un espía para intentar averiguar el mensaje llano. 
+
+Normalmente, se supone que el espía conoce el algoritmo pero no la clave. El criptoanálisis es diferente si el espía sólo dispone de un criptograma, de varios o dispone de texto seleccionado (criptogramas para los que conoce el texto llano). Esta última es la situación más favorable para el ataque. Pensad que hay un criptoanálisis que nunca falla: probar todas las claves posibles (método de la fuerza bruta). Un buen algoritmo de cifrado debe estar pensado para que el único ataque posible sea la fuerza bruta y, además, para que este ataque no sea viable. Para evitar la fuerza bruta, debe haber muchas claves posibles (longitud de clave de muchos bits) de forma que comprobar todas consuma una cantidad de tiempo excesiva (del orden de siglos).
+
+\end{itemize}
+
+
+\begin{entradilla}
+{\em Criptografía significa literalmente {\color{introcolor} escritura
+oculta}}
+\end{entradilla}
+
+
+{\colorbox{excolor}{
+\begin{minipage}{0.98\linewidth}
+Como sabréis (creo que es una de las cosas que enseña esta revista), la mente humana es infinita y hasta ha habido estudios matemáticos sobre cómo crear un algoritmo matemáticamente seguro ante la fuerza bruta. Como no, se debe al creador de la teoría de la información (Claude E. Shannon).
+¿Cómo es posible esto? -os preguntaréis. Si se puede descifrar sabiendo la clave, cualquiera puede ponerse a probar claves: {\bf CIERTO}.
+
+\end{minipage}
+}}
+
+\ebOpage{introcolor}{0.25}{HISTORIA}
+
+{\colorbox{excolor}{
+\begin{minipage}{0.98\linewidth}
+El problema ``no resuelto'' es: ¿Cómo hace el criptoanalista para saber qué clave es la buena, si no conoce el texto en llano? Nuestro malvado espía se tiene que basar en tomar una decisión binaria ante cada prueba: ¿El mensaje descifrado tiene sentido o no? Si un algoritmo es atacado por fuerza bruta y obtenemos varios mensajes coherentes probando claves distintas, no sabremos cuál de ellas es. Realmente, si el espía puede reducir la incógnita sobre la clave, en el próximo criptograma que analice tendrá menos claves que probar.
+Por otra parte, la coherencia del mensaje es algo totalmente dependiente del tipo de mensaje. Si sabemos que son imágenes JPEG deben cumplir un formato y además salir algo con sentido al representarlas. ¿Algo con sentido? algunas imágenes microscópicas pueden no parecer con mucho sentido
+
+\end{minipage}
+}}
+
+\bigskip
+
+\sectiontext{white}{black}{CIFRADOS DE SUSTITUCIÓN}
+
+La técnica de cifrado más antigua es la de sustitución. Como su nombre indica, consiste en sustituir cada símbolo (letra) del alfabeto con el que representamos nuestros mensajes por otro símbolo de otro alfabeto (o del mismo).
+
+El primer método sistemático de cifrado del que se tiene noticia fue
+utilizado por los militares romanos y se conoce todavía hoy como
+``Cifrado de César''. Se le llama así porque se encontraron documentos
+cifrados con esta técnica por Julio César y por su heredero Augusto;
+sin embargo, no está demostrado que César fuera el primero en
+emplearlo.
+
+
+\begin{entradilla}
+{\em El {\color{introcolor} cifrado de César} fué el primer sistema de
+cifrado sistemático que se conoce.}
+\end{entradilla}
+
+El cifrado de César se basa en una sustitución de las letras del alfabeto latino (el nuestro) por ellas mismas según una clave que no es más que un desplazamiento. Esto es: si la clave es +1 cada letra se sustituye por la siguiente del alfabeto, en vez de CÉSAR (ignorando el acento) escribiríamos DFTBS. Nótese que en aquella época el cifrado se realizaba de ``memoria''. Lógicamente, el desplazamiento es circular: después de la Z viene la A. También son posibles los desplazamientos negativos aunque -1 sería equivalente a 25 (si hay 26 letras). Nótese que para N letras en el alfabeto hay N-1 posibles claves y un desplazamiento d es equivalente al d+N. El número tan reducido de claves se debe a que estamos conservando el orden de las letras. Si consideramos sustituir el alfabeto latino por él mismo sin ninguna restricción el número de claves posibles será N!
+
+\begin{entradilla}
+{\em El {\color{introcolor}cryptoanálisis de la sustitución} es muy simple.}
+\end{entradilla}
+
+Ya es un tópico pero es este momento es inevitable recordar que en el nombre de la computadora de la película 2001: ``HAL'' había un mensaje cifrado. ¿Alguien no lo sabía? Pistas: el método empleado ya lo hemos comentado en este artículo y el mensaje llano tiene algo que ver con la informática.
+
+Otro tipo de cifrados de sustitución son los que inventan nuevos alfabetos donde cada símbolo representa una letra. La clave pasa por conocer la correspondencia entre letras y símbolos. Realmente estos métodos no son más seguros que una sustitución de las letras estándar por ellas mismas. Sigue habiendo N! ordenaciones.
+
+El criptoanálisis de la sustitución es muy simple y la manera más gratificante de aprenderlo sería leer ``El Escarabajo de Oro''. En este relato (nunca he sabido si es un cuento largo o una novela corta) los protagonistas descifran un mensaje pirata (con alfabeto de símbolos inventados mezclados con números y signos de puntuación). La técnica que usan es probabilística: ya que la E es la letra más usada del inglés debe ser la que corresponde con el símbolo más repetido. Conociendo la frecuencia de las letras en el idioma podemos hacer suposiciones de este tipo sobre dos o tres caracteres e intentar descubrir alguno más. Para eso ayudan mucho las partículas de cada idioma, en el ejemplo del escarabajo de oro lograr descifrar la T y la E y ven muchas veces la palabra T4E, con lo que ``4'' debe ser la H (recuérdese que era un mensaje en inglés). ¿Quién es el autor de este relato? Se trata de un novelista norteamericano genial aunque de vida algo atormentada: Edgar Allan Poe.
+
+Por supuesto que si sabemos que es un cifrado César la fuerza bruta nos puede ayudar (el número de claves es ridículamente bajo). Ojo... no hay constancia de que ningún enemigo lograra, en su época, descifrar los mensajes cifrados por César por lo que confirmamos (por si no lo sabíamos) que el valor de una tecnología es siempre relativo a su época (también hay que decir que la mayoría de esos enemigos no sabían leer).
+
+\end{multicols}
+
+{\colorbox{introcolor}{
+\begin{minipage}{0.98\linewidth}
+{\large\textbf{La criptografía como disciplina matemática}}
+
+\medskip
+
+Realmente la criptografía puede verse como una parte de las matemáticas dedicada a crear funciones inestables. Un algoritmo criptográfico es una función que opera con dos variables: el mensaje llano y la clave para obtener un resultado: el criptograma. Esa función debe ser biyectiva, esto es inversible ya que debe existir una función inversa que a partir del criptograma y la clave permita obtener de nuevo el mensaje llano.
+Para que una función ``cifre'' debe ser inestable, esto es: al modificar muy poco el mensaje o la clave el criptograma debe variar mucho... eso asegura que es difícil de invertir sin conocer la clave ya que no podemos hacer aproximaciones sucesivas.
+
+\end{minipage}
+}}
+
+\clearpage
+\pagebreak
+
+\msection{introcolor}{black}{0.25}{HISTORIA}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[height=11.0cm,angle=0]{images/historia/criptografia-image2.eps}
+
+{\footnotesize\bf Criptograma de ``El Escarabajo de Oro'' y su texto llano una vez descifrado. Nótese que se eliminan los espacios para lograr una mayor confusión del lector.
+.}
+\end{figure}
+
+\bigskip
+
+\begin{multicols}{2}
+
+Otro método de sustitución muy utilizado hasta el siglo XIX (y muy seguro en aquella época) es el método de Vigenère. Realmente, se trata de una mejora del método de César. La idea es muy simple... definamos M claves para el método de César (M números entre 1 y 25 para un alfabeto de 26 letras). Si aplicamos el cifrado de César con la primera clave a la primera letra, el mismo método a la segunda letra con la segunda clave... tendremos un cifrado César con clave variable. A partir de M aplicaciones volvemos a la primera clave.
+
+El acierto de este método es que una misma letra será cifrada de forma diferente aunque aparezca muchas veces. Si cada clave César, se representa por una letra (donde la A es el desplazamiento 0 y la Z el 26) la clave completa (M letras) se podrá escribir como una palabra. No hay longitud mínima ni máxima. De hecho, la longitud de la clave es el gran secreto del método.
+
+\begin{entradilla}
+{\em El {\color{introcolor} cifrado de Vigenère} realiza una sustitución polialfabética.}
+\end{entradilla}
+
+Este método se consideró invulnerable hasta que el militar prusiano Friedrich Kasiski publicó un método de criptoanálisis válido en 1.863. El método de Kasiski se basa en buscar palabras repetidas en el criptograma. Lo más probable es que sean debidas a que entre ellas el número de caracteres es múltiplo de M. Buscando todas las repeticiones podemos determinar M (como el máximo común divisor de las distancias entre repeticiones). Hecho eso, hay que descifrar M cifrados César.
+
+El cifrado de Vigenère es un ejemplo de sustitución polialfabética. Esto es: se hace sustitución con una secuencia de claves diferentes. El problema del criptoanálisis realmente estriba en predecir la secuencia.
+
+Hacia el 1920 se empezaron a fabricar máquinas capaces de realizar cifrados polialfabéticos. Se trataba de máquinas electro mecánicas, donde se utilizaba el giro de una serie de discos que contenían contactos eléctricos. Esas máquinas tenían el aspecto de máquinas de escribir en las que se tecleaba el texto llano y se obtenía el criptograma. A veces, el resultado se obtenía impreso, y en otras versiones se tenía una bombilla por cada letra del alfabeto y un operador debía copiar ``al dictado''.
+
+La máquina de cifrado electromecánico más famosa de la historia es la alemana ``Enigma''. Las primeras versiones datan de 1919 y, ya desde entonces, existían versiones comerciales que se compraban y vendían libremente. Algunas de esas primeras máquinas fueron utilizadas por españoles e italianos en la guerra civil española y sus mensajes fueron descifrados por criptoanalistas del ejército británico.
+
+\ebOpage{introcolor}{0.25}{HISTORIA}
+
+En esa época, el ejército alemán comenzó a utilizar una ``versión militar'' de enigma muy superior a la comercial. Los primeros esfuerzos británicos por romper el cifrado fueron inútiles (en tiempo de paz, pero temiendo ya el inicio de un conflicto). El primer avance en el criptoanálisis de enigma vino del matemático polaco Marian Rejewski que descubrió ciertas regularidades en el comportamiento de enigma debidas a la repetición de palabras en el texto llano. Sin embargo, el número de cálculos a realizar era excesivo para su capacidad de trabajo y no pudieron descifrar el código. El descubrimiento de Rejewski se realizó antes de que el ejército nazi invadiera Polonia. Cuando la sospecha de invasión fue inminente, el gobierno polaco decidió traspasar a la inteligencia británica todos sus conocimientos.
+
+\begin{entradilla}
+{\em La máquina alemana {\color{introcolor} Enigma}, es el dispositivo {\color{introcolor}
+cifrado electromecánico} más famosa de la historia.}
+\end{entradilla}
+
+
+El gobierno británico montó un centro de criptoanálisis en Bletchley Park (80 Km al norte de Londres) cuyo principal objetivo era romper enigma. El equipo de Bletchley Park, dirigido por Alan Turing, consiguió romper el código de enigma construyendo la ``bomba'': una máquina electromecánica de cálculo que ya había sido propuesta por el equipo de Rejewski y que se puede considerar uno de los primeros ordenadores de la historia.
+
+\begin{center}
+\myfig{0}{images/historia/criptografia-image3.eps}{0.6}
+
+{\footnotesize\bf Máquina Enigma.}
+\end{center}
+
+La existencia del centro de criptoanálisis de Bletchley Park y los trabajos realizados allí fueron estrictamente secretos hasta la década de los 60.
+
+A pesar del gran trabajo de Turing y su equipo quedaron algunos mensajes sin descifrar. Los últimos fueron traducidos en ¡¡¡2006!!! por el llamado ``proyecto-M4''. Como ejemplo, tenemos el siguiente:
+
+\bigskip
+
+{\colorbox{introcolor}{
+\begin{minipage}{0.98\linewidth}
+``nczwvusxpnyminhzxmqxsfwxwlkjahshnmcoccakuqp
+mkcsmhkseinjusblkiosxckubhmllxcsjusrrdvkohulxwc
+cbgvliyxeoahxrhkkfvdrewezlxobafgyujqukgrtvukam
+eurbveksuhhvoyhabcjwmaklfklmyfvnrizrvvrtkofdan
+jmolbgffleoprgtflvrhowopbekvwmuqfmpwparmfhag
+kxiibg''
+
+\end{minipage}
+}}
+
+\bigskip
+
+{\colorbox{excolor}{
+\begin{minipage}{0.98\linewidth}
+``Señal de radio 1132/19. Contenido: Forzados a sumergirnos durante ataque, cargas de profundidad. Última localización enemiga: 8:30h, cuadrícula AJ 9863, 220 grados, 8 millas náuticas. [Estoy] siguiendo [al enemigo]. [El barómetro] cae 14 milibares. NNO 4, visibilidad 10.''
+
+\end{minipage}
+}}
+
+\sectiontext{white}{black}{CIFRADOS POR PERMUTACIÓN}
+
+Los métodos de permutación se basan en cambiar el orden de los símbolos en vez de sustituir estos. Si agrupamos los símbolos de M en M y los trasponemos, habrá M! transposiciones posibles (M! claves).
+
+Fijaos que los métodos de sustitución son ``orientados a símbolos'' mientras que éstos son orientados a bloques (hay que agrupar un bloque de símbolos que se cifra entero). También hay que decidir qué se hace cuando al final del mensaje tengamos un bloque incompleto (algo que ocurrirá casi siempre). Las soluciones pasan por completar el bloque (con el alfabeto empezando en la A o, mejor, con texto aleatorio). Al descifrarlo (sabiendo la clave) tendremos algunos caracteres extra pero los descartaremos porque ``no tienen sentido''.
+
+{\bf Criptoanálisis}: si logramos averiguar el tamaño del bloque (tal vez viendo que todos los mensajes tienen longitud múltiplo de M... que será el máximo común divisor de las longitudes), podremos dividir el criptograma en bloques permutados... Si para alguno de ellos, vemos una hipótesis con sentido (una permutación que da lugar a una palabra o frase válidas) la podemos probar para el resto.
+
+Las permutaciones nunca o casi nunca se usan como método único sino que se combinan con sustituciones u otras operaciones.
+
+\sectiontext{white}{black}{PERMUTACIONES Y SUSTITUCIONES: DES}
+
+A mediados del siglo XX, el conocido investigador Claude Shannon llegó a afirmar que una combinación de muchas permutaciones alternadas con sustituciones podría dar lugar a cifrados muy seguros... Esa idea fue aprovechada algunos años después cuando se dispuso de la tecnología necesaria para automatizar ese tipo de procesos.
+
+El algoritmo DES (Data Encryption Standard) fue creado en los años 70 y, como su nombre indica, pretendía ser ``la solución definitiva'' al problema de cifrado. Por supuesto que las soluciones definitivas no existen pero DES fue una solución válida durante muchos años y fue el primer cifrado que se aplicó masivamente en aplicaciones informáticas.
+
+\ebOpage{introcolor}{0.25}{HISTORIA}
+
+DES nació por iniciativa del NBS (National Bureau of Standards) u oficina de estándares del ministerio de comercio americano (por tanto, hablamos de estándares civiles). Ahora el NBS se llama NIST (National Institute of Standards and Technology, www.nist.gov). Para decidir un estándar de cifrado se convocó un concurso en el que fue elegida la solución presentada por IBM (que provenía de mejorar un algoritmo anterior denominado Lucifer). Desde entonces existe una polémica no resuelta porque se dice que el gobierno (concretamente la agencia de seguridad nacional, NSA) obligó a modificar el algoritmo para que fuese menos seguro. De todas formas, hasta el año 1992 no se publicó una forma de hacer un ataque más eficiente que la fuerza bruta y requiere tener el criptograma correspondiente a ¡¡¡247!!! textos planos determinados... ALGO TOTALMENTE IRREAL. En 1998 se creó un ordenador especial (llamado Deep Crack) para romper el DES. Fue capaz de romper el cifrado por fuerza bruta en 56 horas.
+
+
+\begin{entradilla}
+{\em El {\color{introcolor} DES} es un algoritmo de
+ cifrado {\color{introcolor}por bloques}.}
+\end{entradilla}
+
+
+El DES es un cifrado por bloques. Divide el texto llano en bloques de 64 bits a los que aplica una clave de 56 bits y obtiene un criptograma de 64 bits. Para lograrlo, realiza una complicada combinación de permutaciones y sustituciones. En la edición antigua del excelente libro de A. S. Tanembaum: ``Redes de Ordenadores'' (o en su edición inglesa, ``Computer Networks''), se describía detalladamente la operación del algoritmo e incluso se incluía el código (en pascal) necesario para programarlo. Hablo de la edición antigua porque fue la que leí... imagino que la edición actual seguirá teniendo esa información. Mientras dudaba en ir o no a la biblioteca a comprobarlo, busqué en la mayor biblioteca de la historia y encontré esto: www.thefreecountry.com/sourcecode/encryption.shtml. Si la página no miente, ahí tenéis código libre C++ para DES y para muchos algoritmos más (muchos de ellos mencionados en este artículo).
+
+La debilidad de DES fue siempre la longitud de la clave. Aunque se creó en un momento en el que era inabordable un ataque por fuerza bruta, los grandes avances en potencia de cálculo llegaron a hacerlo posible en algunos años (aproximadamente 30). Probablemente, ese sea un problema de todos los algoritmos... la viabilidad o no de la fuerza bruta cambia con el tiempo.
+
+Decíamos que en un buen algoritmo las modificaciones pequeñas de la clave o del llano deben afectar mucho al criptograma. DES cumple esa condición a la perfección. Se ha comprobado que la modificación de 1 bit en el llano o en la clave provoca que los bits del criptograma cambien con probabilidad $\frac{1}{2}$, esto es: en media cambiarán la mitad... que es el cambio más impredecible que puede haber.
+
+DES ya no se utiliza en la práctica, aunque lo que sí podemos encontrar todavía es una variante llamada triple DES. Triple DES (TDES o 3DES) consiste en aplicar DES tres veces consecutivas a los 64 bits de entrada, si tenemos tres claves diferentes la longitud de la clave global será de 168 bits. Se han publicado ataques que consiguen reducir el número de claves a probar, de forma que se demostró que triple DES ofrece la seguridad de una clave más corta (aunque haya 2.168 claves llega con probar 2.112). Por eso, podéis oír o leer que en el triple DES la tercera clave suele ser igual a la primera (2 claves diferentes pero DES se aplica tres veces). TDES es un algoritmo que va desapareciendo porque es lento frente a otros más modernos (DES ya era lento y aquí hay que ejecutarlo 3 veces) pero, en su momento, sirvió para que DES volviera a ser seguro y se pudieran reutilizar los sistemas software (y hardware) que implementaban DES.
+
+\begin{center}
+\myfig{0}{images/historia/criptografia-image4.eps}{0.9}
+
+{\footnotesize\bf Diagrama de bloques de triple DES.}
+\end{center}
+
+\begin{entradilla}
+{\em DES apenas se utiliza en la actualidad. Sin embargo, su variante
+ {\color{introcolor} triple DES} todavía se puede encontrar por ahí.}
+\end{entradilla}
+
+Todos los algoritmos que comentamos hasta ahora son simétricos. Esto es: la clave de cifrado es la misma que la de descifrado. Eso crea un problema para la seguridad en redes: ¿Cómo se distribuyen las claves? Si se hace de forma offline (un señor con un diskette o algo) será poco práctico. Eso era lo que se hacía hasta los años 90 y el boom de Internet. Si se distribuye la clave llana el intruso sólo tendrá que interceptar ESE mensaje. A partir de ese momento, ya podemos usar el mejor método jamás inventado que estaremos haciendo el tonto.
+
+Para evitar esos problemas nació el cifrado asimétrico, también llamado muchas veces ``cifrado de clave pública''.
+
+\ebOpage{introcolor}{0.25}{HISTORIA}
+
+\sectiontext{white}{black}{CRIPTOGRAFÍA ASIMÉTRICA. RSA}
+
+¿En qué consiste eso? Supongamos que se logra crear un método donde la clave K1 sirve para cifrar y la K2 para descifrar. Por supuesto K1 y K2 estarán relacionadas pero debería ser muy difícil obtener K1 a partir de K2 o al revés... eso debería ser tan difícil como descifrar los criptogramas.
+
+Si yo quiero que me envíen mensajes cifrados puedo ¡¡¡publicar K1 sin más!!!. Si sólo yo conozco K2, sólo yo podré descifrarlos, ¿NO?
+
+La cosa se puede complicar más... Imaginemos que creo otras dos claves F1 y F2 y ahora hago pública F2. ¿Para qué puede servir? Pongamos que tomo un texto llano que quiero enviar y le añado algún código de redundancia (CRC 16 ó 32). Si lo cifro con F1 y lo envío todos podrán leerlo (F2 es pública) y, además, todos podrán comprobar el CRC. ¿Eso qué demuestra? Demuestra que quién lo generó conocía F1. Como sólo yo conozco F1 acaba de nacer la ``firma digital'' (sólo yo puedo generar esos mensajes, aunque todos pueden verlos y comprobar la firma).
+
+
+\begin{entradilla}
+{\em El algoritmo más conocido para {\color{introcolor} criptografía
+ asimétrica} es el {\color{introcolor} RSA}.}
+\end{entradilla}
+
+El algoritmo más conocido para criptografía asimétrica es el RSA (inventado por Rivest, Shamir y Addleman). El algoritmo se basa en los llamados cuerpos y anillos finitos. Si definimos el conjunto de números enteros de 0 a M-1, y hacemos sumas y productos módulo M, tendremos:
+
+\begin{itemize}
+\item Un cuerpo si M es primo.
+\item Un anillo si no lo es.
+
+\end{itemize}
+
+Si K1 y K2 son números del conjunto (enteros entre 0 y M-1) y además K1*K2 = 1 (mod M), tendremos:
+
+\begin{itemize}
+\item {Para un número LL (texto llano), el número $C=LL^{K1}$ es muy diferente a $LL$. Podríamos llamar a $C$ ``texto cifrado''.}
+
+\item {Además: $C^{K2}=(LL^{K1})^{K2}=LL^{(K1*K2)}=LL^1=LL$ (todo módulo $M$, claro).
+Esto es: ciframos conociendo $K1$ y desciframos conociendo $K2$.}
+
+\end{itemize}
+
+Repasemos, para que esto realmente sea cifrado de clave pública, todos deben conocer M y K1 pero K2 debe permanecer secreto. Además fijaos que si publicamos K2 y guardamos K1 el efecto será el mismo... pero los criptogramas se obtendrán como $C=LL^{K2}$.
+
+Puede parecer un poco raro que esto realmente sea un cifrado seguro... para que lo sea deberíamos cumplir:
+
+\begin{itemize}
+\item {$M = (p-1)*(q-1)$ donde p y q son números primos grandes (como de 100 cifras) y distintos.}
+\item {K1 no debe compartir factores primos con M y K2 tampoco... de hecho existe un algoritmo para calcular K1 y K2 (algoritmo extendido de Euclides).}
+
+\end{itemize}
+
+¿De dónde viene la seguridad? De que los números primos son una de las grandes cuestiones no resueltas por las matemáticas. El único algoritmo fiable para saber si un número es primo o no es ponerse a dividir, existen tests de primalidad pero no son 100\% fiables. Lo que es peor, la única forma de descomponer un número en factores es ponerse a dividir... Dicho en una frase: con los primos sólo conocemos un método, ``la fuerza bruta''. Basta que los primos sean grandes para ponerlo muy difícil.
+
+La seguridad del método RSA se basa en que si p y q son dos primos muy grandes, $M = (p-1)*(q-1)$ es una operación muy fácil de realizar pero muy difícil de invertir (hay que factorizar M y eso sólo se puede hacer por fuerza bruta). Si se conocen p y q, se puede calcular K1 a partir de K2 o al revés, esto es: el cifrado habrá caído.
+
+El algoritmo RSA es lento ya que tiene que operar con precisión sobre números enormes. Eso hace que el cifrado asimétrico casi nunca sea el único método utilizado en una comunicación segura. Más bien es un método de distribución de claves para utilizar después algoritmos simétricos (protocolo Diffie-Hellman).
+
+\bigskip
+
+{\colorbox{introcolor}{
+\begin{minipage}{0.98\linewidth}
+Buscando información para el artículo me ``encontré'' con el número primo de Mersenne. Ese número es el primo más grande conocido (por lo menos el más grande publicado hasta la fecha de edición de ese artículo). Vale:
+
+\begin{center}
+$2^{13466917}-1$
+
+\end{center}
+
+¿Os imagináis que se publique el ``mayor número par'' o el ``mayor múltiplo de 5''? ¿Y que encima le pongan el nombre del matemático que lo encontró?
+Yo siempre he pensado que los números primos son una especie de ``error de la naturaleza''...
+
+\end{minipage}
+}}
+
+\bigskip
+
+En 1984 fue publicado un sistema de prestaciones equivalentes al RSA y libre de patentes. Lo diseñó el matemático egipcio Taher Elgamal trabajando en Stanford. El cifrado de Elgamal (a veces, llamado El Gamal) se basa en otro problema de la matemática discreta: el logaritmo discreto. El problema es el siguiente: en un espacio discreto módulo M, dados los números x y a (enteros entre 0 y M-1), se trata de calcular otro entero y tal que $x=a^y$ (mod M). Se dice que {\bf y} es el logaritmo discreto de x en base a (módulo M). Dada la naturaleza discreta del problema, no existe otra solución que probar con todos los enteros entre 0 y M-1. Basta que M sea un número primo grande para que el problema del logaritmo discreto sea imposible de resolver en tiempo razonable.
+
+\ebOpage{introcolor}{0.25}{HISTORIA}
+
+En el método de Elgamal la clave privada es K1 y la pública $K2=g^{K1}$(mod M). Si fuéramos capaces de resolver el logaritmo discreto podríamos calcular K1 a partir de K2 y romper el cifrado. El parámetro g recibe el nombre de generador y es un número elegido aleatoriamente entre 0 y M-1.
+
+Las fórmulas de cifrado y descifrado son:
+
+\begin{enumerate}
+\item {\bf Cifrado}: 
+	\begin{itemize}
+		\item Elegir b aleatorio entre 2 y M-2.
+		\item $C1=gb$ (mod M).
+		\item $C2 =(K2)^bLL$ (mod M).
+		\item $C=(C1,C2)$ (mod M).
+	\end{itemize}
+
+\item {\bf Descifrado}: 
+	\begin{itemize}
+		\item Haciendo $C1^{(M-1-K2)}C2$ (mod M), se obtiene de nuevo LL.
+	\end{itemize}
+
+\end{enumerate}
+
+
+\begin{entradilla}
+{\em El método de Elgamal está {\color{introcolor} libre de patentes}.}
+\end{entradilla}
+
+\sectiontext{white}{black}{MÉTODOS MÁS ACTUALES: IDEA, BLOWFISH, AES...}
+
+Una vez recorridos los que creo que son los hitos principales del cifrado desearía presentar brevemente los métodos actuales:
+
+\begin{itemize}
+
+\item {\bf IDEA}: su nombre viene de ``International Data Encryption Algorithm''. Es un algoritmo publicado en 1991 que se propuso como estándar europeo (una iniciativa similar al DES norteamericano). Igual que DES cifra por bloques de 64 bits pero la clave es de 128. El algoritmo IDEA se basa en realizar repetidas veces una serie de operaciones binarias: O-exclusiva (XOR) bit a bit, Suma módulo 216, multiplicación módulo 216+1. La filosofía es similar al DES (reiteración de operaciones simples) pero es mucho más moderno y la clave es mucho más larga con lo que es mucho más seguro. IDEA se utiliza en PGPv2.0 y hasta la fecha no se ha publicado ningún ataque válido.
+\item {\bf Blowfish}: este método fue diseñado por Bruce Schneier en 1993. De nuevo es un cifrador de bloques de 64 bits. La longitud de la clave es variable y va desde 0 a 448 bits. De nuevo, la filosofía es muy similar al DES ya que se basa en varias rondas de operaciones XOR y sustituciones realizadas por tablas de entradas/salidas llamadas cajas-S (S-boxes, un concepto que ya existía en el DES, se sabe que de su diseño depende enormemente la seguridad del algoritmo). Hoy día se usan más otros métodos que trabajan con bloques mayores como AES y TwoFish (basado en Blowfish). No se conocen ataques efectivos.
+\item {\bf AES}: el Advanced Encryption Standard es el nuevo estándar criptográfico del NIST (desde el 26 de mayo de 2002 ha sustituido al DES). Se espera que sea el más utilizado en un futuro próximo. El tamaño de bloque es de 128 bits y la clave puede ser de 128, 192 ó 256 bits. De nuevo, se trata de la aplicación repetida de sustituciones, permutaciones y operaciones XOR. Nótese que estas operaciones deben estar muy estudiadas para dar lugar a un algoritmo seguro. Si intentamos crear un algoritmo de este tipo de cualquier manera, seguramente crearemos un cifrador predecible (y por tanto atacable).
+
+\end{itemize}
+
+\sectiontext{white}{black}{FUNCIONES HASH: MD5, SHA}
+
+He dejado los algoritmos HASH justo para el final porque realmente no son algoritmos de cifrado sino de ``reducción criptográfica''. Estos métodos convierten cualquier texto en un número de N bits. Además, funcionan como una función de un único sentido, esto es: no se conoce ninguna forma de recuperar el texto a partir del ``texto reducido'' de N bits. Por último, y de ahí viene su nombre, actúan como funciones hash, esto es: la probabilidad de que dos textos diferentes produzcan los mismos N bits es despreciable. ¿Y esto para qué puede servir? Pues, por ejemplo, para almacenar textos que no se pueden guardar en llano pero que tampoco hay que descifrar. Se usan, por ejemplo, para guardar passwords. El sistema aplica obligatoriamente la función hash cuando se introduce una clave y compara las reducciones. Aunque un espía lea las reducciones nunca podrá obtener las claves originales. Hay dos algoritmos hash importantes hoy día:
+
+\begin{itemize}
+
+\item {\bf MD5}: MD viene de ``Message Digest'' o resumen del mensaje. El 5, evidentemente, es el número de versión. MD5 convierte cualquier texto en un número de 128 bits. Este método MD5 fue diseñado en 1991 por el profesor del MIT Ronald Rivest (la R del RSA). MD5 es el método utilizado en en Linux para almacenar las passwords de usuarios. También se usa para calcular resúmenes a modo de CRC's de archivos completos para asegurar su autenticidad. Por último, comentar que el señor Rivest también es autor de varios métodos de cifrado simétrico llamados RC2, RC4, RC5 y RC6 (RC1 y RC3 resultaron ser inseguros y nunca llegaron a ser publicados).
+
+
+\item {\bf SHA}: Secure Hash Algorithm (SHA) es un conjunto de funciones HASH criptográficas publicadas por el NIST norteamericano y cuya autoría se atribuye a la agencia NSA (National Security Agency). La primera (SHA-0) se publicó en 1993 y después surgieron cinco versiones más. SHA-0 y SHA-1 producen una salida resumen de 160 bits. Las versiones SHA-224, SHA-256, SHA-384, y SHA-512 producen salidas de la longitud que indica su nombre, aunque a todos estos métodos se les llama conjuntamente SHA-2.
+
+\end{itemize}
+
+\ebOpage{introcolor}{0.25}{HISTORIA}
+
+\sectiontext{white}{black}{ESTEGANOGRAFÍA, WATERMARKING}
+
+Quería hablar un poco de esteganografía... que no es cifrado sino que se traduciría como ``el arte de escribir oculto''. Otra forma de lograr el secreto es meter un mensaje donde nadie lo puede ver... para eso hay muchas técnicas sencillas pero ingeniosas:
+
+\begin{itemize}
+\item Suponiendo que en inglés ``which'' y ``that'' son equivalentes, pongamos que ``which'' es un 1 y ``that'' un cero, podemos intercambiar un texto que realmente contiene un mensaje... Necesitamos una fuente de texto casi inagotable para sustituir las palabras clave hasta conseguir meter todos los bits. Las hay: la Biblia, las obras completas de Shakespeare...
+\item Un método similar al anterior pero válido en todas las lenguas es usar el espaciado entre palabras: dos espacios es un uno y un espacio es un cero.
+\item El más divertido (aunque igual de simple y de ``atacable'' que los anteriores) es meter el mensaje en los bits de menor peso de un fichero multimedia (audio o imagen). Imaginad una imagen en escala de grises donde cada punto es un número de 8 bits. Modificar el de menor peso (para que sea un bit del mensaje que queremos transmitir) no debería notarse. Para el que no se lo crea, copio abajo dos funciones de matlab. La primera función introduce el mensaje en la imagen sin que se note mientras que la segunda lo recupera. ¿Cuántos Kbytes caben en una imagen 512x512?
+
+\end{itemize}
+
+{\color{listcolor}
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+
+function ImOut = MensajeSecreto(im0,mensaje)
+% Ojo:no funciona si la imagen no es formato uint8
+im00 = im2uint8(im0); 	% Pasar a uint8
+% Pasar el mensaje a binario (ascii)
+msgbin = uint8(mensaje); 
+% 255 = caracter fin de mensaje
+msgbin = [msgbin 255]; 
+% Introducir el mensaje en la imagen 
+% usando los bits de menor peso
+cont = 1; % Pixel actual de la imagen
+for i=1:length(msgbin)
+    aux = msgbin(i); % Valor a introducir
+    for j=0:7,
+        bit = (bitand(aux,2^j)>0); % Bit j-esimo
+        if (bit)
+            % Encender el bit de menor peso 
+            % (si no lo estaba ya)
+            im00(cont) = bitor(im00(cont),1);
+        else
+            % Apagar el bit de menor peso 
+            % (si no lo estaba ya)
+            im00(cont) = bitand(im00(cont),254);
+        end
+        cont = cont+1; % Pasar al siguiente
+    end
+end
+% Dar salida y acabar.
+ImOut = im00;
+function mensaje = LeerMensaje(im0)
+% Ojo:no funciona si la imagen no es formato uint8
+im00 = im2uint8(im0); % Pasar a uint8
+msgbin = []; % Mensaje inicialmente en blanco
+% Ir leyendo el mensaje
+cont = 1; % Pixel actual de la imagen
+aux = -1; % Caracter anterior
+while (aux~=255)
+    if (aux~=-1)
+        % Anhadir el caracter anterior al mensaje 
+        % (si procede)
+        msgbin = [msgbin aux];
+    end
+    aux = 0;
+    for j=0:7,
+        % Bit de menor peso de este pixel
+        bit = (bitand(im00(cont),1)>0); 
+        if (bit)
+            % Encender el bit j-esimo
+            aux = bitor(aux,2^j);
+        end
+        cont = cont+1; % Pasar al siguiente pixel
+    end
+end
+% Pasar a texto y acabar.
+mensaje = char(msgbin);
+
+\end{lstlisting}
+}
+
+Este último ejemplo nos introduce en un tema relacionado con la esteganografía y el cifrado: el watermarking o ``marcado al agua''. La marca al agua de los billetes es un dibujo que se puede ver al trasluz que sirve para autentificar al billete. ¿Podemos añadir a las imágenes y/o al audio una marca imperceptible al ojo (o al oído) que marque quién produjo la imagen y cuando. Eso serviría para saber que esta o aquella película ha sido pirateada... si la marca indica a quién se le prestó el original alguien puede tener problemas : ). Las buenas marcas
+al agua resisten los ataques... el pirata puede que se dedique a hacer operaciones al fichero para intentar hacer desaparecer la marca. Deberíamos asegurar que mientras la imagen/audio no sean estropeados excesivamente, la marca sigue ahí. ¿Qué puede hacer un pirata? Filtrar paso-bajo sin que se note mucho, pasar a analógico y digitalizar, con las imágenes hay muchas más posibilidades: reescalar, girar 30º grados a la derecha y 30.1º a la izquierda, aplicar distorsiones no lineales... (si usamos sólo el bit de menor peso, el pirata los pondrá todos a cero y se quedará tan ancho). El watermarking robusto es un problema muy complejo y sólo puede resolverse si se considera como un problema de transmisión digital en un canal especial (una imagen o un fichero de audio). Con las técnicas adecuadas se crean mensajes que ``se adaptan a la imagen'' ya que en algunas partes se puede sumar un mensaje mayor que 1 bit sin que se note y en otras no.
+
+\bigskip
+
+{\colorbox{excolor}{
+\begin{minipage}{0.98\linewidth}
+No puedo dejar de mencionar que sobre watermarking se han hecho trabajos muy importantes en nuestro centro, por ejemplo: {\bf ``Statistical Analysis of Watermarking Schemes for Copyright Protection of Images''}, autores: {\emph {Juan Ramón, Hernández y Fernando Pérez-González}}. Se publicó en 1999 en los proceedings del {\bf IEEE}.
+
+\end{minipage}
+}}
+
+\bigskip
+
+{\colorbox{introcolor}{
+\begin{minipage}{0.98\linewidth}
+Ahora tocaría hablar de criptografía cuántica... un método que se supone totalmente inviolable. Lo siento pero... ya me ha salido muy largo y no sé si va a caber en la revista.
+Lo de arriba es una excusa... ese tema me parece extra-terrestre y no me atrevo a hablar de él.
+
+Si queréis saber cosas sobre eso ya sabéis... en Internet está todo (bueno, también hay libros). Y, de nuevo, gracias a la Wikipedia por la gran cantidad de información que nos regala.
+
+\end{minipage}
+}}
+
+\end{multicols}
+\clearpage
+\pagebreak

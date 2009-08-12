@@ -1,0 +1,1315 @@
+% Este fichero es parte del Número 4 de la Revista Occam's Razor
+% Revista Occam's Razor Número 4
+%
+% (c)  2009, The Occam's Razor Team
+%
+% Esta obra está bajo una licencia Reconocimiento 3.0 España de
+% Creative Commons. Para ver una copia de esta licencia, visite
+% http://creativecommons.org/licenses/by/3.0/es/ o envie una carta a
+% Creative Commons, 171 Second Street, Suite 300, San Francisco,
+% California 94105, USA. 
+
+% Seccion Reverso Tenebroso
+%
+
+%\rput(4.0,-2.1){\resizebox{19cm}{!}{{\epsfbox{images/reverso/header.eps}}}}
+\rput(3.2,-1.5){\resizebox{15cm}{!}{{\epsfbox{images/reverso/header-1.eps}}}}
+
+% -------------------------------------------------
+% Cabecera
+\begin{flushright}
+\msection{introcolor}{black}{0.25}{REVERSO TENEBROSO}
+
+\mtitle{4cm}{Sockets RAW}
+
+%\msubtitle{12cm}{Descubre como trabajan las herramientas de los
+%hackers}
+\msubtitle{6cm}{Descubre como trabajan}
+
+\msubtitle{8cm}{las herramientas de los hackers}
+
+{\sf por Huakin Paquete }
+
+{\psset{linecolor=black,linestyle=dotted}\psline(-12,0)}
+\end{flushright}
+
+%\vspace{2mm}
+% -------------------------------------------------
+
+\begin{multicols}{2}
+
+% Introducción
+\intro{introcolor}{A}{lguna vez os habéis preguntado como funcionan
+esas herramientas de red que usáis a diario?. No, no hablamos del
+explorador o el Filezilla, sino de las herramientas del sistema como
+ping, traceroute o nmap?... ah, que no las usáis a diario?. En
+ese caso, este artículo probablemente no sea para vosotros.
+}
+
+\vspace{2mm}
+
+% Cuerpo del artículo
+
+La mayoría de las herramientas de red a nivel de sistema necesitan poder
+acceder al hardware de red a muy bajo nivel. 
+
+No es necesario llegar a manejar el chip de la tarjeta
+de red directamente (eso es cosa de los drivers en el kernel), 
+pero prácticamente todas ellas requieren poder construir paquetes
+especiales y capturarlos tal y como llegan, sin que
+nadie los haya manipulado.
+
+El kernel Linux proporciona distintas posibilidades para ello, siendo
+los sockets RAW una de las más utilizadas y veteranas. Los sockets
+RAW, como su propio nombre indican son sockets (iguales que los
+otros), cuya única diferencia es que cuando recibimos o enviamos datos
+a través de ellos, esos datos se proporcionan o se obtienen ``en bruto''
+(o ``raw'').
+
+\begin{entradilla}
+{\em Los {\color{introcolor}{socket RAW}} nos permiten enviar y recibir datos ``en bruto'' a
+través de la red}
+\end{entradilla}
+
+\sectiontext{white}{black}{HERRAMIENTAS ICMP}
+
+Vamos a comenzar con una de las herramientas más sencillas y más
+útiles que nos podemos encontrar en el sistema: \verb!ping!. Esta herramienta
+nos permite saber si una determinada máquina conectada a la red está
+funcionando o no.
+
+La herramienta \verb!ping! simplemente envía paquetes ICMP \verb!ECHO!, y espera
+recibir una respuesta ICMP \verb!ECHOREPLY!. Los paquetes ICMP \verb!ECHO! permiten
+enviar algunos datos extra, y son estos datos los que \verb!ping! utiliza
+para estimar el tiempo de respuesta de la máquina remota. El valor
+{\em time} de la salida del programa.
+
+Para implementar nuestra versión reducida de \verb!ping!, necesitamos
+realizar dos operaciones. La primera es poder enviar paquetes ICMP, y
+la segunda, obviamente, es poder recibir paquetes ICMP.
+
+Comenzaremos por la segunda parte, ya que es más sencilla y nos
+permitirá introducir los nuevos conceptos de una forma más progresiva.
+
+\sectiontext{white}{black}{CREANDO NUESTRO SOCKET}
+
+Como siempre, lo primero que necesitamos son algunos ficheros de
+cabecera. Aquí tenéis la lista de los que necesitamos.
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\footnotesize}   
+\begin{lstlisting}
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+
+#include <linux/ip.h>
+#include <linux/icmp.h>
+\end{lstlisting}
+
+Hemos agrupado los ficheros de cabecera en tres grupos. En el primero
+encontramos los de siempre, ficheros estándar para utilizar funciones
+como \verb!printf! o \verb!exit!. El segundo bloque es el que contiene
+las definiciones que necesitaremos para crear nuestro socket
+RAW. Finalmente, el último grupo contiene la definición de las
+cabeceras de los paquetes para los protocolos IP e ICMP. Enseguida
+veremos como utilizarlos. 
+
+Con estas definiciones ya estamos en condiciones de escribir una
+función para poder crear nuestro socket RAW. 
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\footnotesize}   
+\begin{lstlisting}
+int crea_socket (int proto) {
+ int s;
+
+ if ((s = socket (AF_INET, SOCK_RAW, proto))<0)
+  {
+    perror ("socket:");
+    exit (1);
+  }
+ return s;
+}
+\end{lstlisting}
+
+Hemos decidido pasar como parámetro el protocolo, de forma que podamos
+reutilizar esta función en el resto de los ejemplos de este artículo. 
+Cuando lleguemos a la función main de nuestro programa veremos para
+que sirve ese parámetro. 
+
+Como podéis observar, hemos seleccionado la familia de direcciones de
+internet (\verb!AF_INET!) e indicado que el socket sea de tipo \verb!SOCK_RAW!. Sin
+grandes sorpresas hasta aquí.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ebOpage{introcolor}{0.25}{REVERSO TENEBROSO}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Hemos mantenido la comprobación de errores para la llamada al sistema
+\verb!socket! ya que los socket RAW necesitan permisos especiales. Si no
+ejecutamos nuestro programa como root, o utilizando 
+\verb!sudo!, la llamada al sistema fallará y los resultados del programa
+serán erróneos.
+
+
+
+\sectiontext{white}{black}{LEYENDO PAQUETES}
+
+Lo siguiente que necesitamos es una estructura de datos para poder
+acceder cómodamente a los distintos campos de los paquetes que
+capturemos. Esta es la que nosotros hemos elegido.
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\footnotesize}   
+\begin{lstlisting}
+typedef struct {
+  struct iphdr   ip;
+  struct icmphdr icmp;
+  char   buffer[1024]; /* Datos */
+} PKT;
+
+\end{lstlisting}
+
+Esta estructura representa un paquete de datos ICMP, tal y como lo
+leeremos desde nuestro socket RAW. Lo primero que encontraremos será
+la cabecera IP del paquete. A continuación, la cabecera del mensaje
+ICMP, seguida de un bloque de datos que variará en función del tipo de
+mensaje ICMP recibido.
+
+En principio, el tamaño de buffer debería reservarse dinámicamente
+según la información en los campos de tamaño de las cabeceras del
+paquete. Para mantener los ejemplos de código sencillos vamos a
+utilizar un buffer de 1Kb que será más que suficiente para nuestra pruebas.
+
+\sectiontext{white}{black}{CAPTURANDO PAQUETES ICMP}
+
+Con nuestras definiciones previas, estamos en condiciones de escribir
+nuestro primer capturador de paquetes ICMP. Podéis ver la
+función \verb!main! a continuación:
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\footnotesize}   
+\begin{lstlisting}
+int main (int argc, char *argv[]) {
+int   s;
+PKT   pkt;
+
+s = crea_socket  (IPPROTO_ICMP);
+
+while (1)
+ {
+   read(s, &pkt, sizeof (PKT));
+   printf ("Code: %d.%d ", 
+           pkt.icmp.type, pkt.icmp.code);
+   printf ("(%s)\n", 
+           inet_ntoa(pkt.ip.saddr));
+  }
+return 0;
+}
+\end{lstlisting}
+
+Sencillo no?. Simplemente creamos nuestro socket RAW, indicando que
+queremos utilizar el protocolo ICMP, leemos datos del socket en
+nuestra estructura especial, y accedemos a la información del paquete
+utilizando esta estructura.
+
+Para probar nuestro ejemplo, lanzamos como usuario root (o utilizando
+sudo, lo que más rabia os de), nuestro capturador de paquetes (que hemos
+llamado \verb!icmp_hello_log!. Desde otro terminal, hacemos un \verb!ping! a
+cualquier máquina que sepamos que responderá a nuestra llamada
+(vuestro modem ADSL, vuestro DNS, google o ping.com :). 
+
+Esto es lo que obtendremos:
+
+{\small
+\begin{verbatim}
+occams@razor $ sudo ./icmp_hello_log
+Code: 0.0 (192.168.100.1)
+Code: 0.0 (192.168.100.1)
+...
+\end{verbatim}
+}
+
+Los mensajes de tipo 0 y código 0 son efectivamente mensajes
+\verb!ECHOREPLY!, que el sistema remoto responde a nuestro ping (el
+que estamos ejecutando en la otra
+consola). Obviamente \verb!192.168.100.1! es la máquina contra la que
+lanzamos el ping.
+
+{\colorbox{excolor}{
+\begin{minipage}{0.98\linewidth}
+{\textbf{\textsf PÁ ENTRETENERSE}}
+
+{\textsf{Si miráis la salida del programa ping, veréis que proporciona
+más datos que nuestra pequeña aplicación. Algunos de los
+datos que muestra se encuentran en la cabecera ICMP, otros en la
+sección de datos -tendréis que ver el código fuente de ping- y otros
+requieren conocer que paquete se envió en primer lugar. Los que andéis
+aburridos podéis extender este ejemplo para que se parezca más a ping}}
+\end{minipage}
+}}
+
+\sectiontext{white}{black}{DETECTANDO ESCANEO SIGILOSOS}
+
+Antes de continuar con la versión completa de nuestro
+sencillo \verb!ping! vamos a hacer un pequeño inciso, 
+para, convertir nuestro pequeño programa en un detector de escaneos
+sigilosos como los que realiza 
+\verb!nmap!.
+
+\begin{entradilla}
+{\em {\color{introcolor}{Capturar paquetes IP}} con un socket RAW es muy sencillo}
+\end{entradilla}
+
+A partir de en nuestro ejemplo anterior, vamos a realizar unas pequeñas
+modificaciones para transformar nuestro programa en un rudimentario
+detector de escaneos de tipo \verb!FIN!. Estos escaneos se caracterizan por
+que el flag \verb!FIN! de la cabecera TCP está puesto a 1.
+
+Nosotros vamos a informar de todos los paquetes de este tipo que
+recibamos, si bien puede que algunos sean paquete legítimos.
+
+Lo primero que tenemos que hacer es añadir un nuevo fichero de
+cabecera a nuestro programa
+
+\verb!#include <linux/tcp.h>!
+
+También tenemos que hacer una pequeña modificación a nuestra
+estructura de datos. Ahora vamos a capturar paquete TCP y, en este
+caso, lo que nos encontramos a continuación de la cabecera IP, es una
+cabecera TCP, no una cabecera ICMP. Teniendo esto en cuenta, nuestra
+estructura de datos sería algo como esto:
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\footnotesize}   
+\begin{lstlisting}
+typedef struct {
+  struct iphdr   ip;
+  struct tcphdr  tcp;
+  char   buffer[1024]; /* Datos */
+} PKT_TCP;
+\end{lstlisting}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ebOpage{introcolor}{0.25}{REVERSO TENEBROSO}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+Con estos cambios, nuestra función \verb!main! para detectar posibles
+escaneos FIN quedaría de la siguiente forma:
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+int main (int argc, char *argv[]) {
+int     s;
+PKT_TCP pkt;
+
+s = crea_socket  (IPPROTO_TCP);
+
+while (1)
+ {
+  read(s, &pkt, sizeof (PKT_TCP));
+  if (pkt.tcp.fin)
+    printf ("Posible FIN scan al puerto %d "
+            "desde (%s)\n", 
+	    ntohs (pkt.tcp.dest), 
+            inet_ntoa(pkt.ip.saddr));
+  }
+return 0;
+}
+\end{lstlisting}
+
+Como podéis observar, cuando creamos nuestro nuevo socket RAW, ahora
+estamos indicando que queremos capturar paquetes TCP, en lugar de
+ICMP, como hicimos en nuestro ejemplo anterior.
+
+Una vez hecho esto, nuestra nueva estructura de datos nos permite
+acceder directamente a la información en la cabecera TCP. Por una
+parte comprobamos el valor del flag \verb!FIN!, y por otra obtenemos la
+información relativa al puerto al que va dirigido el paquete.
+
+\begin{entradilla}
+{\em Podemos detectar un {\color{introcolor}{escaneo FIN}} en unas pocas líneas de código}
+\end{entradilla}
+
+Observad que tenemos que utilizar la función \verb!ntohs! para convertir del
+formato de red al formato de máquina (\verb!ntohs! significa {\em
+Network TO Host Short}). Sí, los datos de las cabeceras se transforman
+a un formato especial para ser transmitidos por la red, de forma que cualquier
+máquina pueda acceder a ellos independientemente de su arquitectura
+({\em little} o {\em big endian}).
+
+\sectiontext{white}{black}{COMPROBANDO EL DETECTOR}
+
+ Vamos a comprobar que tal funciona nuestro nuevo detector de escaneos
+ \verb!FIN!. Para ello, iniciamos nuestra aplicación en una consola, y desde
+ otro terminal ejecutamos el siguiente comando:
+
+{\small
+\begin{verbatim}
+# nmap -sF localhost -p 2000
+\end{verbatim}
+}
+
+Nuestro flamante detector nos informará diligentemente del intento de
+ataque:
+
+{\small
+\begin{verbatim}
+occams@razor:~$ sudo ./nullscan 
+[sudo] password for occams: 
+Posible FIN scan al puerto 2000 desde (127.0.0.1)
+\end{verbatim}
+}
+
+Pero si recordáis, os comentamos que el hecho de recibir un paquete \verb!FIN!
+no significa que se esté llevando a cabo un escaneo de puertos. Para comprobar
+como se generan estos paquetes vamos a realizar un pequeño
+experimento.
+
+Abrid dos consolas y en una de ellas ejecutad {\em Netcat} en modo servidor
+escuchando en el puerto 2000. En la otra ejecutad {\em Netcat} en modo
+cliente conectándose a \verb!localhost! y al puerto 2000.
+
+{\small
+\begin{verbatim}
+CONSOLA Servidor: nc -l -p 2000
+CONSOLA Cliente : nc localhost 2000
+\end{verbatim}
+}
+
+Ahora, pulsad CTRL+C en la parte cliente y ved que obtenéis en el
+detector de escaneos. Repetid el proceso, pero ahora pulsando CTRL+C
+en la consola donde se ejecuta el servidor.
+
+Lo que nuestro detector mostrará será algo como esto:
+
+{\small
+\begin{verbatim}
+Posible FIN scan al puerto 60784 desde (127.0.0.1)
+Posible FIN scan al puerto 2000 desde (127.0.0.1)
+\end{verbatim}
+}
+
+Efectivamente, el flag \verb!FIN! se utiliza para cerrar las conexiones, de
+forma que, para detectar si se trata de un escaneo real, tendríamos
+que saber si el paquete \verb!FIN! que hemos capturado no se
+corresponde con el cierre legítimo de una conexión activa. Es decir,
+necesitamos saber que conexiones 
+están abiertas... o quizás podamos averiguarlo a partir de los otros
+campos de las cabeceras IP y TCP?... algo más para entretenerse :).
+
+
+\sectiontext{white}{black}{ENVIANDO PAQUETES ICMP}
+
+Después de este ``no tan corto paréntesis'', volvamos a nuestro
+pequeña utilidad \verb!ping!.
+
+Como os decíamos en una sección anterior, para poder implementar algo
+parecido a \verb!ping!, necesitamos poder enviar paquetes ICMP. No existe una
+manera directa de hacer esto, de forma similar a como se transmiten
+datos utilizando TCP o UDP. Necesitamos un socket RAW para poder
+enviar estos paquetes.
+
+Para este ejemplo necesitamos los mismos ficheros de cabecera que para
+el primer ejemplo que introdujimos (\verb!icmp_hello_log!). También
+reutilizaremos nuestra función \verb!crea_socket!, pero para poder transmitir
+nuestro paquete ICMP necesitaremos algo más de código. 
+
+Lo primero que necesitamos es una estructura de datos adicional. Si
+bien, podríamos utilizar nuestra estructura \verb!PKT!, ya que un paquete es
+un paquete, por cuestione prácticas nos interesa definir una
+estructura como esta:
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+typedef struct {
+  struct icmphdr icmp;
+  char   buffer[1024]; /* Data */
+} PKT_TX;
+\end{lstlisting}
+
+Como podéis observar, hemos eliminado la cabecera IP de nuestra
+estructura de transmisión. La razón: Vamos a dejar que la pila TCP/IP
+de nuestro sistema rellene los campos de la cabecera IP. Más adelante veremos como
+rellenarlos nosotros mismos, pero para implementar nuestro \verb!ping!, es
+mucho más conveniente dejar al sistema hacerlo.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ebOpage{introcolor}{0.25}{REVERSO TENEBROSO}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+Además de esta estructura de datos, vamos a añadir una función para
+construir paquetes ICMP \verb!ECHO!, con un determinado bloque de datos. Podéis
+ver esta función a continuación.
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+int
+hello_pkt2 (char *pkt_icmp, char *str)
+{
+ struct icmphdr *icmp =(struct icmphdr*)pkt_icmp;
+ PKT_TX         *pkt = (PKT_TX*) pkt_icmp;
+ int             len;
+
+ len = sprintf (pkt->buffer, "%s", str);
+ len += sizeof (struct icmphdr);
+
+ /* Construye cabecera ICMP */
+ icmp->type = ICMP_ECHO;
+ icmp->code = 0;
+ icmp->un.echo.id = htons(123);
+ icmp->un.echo.sequence = htons(5);
+ icmp->checksum = 0;
+ icmp->checksum = cksum ((char*)icmp, len);
+ return len;
+}
+\end{lstlisting}
+
+Esta función recibe como parámetro, un puntero a nuestra estructura de
+paquete en memoria, y una cadena de caracteres que se enviará en el
+bloque de datos.
+
+\begin{entradilla}
+{\em Construir un {\color{introcolor}{paquete ICMP ECHO}} es tan sencillo como rellenar una
+estructura de datos}
+\end{entradilla}
+
+
+Con esta información, la función construye un paquete ICMP \verb!ECHO!
+con identificador 123 y número de secuencia 5. Estos valores serán los
+que utilicemos para saber si el paquete que capturamos es el que nos interesa.
+
+\sectiontext{white}{black}{CALCULANDO EL CHECKSUM}
+
+El último elemento que necesitamos para construir un paquete ICMP
+válido es el cálculo de la suma de comprobación de los datos. El
+protocolo ICMP especifica que este valor se debe calcular utilizando
+todo el paquete (cabecera + datos), siendo el valor del campo
+\verb!checksum! de la cabecera igual a 0.
+
+Nosotros hemos tomado prestada la rutina de {\em checksum} de la
+implementación de \verb!ping! que podéis encontrar en cualquier
+distribución linux. Esta función tiene la siguiente pinta.
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+/* Calculo de checksum */
+u_short
+cksum (u_char *addr, int len)
+{
+ register int sum = 0;
+ u_short answer = 0;
+ u_short *wp;
+
+ for (wp =(u_short*)addr; len>1; wp++,len-=2)
+   sum += *wp;
+
+ /* Take in an odd byte if present */
+ if (len == 1)
+   {
+     *(u_char *)&answer = *(u_char*)wp;
+     sum += answer;
+   }
+  
+ /* add high 16 to low 16 */
+ sum = (sum >> 16) + (sum & 0xffff);   
+ /* add carry */
+ sum += (sum >> 16);                   
+ /* truncate to 16 bits */
+ answer = ~sum;                        
+ return answer;
+}
+\end{lstlisting}
+
+Básicamente lo que hace la función es sumar todos los bytes que
+componen el paquete (de ahí lo de suma de comprobación), y finalmente
+reducirlo a un valor de 16 bits que es el espacio disponible en la
+cabecera.
+
+Con estas funciones de soporte ya podemos escribir nuestra versión
+super-simplificada de ping.
+
+
+\sectiontext{white}{black}{EL PING MÁS TONTO DEL MUNDO}
+
+Nuestro programa principal es ahora un poco más complicado... pero no
+mucho más. 
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+int
+main (int argc, char *argv[])
+{
+  int    s, data_size;
+  PKT    pkt;
+  PKT_TX echo;
+  char   tmp[1024];
+  struct sockaddr_in dest;
+
+  s = crea_socket  (IPPROTO_ICMP);
+
+  /* Construimos paquete */
+  dest.sin_family = AF_INET;
+  inet_aton (argv[1], &dest.sin_addr);
+  data_size = hello_pkt2 ((char*) &echo, 
+                          "Hello World!!");
+  /* Enviamos el paquete */
+  sendto (s, &echo, data_size, 0,
+	  (struct sockaddr*) &dest,
+	  sizeof (struct sockaddr_in));
+
+  /* Empezamos la captura */
+  while (1)
+    {
+      read(s, &pkt, sizeof (PKT));
+      printf ("Code: %d.%d (%d)", 
+	      pkt.icmp.type, pkt.icmp.code, 
+	      ntohs(pkt.icmp.un.echo.id));
+      printf ("(%s)", inet_ntoa(pkt.ip.saddr));
+      if ((pkt.icmp.type == ICMP_ECHOREPLY) && 
+          (ntohs(pkt.icmp.un.echo.id) == 123))
+	{
+	  printf ("\nEste es el nuestro :)!!\n");
+	  break;
+	}
+      printf ("\n");
+    }
+  close (s);
+
+  return 0;
+}
+\end{lstlisting}
+
+Al igual que en nuestro anterior ejemplo, comenzamos creando nuestro
+socket RAW, pero en este caso, antes de ponernos a capturar paquetes,
+tenemos que enviar nuestro paquete \verb!ECHO!. 
+
+Para ello utilizamos la llamada al sistema \verb!sendto!, que nos
+permite especificar la dirección de destino del paquete. Recordad que,
+si no se especifica lo contrario, la pila TCP/IP de nuestro ordenador
+rellenará las cabeceras IP. Sin embargo, lo que la pila es capaz de
+rellenar tienen un límite. Hasta que los ordenadores sean capaces de
+leer nuestras mentes, pues tendremos que decirle a donde queremos
+enviar el paquete :). 
+
+La llamada al sistema \verb!sendto! espera esta información en su
+tercer parámetro como un puntero a una variable de tipo 
+\verb!struct sockaddr!. 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ebOpage{introcolor}{0.25}{REVERSO TENEBROSO}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+Así que lo primero que hace el programa es
+rellenar una estructura de ese tipo. A continuación creamos el
+paquete \verb!ECHO! con la función que ya teníamos lista, y lo
+enviamos con la anteriormente mencionada función \verb!sendto!
+
+Lo que sigue ya os tendría que resultar familiar. Es el mismo bucle que
+escribimos para nuestro capturador de paquetes ICMP, pero en este
+caso, mostramos un mensaje especial cuando recibimos una
+respuesta \verb!ECHO_REPLY! al paquete que acabamos de enviar. Además
+comprobamos que el paquete contiene el identificador de paquete que
+habíamos introducido.
+
+\sectiontext{white}{black}{PROBANDO NUESTRO PING}
+
+Ha llegado el momento de probar nuestro \verb!ping!. Para ello, como
+en nuestros ejemplos anteriores, escogemos una máquina que responda a
+los {\em pings} y  ejecutamos nuestro programa.
+
+{\small
+\begin{verbatim}
+occams@razor$ sudo ./pingc1 192.168.100.1
+[sudo] password for occams: 
+Code: 0.0 (123)(192.168.100.1)
+Este es el nuestro :)!!
+\end{verbatim}
+}
+
+Si enviamos nuestros paquetes contra una máquina que no existe (o no
+responde a los paquetes ECHO), nuestro programa quedará esperando
+indefinidamente. Sí, obviamente tenemos que utilizar un temporizador
+para determinar si un paquete se ha perdido... eso os lo dejamos como
+ejercicio :).
+
+Pero, ¿qué ha pasado con nuestro ``Hola Mundo!''?... Ejecutemos de
+nuevo nuestro programa, pero esta vez vamos a lanzar \verb!tcpdump! en
+un terminar. Esto es lo que obtendríamos:
+
+{\scriptsize
+\begin{verbatim}
+occams@razor$ sudo tcpdump -A 'icmp'
+(...)
+15:28:12.219162 IP occams.local > target: ICMP echo request, 
+                id 123, seq 5, length 21
+                E..)..@.@......o.........{..Hello World!!
+15:28:12.219604 IP target > occmas.local: ICMP echo reply, 
+                id 123, seq 5, length 21
+                E..)....@..........o.....{..Hello World!!.3hV.
+(...)
+\end{verbatim}
+}
+
+Sí, ahí está. Ha ido hasta la máquina destino y a vuelto. Así que 
+podemos utilizar paquetes ICMP también para transmitir datos. Un
+ejemplo de este uso es el programa ICMP shell, que permite acceso
+{\em shell} remoto a una máquina a  través de ICMP. En concreto esta
+aplicación permite utilizar otros 
+mensajes ICMP, no solo los mensajes \verb!ECHO!, para este intercambio de
+datos. 
+
+
+{\colorbox{introcolor}{
+\begin{minipage}{0.98\linewidth}
+{\textbf{\textsf EL PING DE LA MUERTE}}
+
+{\textsf{El sistema operativo Windows 95, tenía un bug en su pila TCP/IP
+que hacía que el sistema se estrellase si recibía un paquete ICMP ECHO
+con un bloque de datos de más de 64Kb. Este paquete, así como la
+aplicación que lo mandaba -que ahora ya sabéis hacer- se conocía como
+el Ping de la Muerte ({\em PoD Ping of Death})}}
+\medskip
+
+{\textsf{\href{http://en.wikipedia.org/wiki/Ping_of_death}{Más información...}}}
+\end{minipage}
+}}
+\columnbreak
+
+\sectiontext{white}{black}{ESCANEO DE MEDIA CONEXIÓN}
+
+Ahora que ya tenemos dominado ICMP, vamos con TCP. Para ilustrar este
+ejemplo vamos a implementar el clásico escaneo de media conexión, en
+el que el tradicional {\em ``saludo a tres bandas''} de TCP se queda
+en sólo dos bandas.
+
+Una conexión TCP, se inicia con el envío de un paquete \verb!SYN! (en seguida
+veremos que es esto). El sistema remoto responde con un
+paquete \verb!SYN ACK!, o paquete de asentimiento de conexión. Para que la conexión se
+considere establecida el sistema que inicia la comunicación debe
+enviar un paquete \verb!ACK! de vuelta. 
+
+Básicamente esto es lo que hace la llamada al
+sistema \verb!connect!... nosotros vamos a implementar nuestro
+propio \verb!connect!. 
+
+En este ir y venir  de paquetes, ambos sistemas intercambian números
+de serie que serán utilizados durante la comunicación. Estos números
+de serie son los que hacen
+que el spoofing de una conexión TCP no sea práctico, al menos lo que
+se conoce como {\em blind spoofing}.
+
+\begin{entradilla}
+{\em Los socket RAW nos permiten {\color{introcolor}{control absoluto}} sobre los flags TCP}
+\end{entradilla}
+
+En un escaneo de media conexión no se envía el último paquete \verb!ACK!, con
+lo cual la conexión no se puede considerar completa y, dependiendo del
+sistema de detección de intrusos instalado, puede que el escaneo no se
+detecte. Esto no es muy probable que pase hoy en día, pero desde un
+punto de vista didáctico nos va a permitir introducir un montón de
+conceptos. 
+
+
+\sectiontext{white}{black}{MODIFICANDO NUESTRO EJEMPLO}
+
+Para poder implementar nuestro escáner de media conexión tendremos que
+hacer algunas modificaciones a nuestro programa. Lo primero que
+necesitamos es un nuevo fichero de cabecera, y una mínima modificación
+de nuestras estructuras de datos.
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+#include <linux/tcp.h>
+
+typedef struct {
+  struct tcphdr  tcp;
+} PKT;
+
+typedef struct {
+  struct iphdr   ip;
+  struct tcphdr  tcp;
+} PKT_RX;
+\end{lstlisting}
+
+Como podéis comprobar, simplemente hemos substituido la cabecera ICMP
+de nuestro ejemplo anterior por la nueva cabecera TCP (para eso
+necesitamos el fichero .h adicional). También hemos eliminado el
+bloque de datos que no vamos a necesitar para nuestro
+escáner. Volveremos sobre estas estructuras un  poco más tarde.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ebOpage{introcolor}{0.25}{REVERSO TENEBROSO}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+La siguiente parte que tenemos que modificar es el programa
+principal, que quedaría de esta guisa.
+
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+int
+main (int argc, char *argv[]) {
+ int    s, data_size;
+ PKT_RX pkt;
+ PKT    syn;
+ char   tmp[1024];
+ struct sockaddr_in dest;
+
+ s = crea_socket  (IPPROTO_TCP);
+
+ /* Construimos paquete */ 
+ dest.sin_family = AF_INET;
+ inet_aton (argv[1], &dest.sin_addr);
+ dest.sin_port = htons(atoi(argv[2]));
+
+ memset (&syn, 0, sizeof(PKT));
+ data_size = tcp_pkt (&syn, argv[1],atoi(argv[2]), 
+                      argv[3], atoi(argv[4]));
+
+ /* Enviamos el paquete */
+ sendto (s, &syn, data_size, 0,
+          (struct sockaddr*) &dest,
+	  sizeof (struct sockaddr_in));
+
+ /* Empezamos la captura */
+ while (1)
+ {
+   read(s, &pkt, sizeof (PKT_RX));
+   printf ("Paquete desde %s:%d ACK:%d SYN:%d\n",
+    inet_ntoa(*((struct in_addr*)&pkt.ip.saddr)), 
+    ntohs(pkt.tcp.source),
+    pkt.tcp.ack, pkt.tcp.syn);
+
+   if (!memcmp (&pkt.ip.saddr, 
+                &dest.sin_addr,
+                sizeof (struct in_addr))) break;
+   }
+  close (s);
+
+  return 0;
+}
+\end{lstlisting}
+
+El primer cambio que observamos es que ahora nuestro socket RAW va a
+utilizar un protocolo diferente. En lugar del
+anterior \verb!IPPROTO_ICMP!, ahora nos encontramos un
+interesante \verb!IPPRPTO_TCP!, como parámetro a nuestra función de
+creación del socket.
+
+El segundo cambio importante que nos encontramos es que, ahora,
+nuestro programa va a recibir cuatro parámetros. Los dos primeros
+identificarán la dirección ip y puerto de la máquina remota, y los dos
+segundos identificarán la dirección ip y puerto de la máquina
+local... Esto último debería pareceros interesante ;).
+
+En tercer lugar, obviamente, tenemos que utilizar una función distinta
+para crear nuestro paquete. En esta ocasión le hemos dado el original
+nombre de \verb!tcp_pkt!.
+
+\begin{entradilla}
+{\em No hay grandes diferencias entre la
+{\color{introcolor}construcción de un paquete} ICMP y de un paquete TCP.}
+\end{entradilla}
+
+Para terminar, hemos mejorado un poco nuestro bucle principal. Ahora
+mostramos información específica del protocolo TCP (como por ejemplo
+los valores de los flags \verb!SYN! y \verb!ACK!) y hemos añadido un
+test sencillo para terminar la aplicación.
+
+Como enseguida comprobaréis, el test para terminar la aplicación no es
+completo. El test completo os lo dejamos a vosotros para que os entretengáis y
+así el listado nos queda más corto y centrado en el tema que nos ocupa.
+
+\sectiontext{white}{black}{CONSTRUYENDO UN PAQUETE TCP}
+
+Para que nuestro escáner esté completo, nos falta la función que
+construye el paquete TCP. Como dijimos, necesitamos enviar un
+paquete \verb!SYN!, es decir, un paquete con el flag \verb!SYN! activado en la
+cabecera TCP. Tranquilos, esto es muchísimo más fácil de lo que
+parece. Aquí tenéis la función \verb!tcp_pkt!.
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+int
+tcp_pkt (PKT *p, char *dir_dest, int puertod,
+	 char *dir_orig, int puertoo)
+{
+ p->tcp.source = htons (puertoo);
+ p->tcp.dest = htons (puertod);
+ p->tcp.doff = sizeof (struct tcphdr)  / 4;
+
+ p->tcp.syn = 1;
+
+ p->tcp.check = cksum ((unsigned char*)
+                        &p->tcp, 
+                        sizeof(struct tcphdr));
+ return (sizeof(struct tcphdr));
+}
+\end{lstlisting}
+
+La función simplemente rellena la cabecera TCP con la mínima información
+necesaria para poder enviar el paquete. El puerto origen y destino, el
+flag \verb!SYN! (ya os dije que era fácil), el {\em checksum}, que calculamos con
+la misma función que utilizamos para nuestro \verb!ping!, y el
+campo \verb!doff! que indica el desplazamiento dentro del paquete
+desde la cabecera tcp a la zona de datos en palabras de 32 bits (de
+ahí lo de dividir por 4). 
+
+Dicho de otra forma, contiene el número de palabras de 32bits que
+ocupa la cabecera TCP. Sí, ya, pero como el nombre del campo es doff
+({\em Data Offset})... Podéis probar que sucede si no inicializáis
+correctamente este campo.
+
+\sectiontext{white}{black}{PROBANDO NUESTRO FLAMANTE ESCÁNER}
+
+Compilamos nuestro programa que hemos llamado \verb!syn-scan-bogus! y
+lo ejecutamos.
+
+{\scriptsize
+\begin{verbatim}
+occams@razor$ sudo ./synscan-bogus 192.168.100.1 443 \
+> 192.168.100.100 5000
+
+\end{verbatim}
+}
+
+Nada... Mi gozo en un pozo.
+
+Veamos que nos dice \verb!tcpdump!
+
+{\scriptsize
+\begin{verbatim}
+occams@razor:~$ sudo tcpdump -n
+tcpdump: verbose output suppressed, use -v or -vv for full 
+protocol decode
+listening on eth0, link-type EN10MB (Ethernet), capture size 96 bytes
+20:04:07.617606 IP 192.168.100.100.5000 > 192.168.1.100.443: 
+                S 0:0(0) win 0
+\end{verbatim}
+}
+
+Bueno, el paquete sale, con las direcciones IP y puertos correctos y
+el flag \verb!SYN! activo. Seguiremos el consejo de \verb!tcpdump!, y
+activamos el modo {\em verbose}.
+
+
+
+
+{\scriptsize
+\begin{verbatim}
+occams@razor:~$ sudo tcpdump -nv
+20:07:08.439772 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], 
+                proto TCP (6), length 40) 192.168.100.100.5000 > 
+                192.168.1.1.443: S, cksum 0x9ac4 
+                (incorrect (-> 0x16e9), 0:0(0) win 0
+\end{verbatim}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ebOpage{introcolor}{0.25}{REVERSO TENEBROSO}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ajá, nuestro {\em checksum} es incorrecto y el sistema remoto simplemente
+tira el paquete, por eso no recibimos ninguna respuesta.
+
+Ni cortos ni perezosos comprobamos el RFC 793, el que define
+TCP. Una búsqueda rápida de la cadena {\em checksum} en el documento
+nos lleva a una detallada sección que describe como calcularlo.
+
+\sectiontext{white}{black}{CALCULANDO EL CHECKSUM TCP}
+
+Leyendo detenidamente el RFC, podemos comprobar que nuestra función
+para calcular la suma de comprobación del paquete es correcta, pero
+tenemos que añadir lo que el RFC llama una pseudo-cabecera. Vale,
+modifiquemos nuestro escáner.
+
+Lo primero que tenemos que hacer es modificar nuestras estructuras de
+datos. Añadimos una estructura para trabajar cómodamente con esta
+pseudo-cabecera, y modificamos \verb!PKT! para que la
+incluya. Notad que no estamos enviando datos en nuestro paquete, así
+que simplemente podemos añadir
+la pseudo-cabecera a continuación del la cabecera TCP. Las estructuras
+quedarían de esta forma.
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+typedef  struct pseudo_header {
+  unsigned long src;
+  unsigned long dst;
+  unsigned char zero;
+  unsigned char proto;
+  unsigned short length;
+} TCP_PHDR;
+
+typedef struct {
+  struct tcphdr  tcp;
+  TCP_PHDR       tcp_phdr;
+} PKT;
+\end{lstlisting}
+
+Ahora tenemos que actualizar nuestra función \verb!tcp_pkt! para que
+tenga en cuenta la pseudo-cabecera a la hora de calcular la suma de
+comprobación. Así es como quedaría.
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+int
+tcp_pkt (PKT *p, char *dir_dest, int puertod,
+	 char *dir_orig, int puertoo) {
+ p->tcp.source = htons (puertoo);
+ p->tcp.dest = htons (puertod);
+ p->tcp.doff = sizeof (struct tcphdr)  / 4;
+ p->tcp.syn = 1;
+
+ p->tcp_phdr.src = inet_addr (dir_orig);
+ p->tcp_phdr.dst = inet_addr (dir_dest);
+ p->tcp_phdr.zero = 0;
+ p->tcp_phdr.proto = 6;
+ p->tcp_phdr.length=htons(sizeof(struct tcphdr));
+
+
+ p->tcp.check = cksum ((unsigned char*)&p->tcp, 
+     		       sizeof(struct tcphdr) + 
+                       sizeof (TCP_PHDR));
+
+ return (sizeof(struct tcphdr));
+}
+\end{lstlisting}
+
+Observad que la pseudo-cabecera solo se utiliza para calcular la suma
+de comprobación y no se enviará junto con el paquete, de ahí que el
+valor que retorna la función es simplemente el tamaño de la cabecera
+TCP, como en nuestro primer ejemplo.
+
+\columnbreak
+
+\sectiontext{white}{black}{SEGUNDO INTENTO}
+
+Con esta última modificación del programa, repetimos la nuestra prueba.
+
+{\scriptsize
+\begin{verbatim}
+occams@razor$ sudo ./synscan-tcp 192.168.100.1 443 \
+> 192.168.100.100 5000
+[sudo] password for occams: 
+Paquete desde 192.168.100.1:443 ACK:1 SYN:1
+
+occams@razor$
+\end{verbatim}
+}
+
+Mucho mejor esta vez. Bueno, ya lo sabíamos por eso le cambiamos el
+nombre al programa :). Simplemente para comprobar veamos que dice esta
+vez \verb!tcpdump!
+
+{\scriptsize
+\begin{verbatim}
+occams@razor:~$ sudo tcpdump -nv
+20:40:36.509596 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], 
+                proto TCP (6), length 40) 192.168.100.100.5000 > 
+                192.168.100.1.443: S, cksum 0x16df (correct), 
+                0:0(0) win 0
+20:40:36.510083 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], 
+                proto TCP (6), length 44) 192.168.100.1.443 > 
+                192.168.100.100.5000: S, cksum 0xb8ea (correct), 
+                2921431349:2921431349(0) ack 1 win 5840 <mss 1460>
+
+\end{verbatim}
+}
+
+Ahora nuestros {\em checksums} son correctos, y recibimos la respuesta
+esperada desde la máquina remota, un paquete con los flags \verb!SYN!
+y \verb!ACK! activados. 
+
+\sectiontext{white}{black}{CONTROL ABSOLUTO}
+
+Si observamos con detenimiento la información que nos
+proporciona \verb!tcpdump!, veremos que hay un montón de datos en los
+paquetes que enviamos que a priori no podemos modificar. Datos como
+las direcciones IP o el TTL, se encuentran en la cabecera IP, la cual,
+hasta el momento, hemos dejado que la manejara el sistema operativo.
+
+Pero eso se acabó. Vamos a modificar nuestro escáner para poder
+controlar absolutamente toda la información que nos
+muestra \verb!tcpdump!. Para ello, tenemos que hacer algunas
+modificaciones adicionales en nuestro pequeño programa. 
+
+\begin{entradilla}
+{\em Utilizando la {\color{introcolor}{syscall setsockopts}} podremos acceder a la cabecera IP}
+\end{entradilla}
+
+El primer cambio es que ya no necesitamos dos estructuras de datos
+para enviar y para recibir los paquetes. Ahora vamos a manejar la
+cabecera IP tanto en transmisión como en recepción, así que solo
+necesitaremos la siguiente definición.
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+typedef struct {
+  struct iphdr   ip;
+  struct tcphdr  tcp;
+  TCP_PHDR       tcp_phdr;
+} PKT;
+
+\end{lstlisting}
+
+Esta nueva estructura substituye a las anteriores \verb!PKT!
+y \verb!PKT_RX!. Mantenemos el nombre de la primera, porque mola y
+para tener que hacer menos cambios al programa.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ebOpage{introcolor}{0.25}{REVERSO TENEBROSO}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+Además, necesitamos decirle al kernel que no maneje las cabeceras por
+nosotros. Esto lo conseguimos activando la opción \verb!IP_HDRINCL!
+({\em IP Header Included}... obviamente) de
+nuestro socket RAW. Esto lo hacemos en una nueva función que os
+mostramos a continuación.
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+int
+cfg_socket (int s)
+{
+  int  val = 1;
+
+  if (setsockopt (s, IPPROTO_IP, IP_HDRINCL, 
+                     &val, sizeof (val)) < 0)
+    perror ("setsockopt (IPHDRINCL):"); 
+
+  return s;
+}
+\end{lstlisting}
+
+Como hicimos en el ejemplo anterior, antes de meternos en los detalles
+de la generación de los paquetes, vamos a ver como quedaría nuestra
+función main. 
+
+Solamente vamos a reproducir la primera parte de la función, en la que
+se envía el paquete, ya que el resto no necesita ningún cambio. De
+hecho, en esta primera parte solo vamos a modificar dos líneas.
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+int main (int argc, char *argv[]) {
+  int    s, data_size;
+  PKT    pkt;
+  PKT    syn;
+  char   tmp[1024];
+  struct sockaddr_in dest;
+
+  s = crea_socket  (IPPROTO_RAW);
+  cfg_socket (s);
+
+
+  /* Construimos paquete */ 
+  dest.sin_family = AF_INET;
+  inet_aton (argv[1], &dest.sin_addr);
+  dest.sin_port = htons(atoi(argv[2]));
+ 
+  memset (&syn, 0, sizeof(PKT));
+  ip_pkt (&syn, argv[1],  argv[3]);
+  tcp_pkt (&syn, argv[1], atoi(argv[2]), 
+           argv[3], atoi(argv[4]));
+...
+\end{lstlisting}
+
+Lo primero que podemos ver es que ahora estamos utilizando como
+protocolo \verb!IPPROTO_RAW! y a continuación estamos llamando a
+nuestra nueva función para decirle al kernel que nosotros
+proporcionamos las cabeceras IP (\verb!cfg_socket!).
+
+En este caso concreto, podríamos haber mantenido el
+protocolo \verb!IPPROTO_TCP!, pero \verb!IPPROTO_RAW! es formalmente
+más correcto. 
+
+El segundo cambio que observamos es la llamada a la
+función \verb!ip_pkt!. Sí, efectivamente, esa es la función que
+rellena la cabecera IP. Como en la capa IP no existen los puertos, no
+es necesario que se los enviemos.
+
+Sin grandes sorpresas hasta aquí. Le decimos al kernel que nosotros
+manejamos las cabeceras IP, y añadimos una función para manejarlas.
+
+
+\sectiontext{white}{black}{GENERANDO CABECERAS IP}
+
+Como acabamos de contaros, la función \verb!ip_pkt! es la encargada
+de rellenar la cabecera IP de nuestro paquete. Nosotros hemos incluido
+en el código valores constantes para la mayoría de los campos para
+mantener el programa pequeño. 
+
+Vosotros podéis modificar la función o
+añadir funciones adicionales para configurar esos valores. Aquí está la función.
+
+\lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
+\begin{lstlisting}
+int
+ip_pkt (PKT *p, char *dir_dest, int puertod,
+	 char *dir_orig, int puertoo)
+{
+  p->ip.ihl = 5;
+  p->ip.version = 4;
+  p->ip.tos = 0;
+  p->ip.tot_len = sizeof (struct iphdr) + 
+                  sizeof (struct tcphdr); 
+  p->ip.id = htons (1234);
+  p->ip.frag_off = 0;
+  p->ip.ttl = 255;
+  p->ip.protocol = 6;
+  p->ip.check = 0;  
+  p->ip.saddr = inet_addr (dir_orig);
+  p->ip.daddr = inet_addr (dir_dest);
+
+}
+\end{lstlisting}
+
+Más fácil no se puede. No vamos a explicar en detalle cada uno de los
+campos de la cabecera, para ellos os remitimos al RFC 791. Pero un par
+de ellos si merecen algún comentario.
+
+El campo TTL {\em Time To Live} indica el número de saltos máximo que
+el paquete puede dar a través de internet, antes de que algún router
+lo descarte. Este campo es interesante por dos cosas. A saber.
+
+La primera es que la utilidad \verb!traceroute! utiliza este campo y
+la captura de mensajes ICMP para determinar la ruta de un paquete. La
+utilidad va incrementando el campo de uno en uno, de forma que cada vez
+el paquete es descartado por un nodo más lejano en la ruta. Cuando esto sucede,
+el nodo que lo descarta envía un mensaje ICMP para comunicar la
+situación. Estos mensajes son procesados por \verb!traceroute! para
+mostrarnos la ruta final del paquete.
+
+La segunda es que el campo TTL es uno de los utilizados por los
+sistemas de identificación pasiva de sistema operativo, de tal forma
+que modificándolo el IDS se puede confundir un poco.
+
+
+
+{\colorbox{introcolor}{
+\begin{minipage}{0.98\linewidth}
+{\textbf{\textsf PASSIVE FINGERPRINTING}}
+
+{\textsf{Los sistemas pasivos de extracción de huellas dactilares (sí,
+en inglés es mucho más corto), analizan los paquetes que una
+determinada máquina recibe e intentan determinar el tipo de sistema
+que lo envió. Para ellos utilizan campos como TTL, que por ejemplo, en
+los sistemas Linux suele tener un valor de 64, y en los sistemas
+Windows 255, aunque eso depende de la versión. Es muy fácil modificar
+este comportamiento, por lo que los sistemas pasivos no son muy
+fiables. Quizás el más conocido de estos sistemas es p0f}}.
+
+\medskip
+
+{\textsf{El sistema de detección remota que proporciona nmap, por el
+contrario, es un sistema activo, puesto que envía paquetes especiales
+al sistema remoto con el fin de extraer información adicional sobre
+él. Por supuesto, estos sistemas son mucho más escandalosos..}}
+
+\end{minipage}
+}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ebOpage{introcolor}{0.25}{REVERSO TENEBROSO}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\sectiontext{white}{black}{IP SPOOFING Y OTRAS MALDADES}
+
+Los otros dos campos que nos interesan son, por supuesto, las
+direcciones IP de origen y destino. Y sí, finalmente ahí estamos, esta
+es la forma de hacer {\em IP spoofing}. Podemos poner cualquier
+valor en el campo de la dirección origen y eso es lo que saldrá
+por el cable.
+
+Con el programa que hemos escrito, solo tenéis que cambiar el tercer
+parámetro para enviar un paquete \verb!SYN! con una dirección falsa. El
+problema de hacer esto es que la respuesta del sistema remoto se
+enviará a esa dirección y por lo tanto no la podréis ver.
+
+\begin{entradilla}
+{\em Aplicar técnicas de {\color{introcolor}{Blind IP Spoofing}} hoy en día es prácticamente
+imposible}
+\end{entradilla}
+
+Hay dos formas de sacar partido a esto del {\em spoofing}. La primera, es la
+que proporciona \verb!nmap! con el flag -D (del inglés {\em Decoy}, 
+señuelo). Esta opción le indica a \verb!nmap! que envíe varios
+paquetes al sistema remoto que desea escanear. Todos ellos excepto uno
+tienen direcciones falsas, de forma que el sistema remoto tiene que
+comprobar todas las direcciones de los paquetes que recibe y, en
+general, va a ser bastante complicado determinar desde cual se está
+produciendo el ataque.
+
+La otra forma de sacarle partido al spoofing es en el secuestro de
+conexiones, que no deja de ser un caso particular de un ataque {\em
+MIM} ({\em Man in the Middle}. Hoy en día es muy difícil hacer esto, a no ser que se den
+una serie de condiciones, tan específicas, que la técnica no resulta
+práctica. Estas condiciones son:
+
+\begin{itemize}
+\item El atacante tiene que poder capturar el tráfico de la
+comunicación que desea interceptar. Eso reduce la técnica a las redes
+de área local, o al control de un router que no es algo sencillo. 
+\item El atacante tiene que poder bloquear la conexión de red de la
+máquina que pretende suplantar, ya sea con un ataque DoS o utilizando
+un exploit.
+\end{itemize}
+
+En estas circunstancias, es posible el secuestro de una conexión
+activa. El resumen es que es necesario conocer los números de serie
+que van en cada paquete TCP y esto solo se puede hacer de dos
+formas. O viéndolos directamente o adivinándolos, y esta última opción
+hace muchos años que dejo de ser viable.
+
+Sí, hace años, los generadores de números pseudo-aleatorios utilizados
+para generar esos números de serie no eran muy buenos, y había formas
+de llegar a predecir esos números de forma relativamente sencilla.
+
+Sabemos que no hemos hablado sobre estos números de serie, pero en los
+RFCs que hemos comentado a lo largo del texto podréis encontrar una
+descripción detallada de como se utilizan.
+
+Finalmente comentar que el IP spoofing se suele utilizar en ataques
+DoS no solo para ocultar el origen del ataque, sino para, como en el caso de {\em
+SMURF}, producir efectos de {\em flooding}... Pero eso ya es tema para
+otro artículo.
+
+\sectiontext{white}{black}{A PARTIR DE AQUÍ...}
+
+En este artículo hemos explorado los fundamentos de los socket RAW y
+como utilizarlos para capturar tráfico o generar paquetes
+especiales. Con lo que os hemos contado tenéis las herramientas para
+construir la mayoría de las herramientas del sistema relacionadas con
+la red y jugar con la pila TCP/IP ``casi'' al más bajo nivel.
+
+¿Qué podéis hacer ahora?... Bueno, echadle un ojo al
+fichero \verb!/etc/protocols!, donde encontraréis una lista completa
+de protocolos con los que podéis jugar. También deberíais comprobar la
+página del manual \verb!man 7 raw! y si queréis ir más allá 
+\verb!man 7 packet!... 
+
+Como siempre, esperamos saber de vuestros experimentos!!
+
+
+
+\end{multicols}
+\clearpage
+\pagebreak
