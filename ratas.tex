@@ -110,7 +110,7 @@ En el programa principal es donde está lo interesante.
 
 \sectiontext{white}{black}{CONFIGURANDO LA CAPTURA}
 
-Lo primero que hacemos es obtener información sobre la configuración
+El programa comienza obteniendo información sobre la configuración
 del interfaz eth0. Esta llamada os la podéis ahorrar si no vais a
 trabajar con paquetes de ``broadcast'' ya que su única finalidad es
 obtener la máscara de red asociada con el interfaz.
@@ -138,8 +138,8 @@ través de la línea de comandos (argc mayor que 1).
 {\em El sistema de {\color{introcolor} filtrado de paquetes de} libpcap es muy potente}
 \end{entradilla}
 
-Como podéis ver,simplemente pasamos el primer parámetro del programa a la función
-pcap\_compile. 
+Como podéis ver,simplemente pasamos el primer parámetro del programa a
+la función \verb!pcap_compile!. 
 
 \ebOpage{introcolor}{0.25}{RATAS DE BIBLIOTECA}
 
@@ -154,11 +154,12 @@ libpcap :).
 
 \sectiontext{white}{black}{EL BUCLE PRINCIPAL}
 
-Finalmente, utilizamos la función pcap\_loop para iniciar la
+Finalmente, utilizamos la función \verb!pcap_loop! para iniciar la
 captura. El programa entrará en un bucle infinito en el que, cada vez
-que capture un paquete, ejecutará nuestra función ip\_cb pasándole como
+que capture un paquete, ejecutará nuestra función \verb!ip_cb! pasándole como
 primer parámetro el paquete capturado (bueno, pasa algo más, pero en esencia
-eso es lo que hace). El segundo parámetro de pcap\_loop, nos permite especificar el
+eso es lo que hace). El segundo parámetro de \verb!pcap_loop!, nos
+permite especificar el 
 número de paquetes que queremos capturar. En este caso, el valor -1
 indica que no hay límite.
 
@@ -176,6 +177,7 @@ haremos es compilar nuestro programa de la forma habitual.
 $ gcc -o count_packet count_packet.c -lpcap
 
 \end{lstlisting}
+%$
 
 Como en nuestro programa, hemos decidido poner el interfaz de red en
 modo promiscuo, tendremos que ejecutar nuestro sniffer como usuario
@@ -188,7 +190,7 @@ solo dos paquetes).
 $ ping -c2 una_ip
 
 \end{lstlisting}
-
+%$
 
 Esto es lo que obtendremos, al ejecutar nuestro programa en la misma máquina.
 
@@ -201,10 +203,10 @@ Hemos recibido 1 paquetes!.Ha, ha, ha! 3 paquetes!
 Hemos recibido 2 paquetes!.Ha, ha, ha! 4 paquetes!
 \end{lstlisting}
 
-Como podéis ver, estamos capturando el paquete ICMP ECHO que ping
-envía y el paquete ICMP ECHO-REPLY que recibimos de la máquina
+Como podéis ver, estamos capturando el paquete ICMP \verb!ECHO! que ping
+envía y el paquete ICMP \verb!ECHO-REPLY! que recibimos de la máquina
 remota. Observad que si la ip que habéis utilizado no está accesible,
-solamente recibiréis dos paquetes ICMP HOST\_UNREACH y, obviamente,
+solamente recibiréis dos paquetes ICMP \verb!HOST_UNREACH! y, obviamente,
 ninguna respuesta del sistema remoto (que no existe).
 
 Probemos ahora algo más elaborado.
@@ -218,7 +220,7 @@ Hemos recibido 2 paquetes!.Ha, ha, ha! 2 paquetes!
 
 Si volvemos ha ejecutar nuestro ping... veremos que ahora nuestro
 programa solo muestra dos paquetes... claro, en nuestro filtro estamos diciendo
-que solo nos interesan los paquetes ECHO y no los ECHO-REPLY.
+que solo nos interesan los paquetes \verb!ECHO-REPLY! y no los \verb!ECHO!.
 
 ¿Qué obtendríais ahora haciendo ping a una máquina que no existe?
 
@@ -226,7 +228,7 @@ que solo nos interesan los paquetes ECHO y no los ECHO-REPLY.
 
 Nuestro conde contador es güay, pero no resulta demasiado útil. Como
 decíamos más arriba, el callback que pasemos como parámetro a
-pcap\_loop recibirá toda la información asociada al paquete que se ha
+\verb!pcap_loop! recibirá toda la información asociada al paquete que se ha
 capturado. 
 
 Aquí tenéis uno un poco más interesante.
