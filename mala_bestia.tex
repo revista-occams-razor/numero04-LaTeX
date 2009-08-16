@@ -143,7 +143,6 @@ suerte el programa que proporciona ese servicio y su versión).
 
 Vamos, una herramienta muy útil.
 
-%\sectiontext{white}{black}{RADIOGRAFÍA DE UN ATAQUE}
 \sectiontext{white}{black}{LA IMPORTANCIA DEL ESCANEO}
 
 Para terminar con esta introducción y meternos a saco con el tema,
@@ -325,8 +324,6 @@ recibiremos un paquete ICMP indicándolo.
 un paquete ICMP indicándolo (con UDP) o un paquete \verb!RST!
 (con TCP).
 
-%\item Regla 3. Si enviamos un paquete ``ilegal'' a una máquina que no existe,
-%recibiremos un paquete \verb!RST!
 \item Regla 3. Si enviamos un paquete ``ilegal'', en general,
 recibiremos un paquete \verb!RST! como respuesta.
 \end{itemize}
@@ -1125,27 +1122,6 @@ según el tipo de escaneo, recibir un paquete \verb!RST! o un tamaño de
 ventana positivo puede significar que el puerto esté abierto o
 cerrado, dependiendo de lo que hayamos enviado.
 
-
-%\begin{center}
-%{\colorbox{excolor}{
-%\begin{minipage}{0.9\linewidth}
-%{\textbf{\textsf{CORTAFUEGOS CON Y SIN ESTADO}}}
-%
-%{\textsf{Como todos sabéis, un cortafuegos o firewall, permite controlar el
-%tráfico que entra y sale de una red, para evitar ataques, normalmente
-%desde el exterior. La configuración más habitual es que el
-%cortafuegos, solo permita conexiones desde la red interna hacia el
-%exterior, de forma que los usuarios de la red interna puedan navegar
-%por internet o leer su correo. Si se desea proporcionar algún
-%servicio, en general se suele utilizar una configuración más
-%complicada, con dos cortafuegos y una DMZ. En estos casos, el firewall
-%tiene que llevar la cuenta de que conexiones están abiertas (estado) y
-%así descartar todo paquete no asociado a una conexión válida.}
-%}
-%\end{minipage}
-%}}
-%\end{center}
-
 \sectiontext{white}{black}{CORTAFUEGOS CON Y SIN CONEXIÓN} 
 
 Como todos sabéis, un cortafuegos o firewall, permite controlar el
@@ -1405,7 +1381,7 @@ leer. Hasta el próximo número. \EOP
 
 \end{multicols}
 
-%{\footnotesize
+
 {\scriptsize
 \textbf{FIGURA 13 - SALIDA DEL FLAG -vS CONTRA UN SERVIDOR WEB.}{
 \color{listcolor}{

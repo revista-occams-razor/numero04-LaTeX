@@ -13,4 +13,4 @@ clean:
 	rm -f *aux *dvi *log 
 
 clean-all:
-	rm -f *aux *dvi *log ${NAME}.ps.gz ${NAME}.pdf portada.out
+	rm -f *~ *aux *dvi *log ${NAME}.ps.gz ${NAME}.pdf portada.out
