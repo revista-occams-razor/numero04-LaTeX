@@ -12,7 +12,6 @@
 % Seccion Reverso Tenebroso
 %
 
-%\rput(4.0,-2.1){\resizebox{19cm}{!}{{\epsfbox{images/reverso/header.eps}}}}
 \rput(3.2,-1.5){\resizebox{15cm}{!}{{\epsfbox{images/reverso/header-1.eps}}}}
 
 % -------------------------------------------------
@@ -22,8 +21,6 @@
 
 \mtitle{4cm}{Sockets RAW}
 
-%\msubtitle{12cm}{Descubre como trabajan las herramientas de los
-%hackers}
 \msubtitle{6cm}{Descubre como trabajan}
 
 \msubtitle{8cm}{las herramientas de los hackers}
@@ -33,9 +30,8 @@
 {\psset{linecolor=black,linestyle=dotted}\psline(-12,0)}
 \end{flushright}
 
-%\vspace{2mm}
-% -------------------------------------------------
 
+% -------------------------------------------------
 \begin{multicols}{2}
 
 % Introducción
@@ -64,7 +60,7 @@ los sockets RAW una de las más utilizadas y veteranas. Los sockets
 RAW, como su propio nombre indican son sockets (iguales que los
 otros), cuya única diferencia es que cuando recibimos o enviamos datos
 a través de ellos, esos datos se proporcionan o se obtienen ``en bruto''
-(o ``raw'').
+(``raw'' en inglés).
 
 \begin{entradilla}
 {\em Los {\color{introcolor}{socket RAW}} nos permiten enviar y recibir datos ``en bruto'' a
@@ -89,7 +85,7 @@ realizar dos operaciones. La primera es poder enviar paquetes ICMP, y
 la segunda, obviamente, es poder recibir paquetes ICMP.
 
 Comenzaremos por la segunda parte, ya que es más sencilla y nos
-permitirá introducir los nuevos conceptos de una forma más progresiva.
+permitirá introducir los nuevos conceptos de una forma progresiva.
 
 \sectiontext{white}{black}{CREANDO NUESTRO SOCKET}
 
@@ -109,7 +105,7 @@ cabecera. Aquí tenéis la lista de los que necesitamos.
 \end{lstlisting}
 
 Hemos agrupado los ficheros de cabecera en tres grupos. En el primero
-encontramos los de siempre, ficheros estándar para utilizar funciones
+encontramos los de siempre, cabeceras estándar para utilizar funciones
 como \verb!printf! o \verb!exit!. El segundo bloque es el que contiene
 las definiciones que necesitaremos para crear nuestro socket
 RAW. Finalmente, el último grupo contiene la definición de las
@@ -214,7 +210,7 @@ utilizando esta estructura.
 
 Para probar nuestro ejemplo, lanzamos como usuario root (o utilizando
 sudo, lo que más rabia os de), nuestro capturador de paquetes (que hemos
-llamado \verb!icmp_hello_log!. Desde otro terminal, hacemos un \verb!ping! a
+llamado \verb!icmplog!. Desde otro terminal, hacemos un \verb!ping! a
 cualquier máquina que sepamos que responderá a nuestra llamada
 (vuestro modem ADSL, vuestro DNS, google o ping.com :). 
 
@@ -222,7 +218,7 @@ Esto es lo que obtendremos:
 
 {\small
 \begin{verbatim}
-occams@razor $ sudo ./icmp_hello_log
+occams@razor $ sudo ./icmplog
 Code: 0.0 (192.168.100.1)
 Code: 0.0 (192.168.100.1)
 ...
@@ -237,7 +233,7 @@ lanzamos el ping.
 
 {\colorbox{excolor}{
 \begin{minipage}{0.98\linewidth}
-{\textbf{\textsf PÁ ENTRETENERSE}}
+{\textbf{\textsf{PÁ ENTRETENERSE}}}
 
 {\textsf{Si miráis la salida del programa ping, veréis que proporciona
 más datos que nuestra pequeña aplicación. Algunos de los
@@ -248,10 +244,12 @@ aburridos podéis extender este ejemplo para que se parezca más a ping}}
 \end{minipage}
 }}
 
+%\rput(9.4,3.5){\resizebox{1.5cm}{!}{{\epsfbox{images/general/experimenta.eps}}}}
+
 \sectiontext{white}{black}{DETECTANDO ESCANEO SIGILOSOS}
 
 Antes de continuar con la versión completa de nuestro
-sencillo \verb!ping! vamos a hacer un pequeño inciso, 
+sencillo \verb!ping! vamos a hacer un corto inciso, 
 para, convertir nuestro pequeño programa en un detector de escaneos
 sigilosos como los que realiza 
 \verb!nmap!.
@@ -260,7 +258,7 @@ sigilosos como los que realiza
 {\em {\color{introcolor}{Capturar paquetes IP}} con un socket RAW es muy sencillo}
 \end{entradilla}
 
-A partir de en nuestro ejemplo anterior, vamos a realizar unas pequeñas
+Partiendo de nuestro ejemplo anterior, vamos a realizar unas sencillas
 modificaciones para transformar nuestro programa en un rudimentario
 detector de escaneos de tipo \verb!FIN!. Estos escaneos se caracterizan por
 que el flag \verb!FIN! de la cabecera TCP está puesto a 1.
@@ -319,9 +317,9 @@ return 0;
 }
 \end{lstlisting}
 
-Como podéis observar, cuando creamos nuestro nuevo socket RAW, ahora
+Como podéis observar, cuando creamos nuestro nuevo socket RAW
 estamos indicando que queremos capturar paquetes TCP, en lugar de
-ICMP, como hicimos en nuestro ejemplo anterior.
+ICMP como hicimos en nuestro ejemplo anterior.
 
 Una vez hecho esto, nuestra nueva estructura de datos nos permite
 acceder directamente a la información en la cabecera TCP. Por una
@@ -356,7 +354,7 @@ ataque:
 
 {\small
 \begin{verbatim}
-occams@razor:~$ sudo ./nullscan 
+occams@razor:~$ sudo ./finscan 
 [sudo] password for occams: 
 Posible FIN scan al puerto 2000 desde (127.0.0.1)
 \end{verbatim}
@@ -378,7 +376,7 @@ CONSOLA Cliente : nc localhost 2000
 \end{verbatim}
 }
 
-Ahora, pulsad CTRL+C en la parte cliente y ved que obtenéis en el
+Ahora, pulsad CTRL+C en la parte cliente y comprobad que obtenéis en el
 detector de escaneos. Repetid el proceso, pero ahora pulsando CTRL+C
 en la consola donde se ejecuta el servidor.
 
@@ -402,7 +400,7 @@ campos de las cabeceras IP y TCP?... algo más para entretenerse :).
 
 \sectiontext{white}{black}{ENVIANDO PAQUETES ICMP}
 
-Después de este ``no tan corto paréntesis'', volvamos a nuestro
+Después de este ``no tan corto paréntesis'', volvamos a nuestra
 pequeña utilidad \verb!ping!.
 
 Como os decíamos en una sección anterior, para poder implementar algo
@@ -412,9 +410,9 @@ datos utilizando TCP o UDP. Necesitamos un socket RAW para poder
 enviar estos paquetes.
 
 Para este ejemplo necesitamos los mismos ficheros de cabecera que para
-el primer ejemplo que introdujimos (\verb!icmp_hello_log!). También
-reutilizaremos nuestra función \verb!crea_socket!, pero para poder transmitir
-nuestro paquete ICMP necesitaremos algo más de código. 
+el primer ejemplo que introdujimos (\verb!icmplog!). También
+reutilizaremos nuestra función \verb!crea_socket!, pero para poder
+transmitir nuestro paquete ICMP necesitaremos algo más de código. 
 
 Lo primero que necesitamos es una estructura de datos adicional. Si
 bien, podríamos utilizar nuestra estructura \verb!PKT!, ya que un paquete es
@@ -431,9 +429,9 @@ typedef struct {
 
 Como podéis observar, hemos eliminado la cabecera IP de nuestra
 estructura de transmisión. La razón: Vamos a dejar que la pila TCP/IP
-de nuestro sistema rellene los campos de la cabecera IP. Más adelante veremos como
-rellenarlos nosotros mismos, pero para implementar nuestro \verb!ping!, es
-mucho más conveniente dejar al sistema hacerlo.
+de nuestro sistema rellene los campos de la cabecera IP. Más adelante
+veremos como rellenarlos nosotros mismos, pero para implementar
+nuestro \verb!ping!, es mucho más conveniente dejar al sistema hacerlo.
 
 
 
@@ -490,7 +488,7 @@ El último elemento que necesitamos para construir un paquete ICMP
 válido es el cálculo de la suma de comprobación de los datos. El
 protocolo ICMP especifica que este valor se debe calcular utilizando
 todo el paquete (cabecera + datos), siendo el valor del campo
-\verb!checksum! de la cabecera igual a 0.
+\verb!checksum! de la cabecera igual a 0, para este cálculo.
 
 Nosotros hemos tomado prestada la rutina de {\em checksum} de la
 implementación de \verb!ping! que podéis encontrar en cualquier
@@ -643,7 +641,7 @@ ejercicio :).
 
 Pero, ¿qué ha pasado con nuestro ``Hola Mundo!''?... Ejecutemos de
 nuevo nuestro programa, pero esta vez vamos a lanzar \verb!tcpdump! en
-un terminar. Esto es lo que obtendríamos:
+un terminal. Esto es lo que obtendríamos:
 
 {\scriptsize
 \begin{verbatim}
@@ -670,7 +668,7 @@ datos.
 
 {\colorbox{introcolor}{
 \begin{minipage}{0.98\linewidth}
-{\textbf{\textsf EL PING DE LA MUERTE}}
+{\textbf{\textsf{EL PING DE LA MUERTE}}}
 
 {\textsf{El sistema operativo Windows 95, tenía un bug en su pila TCP/IP
 que hacía que el sistema se estrellase si recibía un paquete ICMP ECHO
@@ -689,7 +687,7 @@ el Ping de la Muerte ({\em PoD Ping of Death})}}
 Ahora que ya tenemos dominado ICMP, vamos con TCP. Para ilustrar este
 ejemplo vamos a implementar el clásico escaneo de media conexión, en
 el que el tradicional {\em ``saludo a tres bandas''} de TCP se queda
-en sólo dos bandas.
+en sólo dos.
 
 Una conexión TCP, se inicia con el envío de un paquete \verb!SYN! (en seguida
 veremos que es esto). El sistema remoto responde con un
@@ -805,7 +803,7 @@ main (int argc, char *argv[]) {
 El primer cambio que observamos es que ahora nuestro socket RAW va a
 utilizar un protocolo diferente. En lugar del
 anterior \verb!IPPROTO_ICMP!, ahora nos encontramos un
-interesante \verb!IPPRPTO_TCP!, como parámetro a nuestra función de
+interesante \verb!IPPRPTO_TCP!, que enviamos como parámetro a nuestra función de
 creación del socket.
 
 El segundo cambio importante que nos encontramos es que, ahora,
@@ -1116,7 +1114,6 @@ int main (int argc, char *argv[]) {
   s = crea_socket  (IPPROTO_RAW);
   cfg_socket (s);
 
-
   /* Construimos paquete */ 
   dest.sin_family = AF_INET;
   inet_aton (argv[1], &dest.sin_addr);
@@ -1203,7 +1200,7 @@ que modificándolo el IDS se puede confundir un poco.
 
 {\colorbox{introcolor}{
 \begin{minipage}{0.98\linewidth}
-{\textbf{\textsf PASSIVE FINGERPRINTING}}
+{\textbf{\textsf{PASSIVE FINGERPRINTING}}}
 
 {\textsf{Los sistemas pasivos de extracción de huellas dactilares (sí,
 en inglés es mucho más corto), analizan los paquetes que una
@@ -1280,8 +1277,9 @@ formas. O viéndolos directamente o adivinándolos, y esta última opción
 hace muchos años que dejo de ser viable.
 
 Sí, hace años, los generadores de números pseudo-aleatorios utilizados
-para generar esos números de serie no eran muy buenos, y había formas
-de llegar a predecir esos números de forma relativamente sencilla.
+para generar esos números de serie no eran muy buenos (probablemente
+por cuestiones de eficiencia), y había formas
+de llegar a predecir esos números de una manera relativamente sencilla.
 
 Sabemos que no hemos hablado sobre estos números de serie, pero en los
 RFCs que hemos comentado a lo largo del texto podréis encontrar una
@@ -1297,7 +1295,7 @@ otro artículo.
 En este artículo hemos explorado los fundamentos de los socket RAW y
 como utilizarlos para capturar tráfico o generar paquetes
 especiales. Con lo que os hemos contado tenéis las herramientas para
-construir la mayoría de las herramientas del sistema relacionadas con
+construir la mayoría de las utilidades del sistema relacionadas con
 la red y jugar con la pila TCP/IP ``casi'' al más bajo nivel.
 
 ¿Qué podéis hacer ahora?... Bueno, echadle un ojo al
@@ -1306,7 +1304,7 @@ de protocolos con los que podéis jugar. También deberíais comprobar la
 página del manual \verb!man 7 raw! y si queréis ir más allá 
 \verb!man 7 packet!... 
 
-Como siempre, esperamos saber de vuestros experimentos!!
+Como siempre, esperamos saber de vuestros experimentos!! \EOP
 
 
 

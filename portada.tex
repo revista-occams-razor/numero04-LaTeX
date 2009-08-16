@@ -19,7 +19,6 @@
 \usepackage[greek,spanish]{babel}  % Símbolo del euro
 \usepackage{graphicx}
 \usepackage{a4,fancyhdr, multicol}
-%\usepackage{a4,multicol}
 \usepackage{float}
 \usepackage{pdftricks}
 \usepackage{pstricks}
@@ -34,7 +33,6 @@
 \usepackage{setspace}
 \usepackage{hyperref}
 \usepackage{colortbl}
-
 
 % Configuración de Hyperenlaces.
 % Uso del paquete hyperref sugerido por Cruz Enrique Borges Hernández
@@ -70,7 +68,7 @@
 \fancyfoot[RO]{\textbf{\textsf{\thepage | OCCAM's Razor}}}
 \renewcommand{\footrulewidth}{0.4pt}
 
-% Elimina l.neas de cabecera
+% Elimina líneas de cabecera
 % 
 \renewcommand{\headrulewidth}{0pt}
 
@@ -189,7 +187,10 @@
 \vspace{1mm}
 }
 
-
+%\newcommand{\sbullet}{\,\begin{picture}(1,1)(0,-3)\circle*{3}\end{picture}\ }
+\newcommand{\EOP}{\psframe[fillstyle=solid, fillcolor=titlecolor,
+linecolor=titlecolor](0,0)(4pt,4pt)}
+%\newcommand{\EOP}{\psframe[fillstyle=solid, fillcolor=black, linecolor=black](0,0)(4pt,6pt)}
 
 % Entornos (begin... end)
 % ----------------------------------------------------
@@ -228,8 +229,6 @@
 % Portada, no utiliza Fancy Header e introduce imagen de portada con PStricks
 \pagestyle{empty}
 
-%\rput(8,-14){\epsfbox{images/portada.eps}}
-%\rput(8,-14){{\resizebox{!}{30cm}{\epsfbox{images/portada-n4-5.eps}}}}
 \rput(8,-14){\epsfbox{images/portada-n4-5.eps}}
 
 \clearpage

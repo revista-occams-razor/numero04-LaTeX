@@ -80,7 +80,7 @@ que proporciona nuestro querido kernel Linux. Este API, como
 veremos muy pronto, es un poco engorroso, por esa razón vamos a
 escribir un pequeño interfaz para hacer nuestra vida más fácil. En
 este artículo utilizaremos la versión 1 del API, que, aunque obsoleta,
-es la única soportada por todos los drivers.
+es la que más dispositivos soportan.
 
 
 Para la codificación y decodificación de las imágenes utilizaremos la
@@ -152,10 +152,10 @@ poder modificarlo fácilmente para que nuestras dos cámaras
 funcionaran. Bendito software libre!. 
 
 Con la información de depuración del driver y mucha suerte, encontramos que el ``problema''
-estaba en la función ``gspca\_init\_transfert''. 
+estaba en la función \verb!gspca_init_transfert!. 
 
-Por cada dispositivo, esta función "reparte" lo que en los logs
-aparece como un "AlternateSet". Cuando la primera cámara es
+Por cada dispositivo, esta función ``reparte'' lo que en los logs
+aparece como un ``AlternateSet''. Cuando la primera cámara es
 inicializada, la función le asigna todos los ``recursos'' (por llamarlos
 de alguna forma) y al intentar inicializar la segunda, se produce un
 error, ya que, aparentemente no hay ``recursos'' que asignarle (los
@@ -164,13 +164,15 @@ tiene todos la primera cámara).
 Los recursos no son otra cosa que el
 ancho de banda USB que se asigna a ese dispositivo. En la FAQ de
 motion, podréis encontrar algunos detalles más sobre como utilizar
-varias cámaras USB, básicamente necesitaríais una segunda tarjeta
+varias cámaras USB. Básicamente necesitaríais una segunda tarjeta
 USB. Como nosotros no la tenemos, hemos optado por este parche, como
 solución de compromiso.
 
 Para ello, añadimos un nuevo parámetro al driver que
 llamamos \verb!ndevices!. Las modificaciones en el fichero \verb!gspca_core.c!
 fueron las siguientes:
+
+\columnbreak
 
 \lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
 \begin{lstlisting}
@@ -181,8 +183,9 @@ MODULE_PARM_DESC(ndevices, "Number of devices to"
                            " use simultaneously.");
 \end{lstlisting}
 
-Esta nueva variable la utilizamos en la función \verb!gspca\_init\_transfert! para
-modificar el valor de la variable \verb!nbalt!, de la siguiente forma:
+Esta nueva variable la utilizamos en la
+función \verb!gspca_init_transfert! para modificar el valor de la
+variable \verb!nbalt!, de la siguiente forma: 
 
 \lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
 \begin{lstlisting}
@@ -223,13 +226,13 @@ hacer que vuestros programas funcionen en el caso general.
 \end{entradilla}
 
 Si vuestro hardware utiliza otro driver, probad con alguna aplicación
-estándar como camorama o cheese.
+estándar como {\em camorama} o {\em cheese}.
 
 \sectiontext{white}{black}{CAPTURANDO VIDEO}
 
 Después de todos estos preparativos vamos al ajo :). Lo primero que
 vamos a hacer es nuestro módulo de captura de vídeo. En esta versión
-supersimplificada, nuestro módulo tendrá 3 funciones. Aquí tenéis los prototipos.
+supersimplificada, nuestro módulo tendrá tres funciones. Aquí tenéis los prototipos.
 
 \lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
 \begin{lstlisting}
@@ -243,10 +246,12 @@ captura. La segunda le dice al dispositivo que comience a capturar
 video. Por último, la tercera, nos permite obtener la última imagen
 capturada por el dispositivo.
 
+\ebOpage{introcolor}{0.25}{MÚ RÁPIDO}
+
 Para poder utilizar el API V4L, necesitamos los siguientes includes en
 nuestro código:
 
-\ebOpage{introcolor}{0.25}{MÚ RÁPIDO}
+
 
 \lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
 \begin{lstlisting}
@@ -297,7 +302,7 @@ las funciones de nuestro interfaz... esto es, ya mismo :)
 
 La función \verb!open_v4l! es la que se encarga de la inicialización del
 dispositivo de captura de vídeo, y es la más larga de todas, por esa
-razón la iremos comentando por partes para que sea más fácil seguirla.
+razón la iremos comentando por partes, para que sea más fácil seguirla.
 
 Lo primero que nos encontramos es esto:
 
@@ -382,10 +387,10 @@ Volviendo al código...
 \end{lstlisting}
 
 Como adelantamos más arriba, la forma de ``hablar'' con el driver es a través de
-la llamada al sistema ioctl. Para la configuración del canal,
+la llamada al sistema \verb!ioctl!. Para la configuración del canal,
 utilizamos tres mensajes. \verb!VIDIOCGCAP!, algo así como "VIDeo Input Output
 Chanel Get Capabilities"... vamos digo yo :), con lo que obtenemos las
-características del dispositivo, la información sobre sus canaleso. En
+características del dispositivo, la información sobre sus canales. En
 nuestro ejemplo, estamos utilizando este 
 mensaje para obtener el ancho y alto máximo de las imágenes que pueden
 ser capturadas utilizando este canal y almacenándolas en nuestra
@@ -398,7 +403,7 @@ necesitaremos para la visualización de las imágenes.
 
 El siguiente mensaje es \verb!VIDIOCGCHAN!, con el que obtenemos información
 sobre el canal de interés. El canal de interés se indica utilizando el
-campo channel de la estructura de datos \verb!video_channel! (variable
+campo \verb!channel! de la estructura de datos \verb!video_channel! (variable
 \verb!channel_info!). La información sobre el canal se retorna sobre esa
 misma estructura de datos.
 
@@ -477,8 +482,8 @@ El último paso que nos falta para completar el proceso de
 inicialización es la configuración de transferencia de datos. Como
 adelantábamos un poco más arriba, hay dos formas de transferir las
 imágenes a nuestro programa. Una es utilizando la llamada al sistema
-read y otra es utilizando mapeado de memoria con la llamada al sistema
-mmap.
+\verb!read! y otra es utilizando mapeado de memoria con la llamada al sistema
+\verb!mmap!.
 
 Nosotros utilizamos el mapeado de memoria, porque mola más y además
 podemos utilizar doble buffer para la captura. El código es el
@@ -496,7 +501,7 @@ siguiente:
 
 Lo primero que hacemos es preguntarle al driver los detalles para el
 mapeado de memoria, utilizando , una vez más, la llamada al sistema
-ioctl. En la estructura \verb!video_mbuf! (uno de los campos de nuestra
+\verb!ioctl!. En la estructura \verb!video_mbuf! (uno de los campos de nuestra
 estructura \verb!DISP!), obtendremos el resultado.
 
 \begin{entradilla}
@@ -504,7 +509,7 @@ estructura \verb!DISP!), obtendremos el resultado.
 {\color{introcolor} mapeado de memoria}}
 \end{entradilla}
 
-Y cuales son los detalles para el mapeado de memoria? Os
+¿Y cuales son los detalles para el mapeado de memoria? Os
 preguntaréis. Básicamente son los siguiente: El número de cuadros que
 el dispositivo es capaz de capturar, el tamaño de la zona de memoria
 en la que el driver va a poder los datos de la imagen y los
@@ -559,7 +564,7 @@ tanto, acceder a los datos de las imágenes capturadas.
 
 \lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
 \begin{lstlisting}
-  /* Mapeamos memoria para acceder a las imagenes */
+  /* Mapeamos memoria para acceder a las imagenes*/
   d->mm = (char *)mmap (0, d->mbuf_info.size, 
 			PROT_READ | PROT_WRITE, 
                         MAP_SHARED, 
@@ -582,7 +587,7 @@ los datos que necesitaremos durante la captura real de las imágenes.
 \end{lstlisting}
 
 En este punto, nuestro hardware de captura está listo para empezar a
-``escupir'' imágenes... pero como las obtenemos?... enseguida lo
+``escupir'' imágenes... pero, ¿cómo las obtenemos?... enseguida lo
 veremos.
 
 \sectiontext{white}{black}{INICIANDO LA CAPTURA}
@@ -675,7 +680,7 @@ que debería contener ya la siguiente imagen.
 \sectiontext{white}{black}{EL PROGRAMA PRINCIPAL}
 
 Ahora que ya tenemos nuestro interfaz de captura de imágenes, estamos
-en condiciones de escribir nuestra aplicación de captura de imágenes.
+en condiciones de escribir nuestra aplicación de captura de imágenes :).
 
 El programa principal, además de utilizar nuestro flamante interface
 para V4L, mostrará en una ventana las imágenes capturadas. Para ello
@@ -877,7 +882,7 @@ void handle_idle (void)
 \end{lstlisting}
 
 Lo primero que hacemos es obtener las últimas imágenes capturadas por
-nuestro dispositivo. A continuación tenemos que hacer un pequeño
+nuestros dispositivos. A continuación tenemos que hacer un pequeño
 procesado. En nuestro caso, las componentes azul y roja (2 y 0) de
 cada pixel de la imagen están intercambiadas. Por alguna razón nuestra
 cámara nos devuelve la imagen en formato BGR en lugar de RGB.
@@ -895,8 +900,8 @@ valen para nada :).
 \end{entradilla}
 
 Ese tipo de procesado, o cualquier otra cosa que queramos hacer con
-las imágenes, implica manipular los pixels de ésta... y eso es lo que
-hacen esos dos bucles tras la captura. 
+las imágenes, implica manipular sus pixels... y eso es lo que
+hacen esos dos bucles tras las funciones de captura. 
 
 Una vez que tenemos nuestras imágenes en el formato que queremos,
 utilizamos la función \verb!change_texture!, con la que modificaremos las
@@ -914,7 +919,7 @@ de mostrar las imágenes en la ventana. Esta es nuestra siguiente víctima!
 
 \sectiontext{white}{black}{VISUALIZANDO LA ESCENA}
 
-La función gfx\_pinta utiliza OpenGL para mostrar el vídeo en tiempo
+La función \verb!gfx_pinta! utiliza OpenGL para mostrar el vídeo en tiempo
 real en un espacio 3D (echadle un ojo a la figura). Si sabéis algo de
 OpenGL, veréis que la función es muy sencilla, sino, os comentaremos
 solamente un par de cosas para que podáis hacer algunos cambios.
@@ -1061,7 +1066,7 @@ realizará la interpolación por nosotros.
 del video en directo}
 \end{entradilla}
 
-Así, la técnica consiste en lo siguiente. Primero generamos e
+Así, el método consiste en lo siguiente. Primero generamos e
 inicializamos una textura por cada imagen que queremos
 mostrar. Utilizamos las imágenes capturadas para inicializar los datos
 de la textura y finalmente, dibujamos un cuadro sobre el que mapeamos
@@ -1069,16 +1074,14 @@ esta textura.
 
 Si habéis seguido los comentarios del programa principal, recordaréis
 que se nos han quedado tres funciones en el tintero. La primera se
-utiliza en la función main y se llama init\_texture. La segunda se
+utiliza en la función main y se llama \verb!init_texture!. La segunda se
 utiliza cuando capturamos nuestras imágenes y se llama,
-change\_texture. Y finalmente, la última la acabamos de ver en la
-sección anterior y se llama square\_texture.
-
-Veamos cada una de ellas por separado.
+\verb!change_texture!. Y finalmente, la última la acabamos de ver en la
+sección anterior y se llama \verb!square_texture!. 
 
 \sectiontext{white}{black}{INICIALIZANDO LAS TEXTURAS}
 
-La función init\_texture se encarga de la inicialización de las
+La función \verb!init_texture! se encarga de la inicialización de las
 texturas. La inicialización consiste en decirle a OpenGL que le de
 ``nombre'' a las texturas que vamos a utilizar y que inicialice sus
 atributos. Recordad que aunque nosotros vamos a utilizar la textura
@@ -1086,7 +1089,7 @@ para visualizar una imagen, las texturas se utilizan sobre modelos 3D
 para darles mayor realismo. Cuando hacemos esto último todos estos
 parámetros toman mucho más sentido.
 
-La función init\_texture es la encargada de hacer esto. La hemos
+La función \verb!init_texture! es la encargada de hacer esto. La hemos
 intentado reducir a la mínima expresión, y el resultado es este:
 
 \lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
@@ -1131,36 +1134,36 @@ void init_texture (int w, int h)
 \end{lstlisting}
 
 Nuestro más-que-básico gestor de texturas es capaz de manejar un
-máximo de 4 de ellas y almacena sus identificadores en una variable
-global del módulo llamada texid. 
+máximo de cuatro de ellas y almacena sus identificadores en una variable
+global del módulo llamada \verb!texid!. 
 
-Lo primero que hacemos es decirle a OpenGL que necesitamos nuestras
+Lo primero que hacemos es decirle a OpenGL que necesitamos 
 cuatro texturas y que nos almacene los identificadores en la matriz
-texid. A continuación, tenemos que inicializar cada una de ellas. 
+\verb!texid!. A continuación, tenemos que inicializar cada una de ellas. 
 
 Aquí podemos configurar un montón de parámetros de la textura, pero
 nosotros solo hemos dejado uno de ellos. Obviamente la forma de
 configurar los parámetros de las texturas es utilizando la función
-glTexParameteri... está claro no? :).
+\verb!glTexParameteri!... está claro no? :).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \ebOpage{introcolor}{0.25}{MÚ RÁPIDO}
 
-Los dos parámetros que hemos dejado le dicen a OpenGL que filtro
+Los dos parámetros que hemos usado le dicen a OpenGL que filtro
 utilizar cuando tiene que ampliar la textura o hacerla más
 pequeña. Nosotros hemos utilizado el filtro "del vecino más cercano",
 que en principio es el más rápido, pero podéis utilizar interpolación
 lineal, mejorando la calidad del zoom de vuestras aplicaciones,
-simplemente cambiando este parámetro de GL\_NEAREST a GL\_LINEAR.
+simplemente cambiando este parámetro de \verb!GL_NEAREST! a \verb!GL_LINEAR!.
 
-Finalmente, la función glTexImage2D es la que nos permite definir el
+Finalmente, la función \verb!glTexImage2D! es la que nos permite definir el
 formato de los datos de imagen que vamos a pasar a OpenGL. Como podéis
 ver los datos se corresponden con los que hemos utilizado todo el
 tiempo, ancho, alto y formato (RGB 24bits). El último parámetro es un
 puntero a los datos de imagen 
 a almacenar en la textura. Nosotros haremos esto en otra función y por
-eso lo hemos dejado a NULL.
+eso pasamos el valor NULL.
 
 \begin{entradilla}
 {\em OpenGL nos permite {\color{introcolor} suavizar las imágenes por
@@ -1184,8 +1187,10 @@ OpenGL.... Pues quizás os lo podáis ahorrar.
 \sectiontext{white}{black}{CAMBIANDO LOS DATOS DE LA TEXTURA}
 
 Cada vez que capturamos una imagen, tenemos que actualizar nuestra
-textura. Esto lo hacemos con la función change\_texture que podéis ver
-a continuación
+textura. Esto lo hacemos con la función \verb!change_texture! que podéis ver
+a continuación.
+
+\columnbreak
 
 \lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
 \begin{lstlisting}
@@ -1199,14 +1204,14 @@ void change_texture (int id, char *in_data)
 }
 \end{lstlisting}
 
-Esta es sencilla no?. La función glBindTexture le dice a OpenGL que
+Esta es sencilla no?. La función \verb!glBindTexture! le dice a OpenGL que
 textura queremos utilizar. Sí, es la misma que utilizamos para
 configurar la textura tras su creación. El índice que pasamos como primer parámetro
 nos permite obtener el identificador OpenGL de la textura que nos
 interesa.
 
 Una vez seleccionada la textura, utilizamos la función
-glTexSubImage2D, que es exactamente igual a la función glTexImage2D
+\verb!glTexSubImage2D!, que es exactamente igual a la función \verb!glTexImage2D!
 que utilizamos en la inicialización, pero ésta nos permite actualizar solo
 una parte de la textura. 
 
@@ -1239,9 +1244,9 @@ void square_texture (int id)
 \end{lstlisting}
 
 Lo primero que hace la función, es seleccionar la textura que vamos a
-utilizar, con la habitual llamada a glBindTexture. A continuación,
+mapear, con la habitual llamada a \verb!glBindTexture!. A continuación,
 dibujaremos el cuadrado, para lo que tendremos que decirle a OpenGL
-cuales serán las coordenadas de sus vértices, y que "punto" de la
+cuales serán las coordenadas de sus vértices, y que ``punto'' de la
 textura queremos asociar a cada uno de ellos.
 
 
@@ -1262,7 +1267,7 @@ textura queremos asociar a cada uno de ellos.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bOpage{introcolor}{0.25}{MÚ RÁPIDO}
 
-La función glTexCoord2f, nos permite seleccionar un punto dentro de la
+La función \verb!glTexCoord2f!, nos permite seleccionar un punto dentro de la
 textura. El 0,0 será el punto inicial de nuestra imagen, y el 1,1 se
 corresponderá con la esquina inferior derecha. Si os fijáis, las
 coordenadas de la textura y del vértice del cuadro no se
@@ -1280,10 +1285,10 @@ Observad que si habéis modificado el programa para utilizar texturas
 con dimensiones múltiplos de potencias de 2, la parte de la textura
 que contiene la imagen no se corresponde con el tamaño de la textura
 (hay una parte negra a la derecha). En ese caso, tendréis que
-sustituir el valor 1.0 en glTexCoord2f, por el valor apropiado, que
+sustituir el valor 1.0 en \verb!glTexCoord2f!, por el valor apropiado, que
 dependerá del tamaño de vuestra imagen.
 
-Finalmente, recordáis el escalado especial de la coordenada Y en la
+Finalmente, ¿recordáis el escalado especial de la coordenada Y en la
 función que dibuja la escena?. Como podéis ver aquí, lo que estamos
 dibujando es un cuadrado. Si en lugar de un cuadrado, dibujáramos el
 rectángulo con el aspecto correcto, no sería necesario escalar la
@@ -1293,7 +1298,7 @@ aplicación.
 \sectiontext{white}{black}{INICIALIZACIÓN DE OPENGL}
 
 Para terminar con todo lo relacionado con la visualización, tenemos
-que comentar una última función, gfx\_init. Esta función se encarga de
+que comentar una última función, \verb!gfx_init!. Esta función se encarga de
 inicializar OpenGL, y en general contiene comandos OpenGL que
 solamente es necesario ejecutar una vez.
 
@@ -1311,7 +1316,7 @@ void gfx_init (void)
 
 El primer comando define el color de fondo a utilizar cuando borremos
 los buffers de color (la imagen en la ventana), utilizando la función
-glClear (la primera llamada en gfx\_pinta).
+\verb!glClear! (la primera llamada en \verb!gfx_pinta!).
 
 Las otras dos funciones permiten activar, respectivamente, el uso del
 z-buffer y el de las texturas 2D. Tened en cuenta que antes de
@@ -1468,7 +1473,7 @@ propuestas:
 \begin{itemize}
 \item Añadir soporte de red a la aplicación. Con lo que os hemos contado
   en los números anteriores de Occam's Razor, en esta misma sección,
-  eso debería estar chupado!
+  eso debería estar {\em chupao}!
 \item Captura de vídeos panorámicos. Utilizando varias cámaras, podemos
   modificar nuestro programa para poder generar vídeos panorámicos,
   utilizando un par de webcams :).
@@ -1483,7 +1488,7 @@ propuestas:
 
 Y cualquier otra cosa que se os ocurra. No os olvidéis de enviarnos
 vuestros experimentos!!. Esta vez hay cosas de sobra para
-jugar!. Hasta el próximo número.
+jugar!. Hasta el próximo número. \EOP
 
 
 %% Tabla de recursos en internet 

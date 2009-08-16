@@ -139,11 +139,12 @@ existe o no (si la máquina está encendida), si se trata de un edificio
 de oficinas o de apartamentos (el sistema operativo) y si la persona
 que responde al telefonillo es un hombre, una mujer, un niño, un
 francés, un inglés o un alemán (el servicio que está corriendo y con
-suerte el programa que lo proporciona y su versión).
+suerte el programa que proporciona ese servicio y su versión).
 
 Vamos, una herramienta muy útil.
 
-\sectiontext{white}{black}{RADIOGRAFÍA DE UN ATAQUE}
+%\sectiontext{white}{black}{RADIOGRAFÍA DE UN ATAQUE}
+\sectiontext{white}{black}{LA IMPORTANCIA DEL ESCANEO}
 
 Para terminar con esta introducción y meternos a saco con el tema,
 vamos a explicaros porque determinar que puertos están ``abiertos'' en
@@ -196,18 +197,18 @@ salir cosas... pues bueno... si hay una salida, hay una entrada :).
 El proceso de escaneo de puertos se basa fundamentalmente en dos
 técnicas. La primera es el análisis de paquetes ICMP, y la segunda es
 el análisis de los paquetes de la capa de transporte (TCP o UDP), en condiciones atípicas. Veamos en
-que consistes estos análisis.
+que consiste cada una de ellas.
 
 \begin{entradilla}
 {\em El análisis de {\color{introcolor}paquetes ICMP} es un elemento básico del escaneo de puertos}
 \end{entradilla}
 
 El protocolo ICMP, como ya os hemos comentado, se encuentra al mismo
-nivel que el protocolo IP. ICMP es el acrónimo de Internet Control
-Message Protocol, es decir, protocolo de mensajes de control de
-Internet. Y eso es precisamente lo que hace, enviar y recibir mensajes de
+nivel que el protocolo IP. ICMP es el acrónimo de {\em Internet Control
+Message Protocol}, es decir, protocolo de mensajes de control 
+inter-redes. Y eso es precisamente lo que hace, enviar y recibir mensajes de
 control. Los que queráis ver la lista completa de todos esos
-mensajes, podéis consultarlos en el RFC 792, el documento que describe
+mensajes, podéis consultarlos en el RFC 792 que describe
 este protocolo.
 
 De todos los mensajes que podemos enviar con ICMP, hay unos cuantos
@@ -232,8 +233,8 @@ otras técnicas de escaneo que hacen uso de ellos.
 
 Bueno, pues como funciona todo esto. Los mensajes ICMP son generados
 por las capas inferiores. Dependiendo del tipo de mensaje, este puede
-generarse localmente (como en el caso de la red inalcanzable, este
-también se puede generar remotamente), o
+generarse localmente (como en el caso de la red inalcanzable -
+también se puede generar remotamente-), o
 remotamente, como en el caso del protocolo inalcanzable.
 
 \ebOpage{introcolor}{0.25}{MALA BESTIA}
@@ -272,7 +273,7 @@ En la siguiente figura, podéis ver el formato de un paquete TCP. La parte
 final, es la que contendrá los datos que queremos enviar o recibir
 (nuestro mensaje de correo, o la página web que deseamos ver). El
 resto de campos son añadidos por el sistema, y están ahí para permitir
-la comunicación fiable entre dos máquinas remotas (eso es lo que hacen
+la comunicación fiable entre dos máquinas conectadas a través de una red (eso es lo que hacen
 los protocolos de transporte como TCP:).
 
 
@@ -292,7 +293,7 @@ estamos interesados especialmente en tres de ellos:
 
 \begin{itemize}
 \item \verb!SYN!. Este es el tipo de paquete utilizado para establecer
-  conexiones. Nos vamos a aburrir de él :)
+  conexiones. Nos vamos a aburrir de él :).
 \item \verb!ACK!. Este es el paquete que una máquina envía a la otra para
   comunicarle que ha recibido ciertos datos correctamente.
 \item \verb!RST!. Cuando sucede algo que no debería pasar, la pila TCP envía uno
@@ -300,7 +301,8 @@ estamos interesados especialmente en tres de ellos:
 \end{itemize}
 
 \begin{entradilla}
-{\em Los {\color{introcolor}paquetes SYN, ACK y RST} son los que interesan}
+{\em Los {\color{introcolor}paquetes SYN, ACK y RST} son los que más
+nos interesan}
 \end{entradilla}
 
 Pues bien, ya estamos en condiciones de empezar a jugar con nmap,
@@ -323,8 +325,10 @@ recibiremos un paquete ICMP indicándolo
 un paquete ICMP indicándolo (con UDP) o un paquete \verb!RST!
 (con TCP)
 
-\item Regla 3. Si enviamos un paquete ``ilegal'' a una máquina que no existe,
-recibiremos un paquete \verb!RST!
+%\item Regla 3. Si enviamos un paquete ``ilegal'' a una máquina que no existe,
+%recibiremos un paquete \verb!RST!
+\item Regla 3. Si enviamos un paquete ``ilegal'', en general,
+recibiremos un paquete \verb!RST! como respuesta.
 \end{itemize}
 
 Sí, así de tonto. Estas tres reglas son la base de cualquier escaneo
@@ -368,8 +372,8 @@ formas de averiguarlo.
 
 \sectiontext{white}{black}{ESCANEO PING} 
 
-La primera forma es el denominado ``ping scan'', que básicamente hace lo mismo
-que la herramienta ping. Y como funciona ping? os preguntaréis. Bueno,
+La primera forma es el denominado {\em ping scan}, que básicamente hace lo mismo
+que la herramienta ping. ¿Y cómo funciona ping? os preguntaréis. Bueno,
 ping, compone un paquete \verb!ICMP ECHO! (código 8), al cual, la máquina
 destino responderá con otro paquete \verb!ICMP ECHOREPLY! (código 0). Esto os
 debería resultar familiar.
@@ -383,17 +387,16 @@ que un cortafuegos filtre los ``pings''.
 
 Para poder enviar un paquete ICMP, al igual que la mayoría de los
 paquetes especiales que veremos a lo largo del artículo, nmap requiere
-permisos de root, puesto que debe utilizar un socket RAW, para
-componer el paquete específicamente para cada prueba. De la misma
+permisos de root puesto que debe utilizar un socket RAW para
+componer el paquete específico para cada prueba. De la misma
 forma para capturar el paquete \verb!ECHOREPLY! de respuesta, nmap utiliza
 una versión modificada de libpcap que se distribuye con sus fuentes. No
 se pueden enviar y recibir paquetes IP o ICMP (recordad que están al
 mismo nivel), utilizando sockets ``normales''.
 
 La opción -sP es la que permite llevar a cabo esta operación. Esta
-opción, además envía un paquete TCP al puerto 80, de forma que un
-usuario no privilegiado pueda utilizar la aplicación. Enseguida
-veremos como.
+opción, además envía un paquete TCP al puerto 80, como prueba
+adicional (es común filtrar paquetes ICMP, pero no el servicio web).
 
 \sectiontext{white}{black}{ENTORNO DE PRUEBAS} 
 
@@ -420,7 +423,7 @@ Figura 2 muestra lo que tcpdump capturaría.
 \sectiontext{white}{black}{PING SCAN EXPLICADO} 
 
 Bien, sin grandes sorpresas verdad?. Sin embargo tenemos que hacer
-algunos comentarios. El primero es relativo al uso de el flag
+algunos comentarios. El primero es relativo al uso del flag
 \verb!--send-ip!. Este flag obliga a nmap a usar paquetes IP. Si no
 utilizamos este flag, al encontrarnos en una red local y ser un
 usuario privilegiado, nmap trata de utilizar el protocolo ARP para
@@ -536,7 +539,7 @@ algún tipo de respuesta. Recibir una respuesta implica que la máquina
 existe.
 
 Así, nmap proporciona distintas técnicas para hacer pings a
-máquinas. La página del manual de nmap proporciona un montón de
+máquinas. La página del manual de nmap contiene un montón de
 información sobre cuando interesa utilizar una u otra. Para no
 reproducirla aquí, nosotros solo os proporcionamos un pequeño resumen
 sobre que ``ping'' hace cada una de ellas.
@@ -632,8 +635,8 @@ incluso en los sistemas menos protegidos :).
 
 El flag \verb!-sT! (TCP {\em connect scan}) de nmap nos permite hacer
 esto. Para verlo, necesitamos utilizar un puerto abierto en nuestra
-máquina destino. Nosotros vamos a utilizar el puerto https de nuestro
-router ADSL utilizado para administración, pero si disponéis de otra
+máquina destino. Nosotros vamos a utilizar el puerto de administración
+https de nuestro router ADSL, pero si disponéis de otra
 máquina podréis utilizar netcat con los flags \verb!-l! y \verb!-p!
 seguido del puerto que vayáis a utilizar. Podéis comprobar el
 resultado en la Figura 6.
@@ -668,7 +671,7 @@ datos de la primera línea. Cuando el sistema remoto recibe ese tipo de
 paquetes se inicia el proceso. El sistema remoto responde con un
 paquete \verb!SYN ACK! (segunda línea). Este paquete sirva para decir ``vale,
 por mi no hay problema para conectarnos... Quieres?''. Este paquete
-básicamente tiene ambos flags, \verb!SYN! y \verb!ACK! activados en
+tiene ambos flags, \verb!SYN! y \verb!ACK! activados en
 sus cabeceras. 
 
 Cuando el sistema que intenta conectar (occams en nuestro caso),
@@ -719,7 +722,7 @@ está interesado en intercambiar ninguna información, inmediatamente
 envía un paquete RST para terminarla (cuarta línea).
 
 Quizás algunos os estéis preguntado qué es toda esa información
-adicional que sale en cada una de las líneas. Bien, todos esos datos
+adicional que proporciona tcpdump. Bien, todos esos datos
 son la información contenida en las cabeceras de los protocolos. Los
 que realmente queráis saber que significa cada una de esas cosas,
 tenéis dos opciones: O leer los RFCs de TCP e IP, o leer la biblia del
@@ -727,30 +730,30 @@ TCP-IP, el libro de Stevens ``TCP-IP Illustrated''.
 
 Nosotros solo os vamos a contar lo que son esos dos número grandes que
 aparecen en los paquetes SYN. Se trata de números de serie aleatorios
-utilizados para evitar lo que se conoce como ``spoofing''.
+que, entre otras cosas, sirven para evitar lo que se conoce como ``spoofing''.
 
 \sectiontext{white}{black}{SPOOFING EXPLICADO} 
 
-Ya que ha salido vamos a explicar mú rápido en que consiste el
+Ya que ha salido el tema, vamos a explicar mú rápido en que consiste el
 ``spoofing'' y como esos números aleatorios pueden evitarlo. 
 
 Desde el punto de vista más general las técnica de ``spoofing'' buscan
 la forma de hacerse pasar por otro. Dependiendo de como se lleve a
 cabo podemos hablar de DNS spoofing, IP spoofing, o cualquier otra
 cosa. A nosotros nos interesa el IP spoofing, puesto que es de lo que
-hemos estado hablando todo este tiempo.
+hemos estado hablando en este artículo.
 
 El IP Spoofing busca permitir la comunicación entre dos máquinas en
 una red TCP-IP en la que una de estas máquinas utiliza una dirección
 IP falsa. Generar paquetes con direcciones IP falsas es muy fácil, el
 problema es que el sistema remoto, va a enviar esos paquetes a la
-dirección falsa y por lo tanto el sistema del spoofer no va a poder
-verlos.
+dirección falsa y por lo tanto el sistema del spoofer no va a recibir
+esas repuestas.
 
 En ese caso tiene dos opciones. O utilizar un snifer para capturar el
 tráfico, u obviar lo que la víctima diga.... ``habla, habla que no te
 escucho''. En el caso de TCP, existe un problema adicional, que
-acabamos de presentar en la sección anterior el ``3-way handshake''.
+acabamos de presentar en la sección anterior; el ``3-way handshake''.
 
 Como os decíamos, cuando se envía el paquete \verb!SYN!, se incluye un número
 de serie que el sistema remoto se queda. El sistema remoto envía un
@@ -773,13 +776,13 @@ Esta es la razón por la que estos números de serie deben ser difíciles
 de predecir. En el pasado, varias pilas TCP-IP generaban estos números
 de serie de una forma más determinista y por tanto, era posible
 ``adivinar'' cual sería el número de serie que el servidor, o máquina
-remota nos iba a enviar y por tanto poder establecer la conexión aún
-cuando no se capturara el paquete \verb!SYN ACK!.
+remota nos iba a enviar y así establecer la conexión incluso
+cuando no se veía el paquete \verb!SYN ACK!.
 
 Nmap nos da algunas pistas sobre esto, y aunque hablaremos sobre el
-tema más adelante, podéis probar lo siguiente:
+tema más adelante, podéis probar lo siguiente, el comando de la Figura 8.
 
-Si, la opción \verb!-O! habilita la detección del sistema operativo, que
+La opción \verb!-O! habilita la detección del sistema operativo, que
 comentaremos más adelante, y la opción \verb!-v! es el clásico
 ``verbose''. Si os fijáis hacia el final del informe que nmap genera,
 nos encontramos una línea que dice: ``TCP Sequence Prediction''. Bueno,
@@ -848,7 +851,7 @@ tira nuestro paquete antes de que alcance la máquina destino.
 \sectiontext{white}{black}{ESCANEOS DE MEDIA CONEXIÓN} 
 
 Con la información que nos ha dado nuestro sniffer el siguiente tipo
-de escaneo es obvio. Porque completar el proceso de conexión con el
+de escaneo es obvio. ¿Porqué completar el proceso de conexión con el
 tercer paquete, si el segundo ya nos ha dado la información que
 necesitábamos?. Bueno, la respuesta es que el primer tipo de escaneo
 no necesita permisos especiales, mientras que el que vamos a describir
@@ -947,7 +950,7 @@ puerto está abierto, lo más probable es que no recibamos nada. Eso
 dependerá del servicio UDP que se esté comprobando.
 
 En UDP no existe concepto de conexión, cada paquete viaja
-independientemente por la red y tampoco existen paquetes ACK que el
+independientemente por la red. Tampoco existen paquetes ACK que el
 sistema remoto envíe de vuelta. Si el servidor remoto envía algún dato
 tras recibir información desde algún sitio habremos tenido suerte, pero
 si el servidor no envía nada, no sabremos si hay alguien al otro lado
@@ -968,7 +971,7 @@ utilizan TCP y muchas veces no se les presta toda la atención que deberían.
 
 Al igual que sucedía con las técnicas de detección de máquinas, nmap
 proporciona una amplia gama de soluciones de escaneo de puertos
-``sigilosos'' que, en general son más difíciles de detectar, o, cuanto
+``sigilosos'' que, en general, son más difíciles de detectar, o, cuanto
 menos, requieren que el administrador del sistema remoto tome ciertas
 precauciones. Cosa que no siempre ocurre.
 
@@ -1017,7 +1020,7 @@ datos y decir que se trata de un escaneo de puertos.
 
 Observad que nmap genera dos paquetes en cada escaneo. Esto ocurre
 porque el primer test no fue definitivo y por tanto se inicia un
-segundo test. La Figura 12 muestra que obtendríamos si dirigimos nuestro escaneo a un
+segundo test (sabríais decir la diferencia). La Figura 12 muestra que obtendríamos si dirigimos nuestro escaneo a un
 puerto cerrado.
 
 Ahora podemos ver los paquetes \verb!RST! provenientes del sistema remoto y
@@ -1047,7 +1050,7 @@ necesario en este caso.
 
 \begin{verbatim}
 13:31:58.832801 IP occams.52797 > razor.www: . win 1024
-13:31:58.833375 IP razor.www > eve.52797: R 0:0(0) ack 3074120381 win 0
+13:31:58.833375 IP razor.www > occams.52797: R 0:0(0) ack 3074120381 win 0
 13:32:03.356435 IP occams.40594 > razor.www: F 1161376370:1161376370(0) win 3072
 13:32:03.356950 IP razor.www > occams.40594: R 0:0(0) ack 1161376371 win 0
 13:32:07.776070 IP occams.56879 > razor.www: FP 3957574167:3957574167(0) win 2048 urg 0
@@ -1103,7 +1106,7 @@ caso.
 Para terminar con esta técnica, comentar que el comportamiento
 del sistema remoto puede ser exactamente al contrario, es decir, si el
 escaneo informa de que todos los puertos están abiertos, excepto un
-puñado de ellos, probablemente ese los que componen ese puñado sean
+puñado de ellos, probablemente los que componen ese puñado sean
 los que realmente están abiertos.
 
 Nmap proporciona además un flag que nos permite enviar paquetes con la
@@ -1123,34 +1126,47 @@ ventana positivo puede significar que el puerto esté abierto o
 cerrado, dependiendo de lo que hayamos enviado.
 
 
-\begin{center}
-{\colorbox{excolor}{
-\begin{minipage}{0.9\linewidth}
-{\textbf{\textsf{CORTAFUEGOS CON Y SIN ESTADO}}}
+%\begin{center}
+%{\colorbox{excolor}{
+%\begin{minipage}{0.9\linewidth}
+%{\textbf{\textsf{CORTAFUEGOS CON Y SIN ESTADO}}}
+%
+%{\textsf{Como todos sabéis, un cortafuegos o firewall, permite controlar el
+%tráfico que entra y sale de una red, para evitar ataques, normalmente
+%desde el exterior. La configuración más habitual es que el
+%cortafuegos, solo permita conexiones desde la red interna hacia el
+%exterior, de forma que los usuarios de la red interna puedan navegar
+%por internet o leer su correo. Si se desea proporcionar algún
+%servicio, en general se suele utilizar una configuración más
+%complicada, con dos cortafuegos y una DMZ. En estos casos, el firewall
+%tiene que llevar la cuenta de que conexiones están abiertas (estado) y
+%así descartar todo paquete no asociado a una conexión válida.}
+%}
+%\end{minipage}
+%}}
+%\end{center}
 
-{\textsf{Como todos sabéis, un cortafuegos o firewall, permite controlar el
+\sectiontext{white}{black}{CORTAFUEGOS CON Y SIN CONEXIÓN} 
+
+Como todos sabéis, un cortafuegos o firewall, permite controlar el
 tráfico que entra y sale de una red, para evitar ataques, normalmente
 desde el exterior. La configuración más habitual es que el
 cortafuegos, solo permita conexiones desde la red interna hacia el
 exterior, de forma que los usuarios de la red interna puedan navegar
 por internet o leer su correo. Si se desea proporcionar algún
 servicio, en general se suele utilizar una configuración más
-complicada, con dos cortafuegos y una DMZ.}
-}
-\end{minipage}
-}}
-\end{center}
+complicada, con dos cortafuegos y una DMZ.
 
 La forma más sencilla de evitar conexiones desde el exterior, es tirar
-por paquetes \verb!SYN!, sin embargo, los paquetes \verb!ACK! no se
+los paquetes \verb!SYN!, sin embargo, los paquetes \verb!ACK! no se
 pueden tirar ya que son necesarios para que las máquinas tras el
 cortafuegos puedan utilizar la red.
 
 Los cortafuegos con estado o seguimiento de conexiones, son capaces de
 filtrar paquetes \verb!ACK! ``inapropiados''. Para ello, mantienen una lista de
 todas las conexiones activas entre el exterior y la red interna. Si
-recibe un paquete \verb!ACK! cuyo número de serie no se corresponde con
-ninguna de las conexiones activas, ese paquete es descartado. 
+recibe un paquete \verb!ACK! que no se pueda asociar  con
+ninguna de las conexiones activas, ese paquete es descartado.
 
 El escaneo ACK de nmap, está especialmente diseñado para detectar
 estas configuraciones.
@@ -1164,7 +1180,7 @@ aún hay más''. Efectivamente, nmap es una mala bestia :).
 No hace mucho tiempo, nmap incluyó un nuevo modo de escaneo denominado
 {\em Idlescan}. La peculiaridad de este escaneo es que es indetectable. El
 problema es que no se puede utilizar en cualquier situación, como
-sucede con las técnicas que hemos visto hasta el momento.
+sucede con las técnicas que hemos visto hasta el momento..
 
 \begin{entradilla}
 {\em El {\color{introcolor}escaneo IDLE} es indetectable ya que la maquina del atacante no
@@ -1175,7 +1191,8 @@ La técnica es indetectable en el sentido de que la máquina del
 atacante no envía ningún paquete al sistema remoto, y por tanto no
 existe una forma directa de relacionar ambas máquinas. Evidentemente,
 para conseguir esto, hay que usar una tercera máquina, a la que la
-documentación de nmap se refiere como ``maquina zombie''.
+documentación de nmap se refiere como ``maquina zombie''. Está máquina
+es la que recibirá la información por nosotros.
 
 \ebOpage{introcolor}{0.25}{MALA BESTIA}
 
@@ -1208,7 +1225,7 @@ cualquiera :).
 \end{itemize}
 
 
-Un incremento de 1 en el ID significa que la máquina no ha enviado
+Un incremento de 1 en el ID significa que la máquina zombie no ha recibido
 ningún paquete a excepción de la prueba realizada desde la máquina
 atacante. Esto significa que el puerto remoto está cerrado, puesto que
 la máquina zombie habrá recibido un paquete \verb!RST! o nada (en caso de
@@ -1234,8 +1251,7 @@ Para terminar, comentaros  que existe
 una forma de escaneo adicional denominada {\em FTP bounce scan}, que explota
 las denominadas conexiones 
 proxy ftp. La mayoría de los servidores FTP actuales tienen
-desactivada esta funcionalidad, porque no es muy práctica en la
-actualidad... pero siempre hay algún despistado por ahí. Lo que
+desactivada esta funcionalidad, porque ha dejado de ser práctica... pero siempre hay algún despistado por ahí. Lo que
 queráis conocer más detalles sobre este tipo de escaneo, podéis
 consultar la página del manual de nmap o su sitio web.
 
@@ -1323,7 +1339,7 @@ Nmap es capaz de realizar una batería de pruebas contra los puertos de
 una determinada máquina. Estas pruebas son un poco más complejas que
 los métodos de escaneo que hemos visto, y en general se basan en la
 ejecución de una serie de scripts y de la consulta de una base de
-datos bastante extensa.
+datos bastante completa.
 
 \begin{entradilla}
 {\em Nmap utiliza un {\color{introcolor}sistema de ``pruebas''} para obtener información
@@ -1338,7 +1354,7 @@ asociada a un determinado puerto, y el flag \verb!-O! para obtener
 información sobre el sistema operativo.
 
 En la sección sobre spoofing ya vimos que tipo de información nos
-proporciona la opción. La Figura 13, muestra lo que obtenemos al
+proporciona el flag \verb!-O!. La Figura 13, muestra lo que obtenemos al
 utilizar el flag \verb!-vS!... da miedo eh?
 
 
@@ -1385,7 +1401,7 @@ artículo tengáis las herramientas suficientes para utilizar a fondo
 nmap.
 
 Solo tenéis que ejecutar ``man nmap'' en vuestra consola y  empezar a
-leer. Hasta el próximo número.
+leer. Hasta el próximo número. \EOP
 
 \end{multicols}
 

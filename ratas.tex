@@ -35,7 +35,9 @@
 
 
 % Introducción
-\intro{introcolor}{C}{apturar paquetes es una de esas cosas ``Sinatra'', vamos, que cada sistema hace ``a su manera''. Afortunadamente para nosotros algunas
+\intro{introcolor}{C}{apturar paquetes es una de esas cosas
+``Sinatra'', vamos, que cada sistema hace ``a su
+manera''. Afortunadamente para nosotros algunas 
 personas se han preocupado de escribir una librería para poder llevar
 a cabo esta tarea de una forma portable. Estamos hablando de la
 librería libpcap.
@@ -124,7 +126,8 @@ paquetes dirigidos a ella.
 
 
 En estos momentos ya estamos en condiciones de capturar paquetes, y
-la sentencia if (y la siguiente sección) que sigue a continuación os la podéis ahorrar si no
+la sentencia if (y la siguiente sección) que sigue a continuación os
+la podéis ahorrar si no 
 queréis utilizar el filtrado de paquetes que ofrece la librería. 
 
 \sectiontext{white}{black}{FILTRANDO PAQUETES}
@@ -135,7 +138,8 @@ solamente activamos el filtro si hemos recibido algún parámetro a
 través de la línea de comandos (argc mayor que 1).
 
 \begin{entradilla}
-{\em El sistema de {\color{introcolor} filtrado de paquetes de} libpcap es muy potente}
+{\em El sistema de {\color{introcolor} filtrado de paquetes de}
+libpcap es muy potente} 
 \end{entradilla}
 
 Como podéis ver,simplemente pasamos el primer parámetro del programa a
@@ -147,7 +151,9 @@ Y a continuación asignamos el nuevo filtro a nuestro
 manejador pcap.
 
 
-Supongo que ahora os estaréis preguntando \ldots ¿Y cómo son esos filtros? Bueno, pues para tener una descripción detallada de como definirlos
+Supongo que ahora os estaréis preguntando \ldots ¿Y cómo son esos
+filtros? Bueno, pues para tener una descripción detallada de como
+definirlos 
 solo tenéis que consultar la página del manual del programa
 tcpdump. Sí, tcpdump, el capturador de paquetes por excelencia utiliza
 libpcap :).
@@ -163,14 +169,10 @@ permite especificar el
 número de paquetes que queremos capturar. En este caso, el valor -1
 indica que no hay límite.
 
-%
-
-
 \sectiontext{white}{black}{PROBANDO NUESTRO SNIFFER}
 
 Pues ya solo nos queda probar que todo funciona. Lo primero que
 haremos es compilar nuestro programa de la forma habitual.
-
 
 \lstset{language=C,frame=tb,framesep=5pt,basicstyle=\small}   
 \begin{lstlisting}
@@ -265,11 +267,13 @@ que hacemos es saltarnos la cabecera ethernet para poder acceder a los
 datos IP.
 
 \begin{entradilla}
-{\em Para escribir un {\color{introcolor} sniffer personalizado,} solo necesitáis hacer 5 llamadas a la librería}
+{\em Para escribir un {\color{introcolor} sniffer personalizado,} solo
+necesitáis hacer 5 llamadas a la librería} 
 \end{entradilla} 
 
 Una explicación detallada de como funciona una pila de protocolos se
-sale de los objetivos de este pequeño artículo, pero jugando con libpcap, un par
+sale de los objetivos de este pequeño artículo, pero jugando con
+libpcap, un par 
 de buenos libros y un puñado de RFC, los protocolos de red no tendrán
 secretos para vosotros.
 
@@ -286,7 +290,7 @@ ni si se trata de un paquete completo o un fragmento.
 Si tenéis mucha curiosidad, una buena idea es echarle un ojo al código
 fuente de tcpdump o wireshark. Ambos utilizan libpcap.
 
-Hasta el próximo número.
+Hasta el próximo número. \EOP
 
 \end{multicols}
 \clearpage

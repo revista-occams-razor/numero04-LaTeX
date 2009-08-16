@@ -474,7 +474,21 @@ mensaje = char(msgbin);
 }
 
 Este último ejemplo nos introduce en un tema relacionado con la esteganografía y el cifrado: el watermarking o ``marcado al agua''. La marca al agua de los billetes es un dibujo que se puede ver al trasluz que sirve para autentificar al billete. ¿Podemos añadir a las imágenes y/o al audio una marca imperceptible al ojo (o al oído) que marque quién produjo la imagen y cuando. Eso serviría para saber que esta o aquella película ha sido pirateada... si la marca indica a quién se le prestó el original alguien puede tener problemas : ). Las buenas marcas
-al agua resisten los ataques... el pirata puede que se dedique a hacer operaciones al fichero para intentar hacer desaparecer la marca. Deberíamos asegurar que mientras la imagen/audio no sean estropeados excesivamente, la marca sigue ahí. ¿Qué puede hacer un pirata? Filtrar paso-bajo sin que se note mucho, pasar a analógico y digitalizar, con las imágenes hay muchas más posibilidades: reescalar, girar 30º grados a la derecha y 30.1º a la izquierda, aplicar distorsiones no lineales... (si usamos sólo el bit de menor peso, el pirata los pondrá todos a cero y se quedará tan ancho). El watermarking robusto es un problema muy complejo y sólo puede resolverse si se considera como un problema de transmisión digital en un canal especial (una imagen o un fichero de audio). Con las técnicas adecuadas se crean mensajes que ``se adaptan a la imagen'' ya que en algunas partes se puede sumar un mensaje mayor que 1 bit sin que se note y en otras no.
+al agua resisten los ataques... el pirata puede que se dedique a hacer
+operaciones al fichero para intentar hacer desaparecer la
+marca. Deberíamos asegurar que mientras la imagen/audio no sean
+estropeados excesivamente, la marca sigue ahí. ¿Qué puede hacer un
+pirata? Filtrar paso-bajo sin que se note mucho, pasar a analógico y
+digitalizar, con las imágenes hay muchas más posibilidades: reescalar,
+girar 30º grados a la derecha y 30.1º a la izquierda, aplicar
+distorsiones no lineales... (si usamos sólo el bit de menor peso, el
+pirata los pondrá todos a cero y se quedará tan ancho). El
+watermarking robusto es un problema muy complejo y sólo puede
+resolverse si se considera como un problema de transmisión digital en
+un canal especial (una imagen o un fichero de audio). Con las técnicas
+adecuadas se crean mensajes que ``se adaptan a la imagen'' ya que en
+algunas partes se puede sumar un mensaje mayor que 1 bit sin que se
+note y en otras no. \EOP
 
 \bigskip
 
