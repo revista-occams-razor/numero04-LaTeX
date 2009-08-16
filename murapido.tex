@@ -84,7 +84,7 @@ es la que más dispositivos soportan.
 
 
 Para la codificación y decodificación de las imágenes utilizaremos la
-librería libjpeg. También os contaremos como utilizar un formato mucho
+librería libjpeg. También os contaremos cómo utilizar un formato mucho
 más sencillo y que podéis incluir en vuestras aplicaciones "mú rápido".
 
 Finalmente, para la visualización de las imágenes vamos a utilizar
@@ -463,7 +463,7 @@ Pero los datos importantes son los dos últimos (\verb!depth! y
 \verb!palette!). Estos campos nos permiten configurar la profundidad de color
 y el formato de la imagen que vamos a obtener. Nosotros estamos
 utilizando 24 bits por pixel (True Color) y un formato RGB de 24 bits,
-ya que esto va ha hacer nuestro código de visualización mucho más
+ya que esto va a hacer nuestro código de visualización mucho más
 sencillo.
 
 Estos parámetros dependen del hardware de captura e idealmente, el
@@ -510,7 +510,7 @@ estructura \verb!DISP!), obtendremos el resultado.
 \end{entradilla}
 
 ¿Y cuales son los detalles para el mapeado de memoria? Os
-preguntaréis. Básicamente son los siguiente: El número de cuadros que
+preguntaréis. Básicamente son los siguientes: El número de cuadros que
 el dispositivo es capaz de capturar, el tamaño de la zona de memoria
 en la que el driver va a poder los datos de la imagen y los
 desplazamientos, dentro de ese bloque de memoria, donde se almacenarán
@@ -611,7 +611,7 @@ void start_v4l (DISP d)
 
 Esta función utiliza el mensaje \verb!VIDIOCMCAPTURE! y espera como parámetro
 una estructura del tipo \verb!video_mmap!. El campo \verb!frame!, le dice al driver
-que cuadro capturar, o dicho de otra forma, que parte del buffer
+qué cuadro capturar, o dicho de otra forma, que parte del buffer
 utilizar.
 
 Con lo que acabamos de comentar, debería estar claro lo que hace la
@@ -649,8 +649,8 @@ listo?. Pues que la parte del buffer asociada a ese cuadro, contenga
 una imagen completa.
 
 \begin{entradilla}
-{\em Nuestro {\color{introcolor} sencillo interfaz con V4L}, nos permite capturar imágenes
-de forma sencilla}
+{\em Nuestro {\color{introcolor} sencillo interfaz con V4L}, nos
+permite capturar imágenes de forma {\color{introcolor}mú rápida}}
 \end{entradilla}
 
 Una vez que tenemos una imagen disponible (cuando \verb!ioctl! retorna),
@@ -778,7 +778,7 @@ y lo reproducimos de nuevo aquí por comodidad:
 \end{lstlisting}
 
 Estas tres funciones nos permiten definir ``call-backs''. Concretamente,
-nos permiten decirle a GLUT que función tiene que ejecutar cuando
+nos permiten decirle a GLUT qué función tiene que ejecutar cuando
 tenga que actualizar la ventana, cuando se pulse una tecla y cuando no
 tenga nada que hacer... sí, en esta última es en la que vamos a capturar
 nuestras imágenes.
@@ -837,7 +837,7 @@ yangle, que utilizaremos para rotar nuestros vídeos en 3D.
 La captura se realiza en la función \verb!handle_idle!. Esta función se
 ejecuta en cada ciclo del bucle principal cuando no hay otra cosa que
 hacer, es decir, no hay que actualizar el contenido de la ventana, no
-se ha pulsado ninguna tecla ni se a movido el ratón.
+se ha pulsado ninguna tecla ni se ha movido el ratón.
 
 Esta función sería algo tal que así:
 
@@ -1178,7 +1178,7 @@ blanca en lugar de la imagen de la cámara), en la función de
 inicialización tendréis que aproximar las dimensiones de vuestras
 imágenes a los valores correctos.
 
-El otro comentario, es que algunas implementaciones de OpenGL,
+El otro comentario, es que algunas implementaciones de OpenGL
 soportan el formato de texturas GL\_BGR. Si recordáis, nuestro
 dispositivo V4L, nos devolvía los valores en este formato, y tuvimos
 que añadir un pequeño bucle para ordenarlos antes de enviárselos a

@@ -262,8 +262,8 @@ Esa información que viaja por la red, debe seguir un determinado
 formato, lo que se conoce como el formato de paquete TCP. En general,
 todos estos protocolos funcionan de la misma forma.
 
-Toman los datos de una capa superior que en última estancia es el
-usuario proporcionando el nombre de una página web (en nuestro
+Toman los datos de una capa superior que en última instancia es el
+usuario, proporcionando el nombre de una página web (en nuestro
 ejemplo), y a esos datos les añade una cabecera. El nuevo bloque de
 datos se pasa al nivel inferior, y así sucesivamente, hasta que el
 bloque de datos (el paquete) alcanza el último nivel y es enviado
@@ -293,7 +293,7 @@ estamos interesados especialmente en tres de ellos:
 
 \begin{itemize}
 \item \verb!SYN!. Este es el tipo de paquete utilizado para establecer
-  conexiones. Nos vamos a aburrir de él :).
+  conexiones. Nos vamos a aburrir de él a lo largo del artículo :).
 \item \verb!ACK!. Este es el paquete que una máquina envía a la otra para
   comunicarle que ha recibido ciertos datos correctamente.
 \item \verb!RST!. Cuando sucede algo que no debería pasar, la pila TCP envía uno
@@ -319,11 +319,11 @@ el fundamento de todas ellas es más o menos el mismo.
 
 \begin{itemize}
 \item Regla 1. Si enviamos un paquete a una máquina que no existe,
-recibiremos un paquete ICMP indicándolo
+recibiremos un paquete ICMP indicándolo.
 
 \item Regla 2. Si enviamos un paquete a un puerto no utilizado, recibiremos
 un paquete ICMP indicándolo (con UDP) o un paquete \verb!RST!
-(con TCP)
+(con TCP).
 
 %\item Regla 3. Si enviamos un paquete ``ilegal'' a una máquina que no existe,
 %recibiremos un paquete \verb!RST!
@@ -340,13 +340,13 @@ diferentes maneras para solucionar diferentes problemas.
 Si has llegado hasta aquí, espero que tengas claro lo que es una
 dirección IP, un puerto, y cual es la finalidad de los escáneres de
 puertos. A partir de aquí, y con la ayuda de nmap, vamos a entrar en
-detalle sobre como llamar a los telefonillos, evitar porteros y hacer
+detalle sobre cómo llamar a los telefonillos, evitar porteros y hacer
 todo esto sin que se note :)
 
 El primer paso, antes de llevar a cabo ningún tipo de acción más
-complicada, es determinar si la máquina a analizar existe y esta
+complicada, es determinar si la máquina a analizar existe y está
 encendida. Este proceso se suele extender a analizar rangos de
-direcciones IPs, ya que quizás la máquina que interesa al intruso este
+direcciones IPs, ya que quizás la máquina que interesa al intruso esté
 muy protegida y el acceso desde fuera de la subred sea difícil, pero
 quizás otra máquina, en esa misma subred, no lo está tanto y accediendo a ésta,
 resulte más sencillo alcanzar el objetivo final.
@@ -366,7 +366,7 @@ localizar máquinas vulnerables que comprometer, para luego utilizarlas en
 un ataque de tipo DDoS o utilizarla como parte de una cadena de ``proxies'' para
 realizar un ataque a cualquier otra máquina.
 
-Así, lo primero que tenemos que averiguar es como saber si una determinada
+Así, lo primero que tenemos que averiguar es cómo saber si una determinada
 dirección IP está asociada a una máquina. Nmap nos proporciona varias
 formas de averiguarlo. 
 
@@ -427,9 +427,9 @@ algunos comentarios. El primero es relativo al uso del flag
 \verb!--send-ip!. Este flag obliga a nmap a usar paquetes IP. Si no
 utilizamos este flag, al encontrarnos en una red local y ser un
 usuario privilegiado, nmap trata de utilizar el protocolo ARP para
-determinar si la máquina esta funcionando.
+determinar si la máquina está funcionando.
 
-El segundo comentario es relativo a porqué enviar un paquete TCP al
+El segundo comentario es relativo a por qué enviar un paquete TCP al
 puerto 80 para determinar si una máquina está levantada. Si os fijáis
 en el log de tcpdump, la máquina razor, responde con un paquete TCP
 \verb!RST! (la R que aparece en primer lugar). Esto sucede porque lo que nmap
@@ -523,7 +523,7 @@ comunicará con un mensaje ICMP.
 \sectiontext{white}{black}{MÁS TÉCNICAS} 
 
 Hasta ahora hemos visto la forma estándar de determinar si un host
-esta levantado, pero nmap nos proporciona una serie de opciones
+está levantado, pero nmap nos proporciona una serie de opciones
 alternativas para llevar a cabo esta tarea. El uso de una u otra
 dependerá del caso particular de la máquina que se esté
 escaneando. Por ejemplo, si la máquina está tras un firewall, los
@@ -542,7 +542,7 @@ Así, nmap proporciona distintas técnicas para hacer pings a
 máquinas. La página del manual de nmap contiene un montón de
 información sobre cuando interesa utilizar una u otra. Para no
 reproducirla aquí, nosotros solo os proporcionamos un pequeño resumen
-sobre que ``ping'' hace cada una de ellas.
+sobre qué ``ping'' hace cada una de ellas.
 
 \begin{itemize}
 
@@ -597,8 +597,8 @@ mucho más fiable. En la Figura 5 podemos ver un pequeño ejemplo.
 
 \bOpage{introcolor}{0.25}{MALA BESTIA}
 
-En este caso, nmap mantiene una base de datos de direcciones MAC
-associadas a fabricantes, siendo capaz, en algunos casos, de
+En este caso, nmap mantiene una lista de direcciones MAC
+y su fabricante asociado, siendo capaz, en algunos casos, de
 informarnos del fabricante de la máquina que estamos escaneando.
 
 
@@ -615,9 +615,9 @@ activas. Una vez que el intruso sabe que la máquina está activa, es
 decir, existe, es el momento de averiguar toda la información posible
 sobre ella.
 
-La principal función de nmap es informar de que puertos en la máquina
+La principal función de nmap es informar de qué puertos en la máquina
 víctima están abiertos, pero, como ya adelantamos, también es capaz de
-proporcionar un montón de información adicional muy util. Todo esto lo
+proporcionar un montón de información adicional muy útil. Todo esto lo
 veremos a continuación, pero antes de continuar vamos a introducir
 algunos conceptos más para que os resulte más fácil de entener el
 resto del artículo.
@@ -761,7 +761,7 @@ paquete \verb!SYN ACK! de vuelta, con su número de serie y el asentimiento
 del número de serie que había recibido en el paquete \verb!SYN!.
 
 En este punto, el sistema que está intentando establecer la conexión,
-tiene que enviar un nuevo paquete \verb!ACK! para compretar la conexión, como
+tiene que enviar un nuevo paquete \verb!ACK! para completar la conexión, como
 comentamos más arriba. Este paquete \verb!ACK! tiene que referenciar el
 número de serie recibido de la máquina remota (el del
 paquete \verb!SYN ACK!). Si el cliente no proporciona el número
@@ -830,7 +830,7 @@ Nmap finished: 1 IP address (1 host up) scanned in 2.736 seconds
 \sectiontext{white}{black}{PUERTOS CERRADOS} 
 
 En nuestro primer ejemplo nos hemos asegurado de que el puerto
-estuviera abierto... pero que sucede cuando el puerto está
+estuviera abierto... pero qué sucede cuando el puerto está
 cerrado?. Recordad que es tan importante saber que el puerto está
 abierto como que está cerrado. Veamos que sucedería en este caso
 (Figura 9)
@@ -851,11 +851,11 @@ tira nuestro paquete antes de que alcance la máquina destino.
 \sectiontext{white}{black}{ESCANEOS DE MEDIA CONEXIÓN} 
 
 Con la información que nos ha dado nuestro sniffer el siguiente tipo
-de escaneo es obvio. ¿Porqué completar el proceso de conexión con el
+de escaneo es obvio. ¿Por qué completar el proceso de conexión con el
 tercer paquete, si el segundo ya nos ha dado la información que
 necesitábamos?. Bueno, la respuesta es que el primer tipo de escaneo
 no necesita permisos especiales, mientras que el que vamos a describir
-a continuación si.
+a continuación sí.
 
 El flag de nmap que nos permite hacer este tipo de escaneo
 es \verb!-sS! ({\em SYN Scan}). La Figura 10 muestra un ejemplo.
@@ -863,9 +863,9 @@ es \verb!-sS! ({\em SYN Scan}). La Figura 10 muestra un ejemplo.
 
 Como podéis observar hemos añadido de nuevo el flag \verb!--send-ip! para que
 no se generen los paquetes ARP y la captura de nuestro sniffer sea más
-clara. Sino estáis en una red local podéis prescindir de este flag.
+clara. Si no estáis en una red local podéis prescindir de este flag.
 
-Lo que nuestro sniffer capturar en este caso es lo esperado. El
+Lo que nuestro sniffer captura en este caso es lo esperado. El
 proceso es idéntico al del {\em connect scan} (flag \verb!-sT!), 
 pero en este caso, no se llega a completar la conexión con el tercer
 paquete \verb!ACK!.
@@ -875,7 +875,7 @@ paquete \verb!ACK!.
 \end{entradilla}
 
 La ventaja de este escaneo es que los sistemas de log más sencillos  no
-lo detectan. Muchos servidor graban en su log información sobre las
+lo detectan. Muchos servidores graban en su log información sobre las
 distintas conexiones que reciben. En este caso, la conexión no se
 llega a completar y por tanto nada se grabará en el log.
 
@@ -891,7 +891,7 @@ UDP es bastante sencillo.
 
 El flag de nmap que permite hacer escaneos UDP es \verb!-sU! (obviamente
 :). En general estos escaneos son más lentos que los TCP, y enseguida
-veremos porque.
+veremos por qué.
 
 \end{multicols}
 
@@ -943,7 +943,7 @@ Nmap finished: 1 IP address (1 host up) scanned in 0.158 seconds
 
 \bOpage{introcolor}{0.25}{MALA BESTIA}
 
-El proceso consiste en enviar un paquete UDP vacio al puerto que se
+El proceso consiste en enviar un paquete UDP vacío al puerto que se
 desea comprobar. Si el puerto está cerrado, recibiremos como respuesta
 un mensaje de error a través del protocolo ICMP (Regla 2), sin embargo si el
 puerto está abierto, lo más probable es que no recibamos nada. Eso
@@ -954,7 +954,7 @@ independientemente por la red. Tampoco existen paquetes ACK que el
 sistema remoto envíe de vuelta. Si el servidor remoto envía algún dato
 tras recibir información desde algún sitio habremos tenido suerte, pero
 si el servidor no envía nada, no sabremos si hay alguien al otro lado
-o el cortafuegos a tirado nuestro paquete.
+o el cortafuegos ha tirado nuestro paquete.
 
 El gran problema con UDP es que normalmente existe un límite en la
 cantidad de paquetes ICMP que un sistema puede enviar en un tiempo
@@ -979,7 +979,7 @@ Este tipo de escaneos se fundamentan en que el RFC que define TCP
 establece que la respuesta a cualquier paquete que no contenga los
 bits \verb!SYN!, \verb!RST! o \verb!ACK! debe ser \verb!RST! (la Regla
 3). De esta forma, jugando con el resto de los flags TCP es posible
-averiguar si una puerto esta abierto o no de forma sigilosa.
+averiguar si un puerto esta abierto o no de forma sigilosa.
 
 Nmap proporciona tres tipos de escaneos de este tipo y una opción para
 que el usuario especifique cualquier combinación que desee. Veamos
@@ -987,9 +987,9 @@ rápidamente cuales son estas tres opciones.
 
 \begin{itemize}
 \item \verb!-sN! {\em Null Scan}. Con este flag enviaremos paquetes
-con todos los bits a  cero
+con todos los bits a  cero.
 \item \verb!-sF! {\em FIN Scan}. Este flag permite enviar paquetes con
-el bit TCP \verb!FIN!  activo
+el bit TCP \verb!FIN!  activo.
 \item \verb!-sX! {\em Xmas scan}. Este flag permite enviar paquetes
 con todos los bits  activos. El nombre proviene de un símil con un
  árbol de navidad en el  que todas las luces se encienden a la vez.
@@ -1020,7 +1020,7 @@ datos y decir que se trata de un escaneo de puertos.
 
 Observad que nmap genera dos paquetes en cada escaneo. Esto ocurre
 porque el primer test no fue definitivo y por tanto se inicia un
-segundo test (sabríais decir la diferencia). La Figura 12 muestra que obtendríamos si dirigimos nuestro escaneo a un
+segundo test (sabríais decir la diferencia). La Figura 12 muestra qué obtendríamos si dirigimos nuestro escaneo a un
 puerto cerrado.
 
 Ahora podemos ver los paquetes \verb!RST! provenientes del sistema remoto y
@@ -1068,7 +1068,7 @@ necesario en este caso.
 
 Algunas secciones antes hemos introducido tres reglas generales con
 las que pretendíamos resumir el proceso de escaneo de puertos, sin
-embargo, como sucede con toda reglas, siempre hay excepciones.
+embargo, como sucede con toda regla, siempre hay excepciones.
 
 La principal excepción es el denominado escaneo TCP {\em Maimon scan}, que
 toma su nombre de Uriel Maimon, la 
@@ -1209,7 +1209,7 @@ sabremos cuantos paquetes IP ha enviado esa máquina hasta el momento.
 
 \begin{entradilla}
 {\em El IDLE SCAN utiliza los {\color{introcolor} números de identificación de fragmento
-IP} de las máquinas zombi}
+IP} de las máquinas zombie}
 \end{entradilla}
 
 Con esta información, muchos de vosotros ya os estaréis imaginando
@@ -1238,12 +1238,12 @@ paquete \verb!RST! a la máquina víctima, puesto que, para ella,
 ninguna conexión está en marcha. 
 
 Si el ID se ha incrementado en más de 2, significa que el zombie no es
-una buena elección. Si, eso todavía no lo hemos dicho, pero la máquina
+una buena elección. Sí, eso todavía no lo hemos dicho, pero la máquina
 zombie debe ser una que no tenga apenas actividad de red, de forma que
-durante el escaneo, no envié ningún paquete y la monitorización del IP
+durante el escaneo, no envíe ningún paquete y la monitorización del IP
 ID sea efectiva.
 
-Como os decíamos en el sitio web de nmap, podéis encontrar un extenso
+Como os decíamos, en el sitio web de nmap podéis encontrar un extenso
 y detallado artículo sobre como funciona este tipo de escaneo (está
 traducido al español y portugués).
 
@@ -1251,7 +1251,7 @@ Para terminar, comentaros  que existe
 una forma de escaneo adicional denominada {\em FTP bounce scan}, que explota
 las denominadas conexiones 
 proxy ftp. La mayoría de los servidores FTP actuales tienen
-desactivada esta funcionalidad, porque ha dejado de ser práctica... pero siempre hay algún despistado por ahí. Lo que
+desactivada esta funcionalidad, porque ha dejado de ser práctica... pero siempre hay algún despistado por ahí. Los que
 queráis conocer más detalles sobre este tipo de escaneo, podéis
 consultar la página del manual de nmap o su sitio web.
 
@@ -1279,7 +1279,7 @@ observar el funcionamiento es muy similar al del escaneo UDP.
 }}
 \end{center}
 
-\sectiontext{white}{black}{PONIENDOLO DIFÍCIL} 
+\sectiontext{white}{black}{PONIÉNDOLO DIFÍCIL} 
 
 Además de todas estas distintas formas de escaneo, para otros tantos
 escenarios, nmap proporciona una serie de flags adicionales con los

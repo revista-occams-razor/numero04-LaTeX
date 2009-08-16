@@ -175,7 +175,7 @@ mensaje ICMP recibido.
 En principio, el tamaño de buffer debería reservarse dinámicamente
 según la información en los campos de tamaño de las cabeceras del
 paquete. Para mantener los ejemplos de código sencillos vamos a
-utilizar un buffer de 1Kb que será más que suficiente para nuestra pruebas.
+utilizar un buffer de 1Kb que será más que suficiente para nuestras pruebas.
 
 \sectiontext{white}{black}{CAPTURANDO PAQUETES ICMP}
 
@@ -239,14 +239,14 @@ lanzamos el ping.
 más datos que nuestra pequeña aplicación. Algunos de los
 datos que muestra se encuentran en la cabecera ICMP, otros en la
 sección de datos -tendréis que ver el código fuente de ping- y otros
-requieren conocer que paquete se envió en primer lugar. Los que andéis
+requieren conocer qué paquete se envió en primer lugar. Los que andéis
 aburridos podéis extender este ejemplo para que se parezca más a ping}}
 \end{minipage}
 }}
 
 %\rput(9.4,3.5){\resizebox{1.5cm}{!}{{\epsfbox{images/general/experimenta.eps}}}}
 
-\sectiontext{white}{black}{DETECTANDO ESCANEO SIGILOSOS}
+\sectiontext{white}{black}{DETECTANDO ESCANEOS SIGILOSOS}
 
 Antes de continuar con la versión completa de nuestro
 sencillo \verb!ping! vamos a hacer un corto inciso, 
@@ -416,7 +416,7 @@ transmitir nuestro paquete ICMP necesitaremos algo más de código.
 
 Lo primero que necesitamos es una estructura de datos adicional. Si
 bien, podríamos utilizar nuestra estructura \verb!PKT!, ya que un paquete es
-un paquete, por cuestione prácticas nos interesa definir una
+un paquete, por cuestiones prácticas nos interesa definir una
 estructura como esta:
 
 \lstset{language=C,frame=tb,framesep=5pt,basicstyle=\scriptsize}   
@@ -996,7 +996,7 @@ TCP, como en nuestro primer ejemplo.
 
 \sectiontext{white}{black}{SEGUNDO INTENTO}
 
-Con esta última modificación del programa, repetimos la nuestra prueba.
+Con esta última modificación del programa, repetimos nuestra prueba.
 
 {\scriptsize
 \begin{verbatim}

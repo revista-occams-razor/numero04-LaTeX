@@ -128,7 +128,7 @@ Ya es un tópico pero es este momento es inevitable recordar que en el nombre de 
 
 Otro tipo de cifrados de sustitución son los que inventan nuevos alfabetos donde cada símbolo representa una letra. La clave pasa por conocer la correspondencia entre letras y símbolos. Realmente estos métodos no son más seguros que una sustitución de las letras estándar por ellas mismas. Sigue habiendo N! ordenaciones.
 
-El criptoanálisis de la sustitución es muy simple y la manera más gratificante de aprenderlo sería leer ``El Escarabajo de Oro''. En este relato (nunca he sabido si es un cuento largo o una novela corta) los protagonistas descifran un mensaje pirata (con alfabeto de símbolos inventados mezclados con números y signos de puntuación). La técnica que usan es probabilística: ya que la E es la letra más usada del inglés debe ser la que corresponde con el símbolo más repetido. Conociendo la frecuencia de las letras en el idioma podemos hacer suposiciones de este tipo sobre dos o tres caracteres e intentar descubrir alguno más. Para eso ayudan mucho las partículas de cada idioma, en el ejemplo del escarabajo de oro lograr descifrar la T y la E y ven muchas veces la palabra T4E, con lo que ``4'' debe ser la H (recuérdese que era un mensaje en inglés). ¿Quién es el autor de este relato? Se trata de un novelista norteamericano genial aunque de vida algo atormentada: Edgar Allan Poe.
+El criptoanálisis de la sustitución es muy simple y la manera más gratificante de aprenderlo sería leer ``El Escarabajo de Oro''. En este relato (nunca he sabido si es un cuento largo o una novela corta) los protagonistas descifran un mensaje pirata (con alfabeto de símbolos inventados mezclados con números y signos de puntuación). La técnica que usan es probabilística: ya que la E es la letra más usada del inglés debe ser la que corresponde con el símbolo más repetido. Conociendo la frecuencia de las letras en el idioma podemos hacer suposiciones de este tipo sobre dos o tres caracteres e intentar descubrir alguno más. Para eso ayudan mucho las partículas de cada idioma, en el ejemplo del escarabajo de oro logran descifrar la T y la E y ven muchas veces la palabra T4E, con lo que ``4'' debe ser la H (recuérdese que era un mensaje en inglés). ¿Quién es el autor de este relato? Se trata de un novelista norteamericano genial aunque de vida algo atormentada: Edgar Allan Poe.
 
 Por supuesto que si sabemos que es un cifrado César la fuerza bruta nos puede ayudar (el número de claves es ridículamente bajo). Ojo... no hay constancia de que ningún enemigo lograra, en su época, descifrar los mensajes cifrados por César por lo que confirmamos (por si no lo sabíamos) que el valor de una tecnología es siempre relativo a su época (también hay que decir que la mayoría de esos enemigos no sabían leer).
 
@@ -242,7 +242,20 @@ El algoritmo DES (Data Encryption Standard) fue creado en los años 70 y, como su
 
 \ebOpage{introcolor}{0.25}{HISTORIA}
 
-DES nació por iniciativa del NBS (National Bureau of Standards) u oficina de estándares del ministerio de comercio americano (por tanto, hablamos de estándares civiles). Ahora el NBS se llama NIST (National Institute of Standards and Technology, www.nist.gov). Para decidir un estándar de cifrado se convocó un concurso en el que fue elegida la solución presentada por IBM (que provenía de mejorar un algoritmo anterior denominado Lucifer). Desde entonces existe una polémica no resuelta porque se dice que el gobierno (concretamente la agencia de seguridad nacional, NSA) obligó a modificar el algoritmo para que fuese menos seguro. De todas formas, hasta el año 1992 no se publicó una forma de hacer un ataque más eficiente que la fuerza bruta y requiere tener el criptograma correspondiente a ¡¡¡247!!! textos planos determinados... ALGO TOTALMENTE IRREAL. En 1998 se creó un ordenador especial (llamado Deep Crack) para romper el DES. Fue capaz de romper el cifrado por fuerza bruta en 56 horas.
+DES nació por iniciativa del NBS (National Bureau of Standards) u
+oficina de estándares del ministerio de comercio americano (por tanto,
+hablamos de estándares civiles). Ahora el NBS se llama NIST (National
+Institute of Standards and Technology, www.nist.gov). Para decidir un
+estándar de cifrado se convocó un concurso en el que fue elegida la
+solución presentada por IBM (que provenía de mejorar un algoritmo
+anterior denominado Lucifer). Desde entonces existe una polémica no
+resuelta porque se dice que el gobierno (concretamente la agencia de
+seguridad nacional, NSA) obligó a modificar el algoritmo para que
+fuese menos seguro. De todas formas, hasta el año 1992 no se publicó
+una forma de hacer un ataque más eficiente que la fuerza bruta y
+requiere tener el criptograma correspondiente a ¡¡¡247!!! textos
+planos determinados... ALGO TOTALMENTE IRREAL. En 1998 se creó un
+ordenador especial (conocido como Deep Crack) para romper el DES. Fue capaz de romper el cifrado por fuerza bruta en 56 horas.
 
 
 \begin{entradilla}
@@ -251,7 +264,7 @@ DES nació por iniciativa del NBS (National Bureau of Standards) u oficina de est
 \end{entradilla}
 
 
-El DES es un cifrado por bloques. Divide el texto llano en bloques de 64 bits a los que aplica una clave de 56 bits y obtiene un criptograma de 64 bits. Para lograrlo, realiza una complicada combinación de permutaciones y sustituciones. En la edición antigua del excelente libro de A. S. Tanembaum: ``Redes de Ordenadores'' (o en su edición inglesa, ``Computer Networks''), se describía detalladamente la operación del algoritmo e incluso se incluía el código (en pascal) necesario para programarlo. Hablo de la edición antigua porque fue la que leí... imagino que la edición actual seguirá teniendo esa información. Mientras dudaba en ir o no a la biblioteca a comprobarlo, busqué en la mayor biblioteca de la historia y encontré esto: www.thefreecountry.com/sourcecode/encryption.shtml. Si la página no miente, ahí tenéis código libre C++ para DES y para muchos algoritmos más (muchos de ellos mencionados en este artículo).
+El DES es un cifrado por bloques. Divide el texto llano en bloques de 64 bits a los que aplica una clave de 56 bits y obtiene un criptograma de 64 bits. Para lograrlo, realiza una complicada combinación de permutaciones y sustituciones. En la edición antigua del excelente libro de A. S. Tanembaum: ``Redes de Ordenadores'' (o en su edición inglesa, ``Computer Networks''), se describía detalladamente la operación del algoritmo e incluso se incluía el código (en pascal) necesario para programarlo. Hablo de la edición antigua porque fue la que leí... imagino que la edición actual seguirá teniendo esa información. Mientras dudaba en ir o no a la biblioteca a comprobarlo, busqué en la mayor biblioteca de la historia y encontré esto: {\small{\url{www.thefreecountry.com/sourcecode/encryption.shtml}}}. Si la página no miente, ahí tenéis código libre C++ para DES y para muchos algoritmos más (muchos de ellos mencionados en este artículo).
 
 La debilidad de DES fue siempre la longitud de la clave. Aunque se creó en un momento en el que era inabordable un ataque por fuerza bruta, los grandes avances en potencia de cálculo llegaron a hacerlo posible en algunos años (aproximadamente 30). Probablemente, ese sea un problema de todos los algoritmos... la viabilidad o no de la fuerza bruta cambia con el tiempo.
 
@@ -390,7 +403,7 @@ He dejado los algoritmos HASH justo para el final porque realmente no son algori
 
 \begin{itemize}
 
-\item {\bf MD5}: MD viene de ``Message Digest'' o resumen del mensaje. El 5, evidentemente, es el número de versión. MD5 convierte cualquier texto en un número de 128 bits. Este método MD5 fue diseñado en 1991 por el profesor del MIT Ronald Rivest (la R del RSA). MD5 es el método utilizado en en Linux para almacenar las passwords de usuarios. También se usa para calcular resúmenes a modo de CRC's de archivos completos para asegurar su autenticidad. Por último, comentar que el señor Rivest también es autor de varios métodos de cifrado simétrico llamados RC2, RC4, RC5 y RC6 (RC1 y RC3 resultaron ser inseguros y nunca llegaron a ser publicados).
+\item {\bf MD5}: MD viene de ``Message Digest'' o resumen del mensaje. El 5, evidentemente, es el número de versión. MD5 convierte cualquier texto en un número de 128 bits. Este método MD5 fue diseñado en 1991 por el profesor del MIT Ronald Rivest (la R del RSA). MD5 es el método utilizado en Linux para almacenar las passwords de usuarios. También se usa para calcular resúmenes a modo de CRC's de archivos completos para asegurar su autenticidad. Por último, comentar que el señor Rivest también es autor de varios métodos de cifrado simétrico llamados RC2, RC4, RC5 y RC6 (RC1 y RC3 resultaron ser inseguros y nunca llegaron a ser publicados).
 
 
 \item {\bf SHA}: Secure Hash Algorithm (SHA) es un conjunto de funciones HASH criptográficas publicadas por el NIST norteamericano y cuya autoría se atribuye a la agencia NSA (National Security Agency). La primera (SHA-0) se publicó en 1993 y después surgieron cinco versiones más. SHA-0 y SHA-1 producen una salida resumen de 160 bits. Las versiones SHA-224, SHA-256, SHA-384, y SHA-512 producen salidas de la longitud que indica su nombre, aunque a todos estos métodos se les llama conjuntamente SHA-2.
