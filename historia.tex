@@ -264,7 +264,21 @@ ordenador especial (conocido como Deep Crack) para romper el DES. Fue capaz de r
 \end{entradilla}
 
 
-El DES es un cifrado por bloques. Divide el texto llano en bloques de 64 bits a los que aplica una clave de 56 bits y obtiene un criptograma de 64 bits. Para lograrlo, realiza una complicada combinación de permutaciones y sustituciones. En la edición antigua del excelente libro de A. S. Tanembaum: ``Redes de Ordenadores'' (o en su edición inglesa, ``Computer Networks''), se describía detalladamente la operación del algoritmo e incluso se incluía el código (en pascal) necesario para programarlo. Hablo de la edición antigua porque fue la que leí... imagino que la edición actual seguirá teniendo esa información. Mientras dudaba en ir o no a la biblioteca a comprobarlo, busqué en la mayor biblioteca de la historia y encontré esto: {\small{\url{www.thefreecountry.com/sourcecode/encryption.shtml}}}. Si la página no miente, ahí tenéis código libre C++ para DES y para muchos algoritmos más (muchos de ellos mencionados en este artículo).
+El DES es un cifrado por bloques. Divide el texto llano en bloques de
+64 bits a los que aplica una clave de 56 bits y obtiene un criptograma
+de 64 bits. Para lograrlo, realiza una complicada combinación de
+permutaciones y sustituciones. En la edición antigua del excelente
+libro de A. S. Tanembaum: ``Redes de Ordenadores'' (o en su edición
+inglesa, ``Computer Networks''), se describía detalladamente la
+operación del algoritmo e incluso se incluía el código (en pascal)
+necesario para programarlo. Hablo de la edición antigua porque fue la
+que leí... imagino que la edición actual seguirá teniendo esa
+información. Mientras dudaba en ir o no a la biblioteca a comprobarlo,
+busqué en la mayor biblioteca de la historia y encontré esto:
+{\href{http://www.thefreecountry.com/sourcecode/encryption.shtml}{Free
+Encription/Cryptographic Libraries}}. Si la página no miente, ahí
+tenéis código libre C++ para DES y para 
+muchos algoritmos más (muchos de ellos mencionados en este artículo). 
 
 La debilidad de DES fue siempre la longitud de la clave. Aunque se creó en un momento en el que era inabordable un ataque por fuerza bruta, los grandes avances en potencia de cálculo llegaron a hacerlo posible en algunos años (aproximadamente 30). Probablemente, ese sea un problema de todos los algoritmos... la viabilidad o no de la fuerza bruta cambia con el tiempo.
 
